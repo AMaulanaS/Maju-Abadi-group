@@ -290,21 +290,122 @@
   </div>
 </section>
 
-<section class="stats-section section" id="stats">
-  <div class="stats-bg"><div class="stats-grid-bg"></div></div>
+  <section class="projects section" id="projects">
   <div class="container">
+
     <div class="section-header reveal">
-      <div class="section-tag light">Keunggulan Kami</div>
-      <h2 class="section-title light">Mengapa Memilih <span class="text-accent">Maju Abadi Group</span></h2>
+      <div class="section-tag">Portofolio</div>
+      <h2 class="section-title">
+        Pengalaman <span class="text-accent">Proyek Kami</span>
+      </h2>
+      <p class="section-desc">
+        Berbagai proyek telah kami selesaikan dengan mengedepankan kualitas,
+        keselamatan kerja, dan kepuasan pelanggan sebagai prioritas utama.
+      </p>
     </div>
-    <div class="stats-big-grid">
-      <div class="stat-big-card reveal"><div class="stat-big-icon">⚡</div><div class="stat-big-label">Mechanical & Electrical</div><p class="stat-big-desc">Layanan instalasi mekanikal dan elektrikal dengan tenaga profesional.</p></div>
-      <div class="stat-big-card reveal"><div class="stat-big-icon">🏗️</div><div class="stat-big-label">Konstruksi & Infrastruktur</div><p class="stat-big-desc">Pekerjaan konstruksi dan pembangunan infrastruktur untuk berbagai sektor.</p></div>
-      <div class="stat-big-card reveal"><div class="stat-big-icon">📦</div><div class="stat-big-label">Pengadaan</div><p class="stat-big-desc">Pengadaan barang dan jasa secara profesional dan tepat waktu.</p></div>
-      <div class="stat-big-card reveal"><div class="stat-big-icon">🧭</div><div class="stat-big-label">Tour & Travel</div><p class="stat-big-desc">Perjalanan kelompok dan wisata yang terencana dan fleksibel.</p></div>
+
+    <div class="project-filter reveal">
+      <button class="filter-btn active" data-filter="all">Semua</button>
+      <button class="filter-btn" data-filter="electrical">Mechanical & Electrical</button>
+      <button class="filter-btn" data-filter="pju">PJU & PJUTS</button>
+      <button class="filter-btn" data-filter="supplier">Pengadaan Barang</button>
+      <button class="filter-btn" data-filter="maintenance">Maintenance</button>
     </div>
+
+    <div class="projects-grid" id="projectsGrid">
+
+      <!-- Mechanical Electrical -->
+      <div class="project-card reveal" data-category="electrical">
+        <div class="project-img">
+          <img src="https://images.pexels.com/photos/9679179/pexels-photo-9679179.jpeg" alt="Panel Listrik">
+          <div class="project-overlay"></div>
+        </div>
+
+        <div class="project-info">
+          <span class="project-cat">Mechanical & Electrical</span>
+          <h3>Instalasi Panel Listrik & Sistem Kelistrikan</h3>
+        </div>
+      </div>
+
+      <!-- Featured -->
+      <div class="project-card reveal project-card-large" data-category="pju">
+        <div class="project-img">
+          <img src="https://images.pexels.com/photos/34610710/pexels-photo-34610710.jpeg">
+          <div class="project-overlay"></div>
+        </div>
+
+        <div class="project-info">
+          <span class="project-cat">PJU & PJUTS</span>
+          <h3>Pembangunan Penerangan Jalan Umum</h3>
+        </div>
+      </div>
+
+      <!-- PJU -->
+      <div class="project-card reveal" data-category="pju">
+        <div class="project-img">
+          <img src="https://images.pexels.com/photos/14613940/pexels-photo-14613940.jpeg" alt="PJUTS">
+          <div class="project-overlay"></div>
+        </div>
+
+        <div class="project-info">
+          <span class="project-cat">PJU Tenaga Surya</span>
+          <h3>Instalasi Penerangan Jalan Umum Tenaga Surya</h3>
+        </div>
+      </div>
+
+      <!-- Supplier -->
+      <div class="project-card reveal" data-category="supplier">
+        <div class="project-img">
+          <img src="img/pengadaan.png" alt="Pengadaan Barang">
+          <div class="project-overlay"></div>
+        </div>
+
+        <div class="project-info">
+          <span class="project-cat">Pengadaan Barang</span>
+          <h3>Pengadaan Material & Peralatan Teknik</h3>
+        </div>
+      </div>
+
+      <!-- Maintenance -->
+      <div class="project-card reveal" data-category="maintenance">
+        <div class="project-img">
+          <img src="https://images.pexels.com/photos/34054464/pexels-photo-34054464.jpeg" alt="Maintenance">
+          <div class="project-overlay"></div>
+        </div>
+
+        <div class="project-info">
+          <span class="project-cat">Maintenance</span>
+          <h3>Pemeliharaan Sistem Kelistrikan</h3>
+        </div>
+      </div>
+
+      <!-- Infrastruktur -->
+      <div class="project-card reveal" data-category="electrical">
+        <div class="project-img">
+          <img src="https://images.pexels.com/photos/11644973/pexels-photo-11644973.jpeg" alt="Infrastruktur">
+          <div class="project-overlay"></div>
+        </div>
+
+        <div class="project-info">
+          <span class="project-cat">Infrastruktur</span>
+          <h3>Pekerjaan Infrastruktur & Instalasi Pendukung</h3>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="projects-cta reveal">
+      <a href="#contact" class="btn-primary">
+        <span>Konsultasikan Proyek Anda</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </a>
+    </div>
+
   </div>
 </section>
+
 
 <section class="testimonials section">
   <div class="container">
