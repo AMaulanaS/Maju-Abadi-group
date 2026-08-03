@@ -1218,6 +1218,7 @@ button {
   font-size: 12px;
   color: var(--white-60);
 }
+.projects-cta { text-align: center; margin-top: 48px; }
 
 .stats-section {
   background: var(--black);
