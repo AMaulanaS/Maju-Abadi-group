@@ -405,15 +405,96 @@
   </div>
 </section>
 
-<section class="testimonials section">
+<section class="testimonials section" id="testimonials">
   <div class="container">
-    <div class="section-header reveal text-center"><div class="section-tag">Testimoni</div><h2 class="section-title">Apa Kata <span class="text-accent">Klien Kami</span></h2></div>
-    <div class="testimonial-single reveal">
-      <div class="testimonial-card">
+    <div class="section-header reveal text-center">
+      <div class="section-tag">Testimoni</div>
+      <h2 class="section-title">Apa Kata <span class="text-accent">Klien Kami</span></h2>
+      <p class="section-desc testimonial-intro">
+        Pengalaman dan kepercayaan dari klien menjadi bagian penting dari perjalanan Maju Abadi Group.
+      </p>
+    </div>
+
+    <div id="testimonialList" class="testimonial-list reveal" aria-live="polite">
+      <article class="testimonial-card">
         <div class="quote-icon">"</div>
+        <div class="testimonial-stars" aria-label="5 dari 5 bintang">★★★★★</div>
         <p class="testimonial-text">Maju Abadi Group menyelesaikan proyek kami tepat waktu dan sesuai kebutuhan. Kualitas pengerjaan sangat memuaskan — tim profesional dan responsif.</p>
-        <div class="testimonial-author"><div class="author-avatar">W</div><div><strong>Winarko</strong><small>PPTK DISPERKIM</small></div></div>
+        <div class="testimonial-author">
+          <div class="author-avatar">W</div>
+          <div><strong>Winarko</strong><small>PPTK DISPERKIM</small></div>
+        </div>
+      </article>
+    </div>
+
+    <div class="testimonial-cta reveal">
+      <div>
+        <strong>Pernah bekerja sama dengan kami?</strong>
+        <span>Ceritakan pengalaman Anda untuk membantu calon klien mengenal layanan kami.</span>
       </div>
+      <button type="button" class="btn-primary testimonial-open-btn" id="openTestimonialForm">
+        <span>★ Berikan Testimoni</span>
+      </button>
+    </div>
+
+    <div class="testimonial-form-wrap reveal" id="testimonialFormWrap" hidden>
+      <div class="testimonial-form-head">
+        <div>
+          <div class="section-tag">Bagikan Pengalaman</div>
+          <h3>Berikan Testimoni Anda</h3>
+          <p>Testimoni akan diperiksa terlebih dahulu sebelum ditampilkan di website.</p>
+        </div>
+        <button type="button" class="testimonial-close" id="closeTestimonialForm" aria-label="Tutup form">×</button>
+      </div>
+
+      <form id="testimonialForm" class="testimonial-form" autocomplete="on">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="testimonialName">Nama *</label>
+            <input id="testimonialName" name="name" type="text" maxlength="80" required placeholder="Nama Anda">
+          </div>
+          <div class="form-group">
+            <label for="testimonialOrg">Instansi / Perusahaan</label>
+            <input id="testimonialOrg" name="organization" type="text" maxlength="100" placeholder="Contoh: PT ABC / DISPERKIM">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Rating *</label>
+          <div class="rating-picker" role="radiogroup" aria-label="Pilih rating">
+            <input type="radio" id="rating5" name="rating" value="5" checked>
+            <label for="rating5" title="5 bintang">★</label>
+            <input type="radio" id="rating4" name="rating" value="4">
+            <label for="rating4" title="4 bintang">★</label>
+            <input type="radio" id="rating3" name="rating" value="3">
+            <label for="rating3" title="3 bintang">★</label>
+            <input type="radio" id="rating2" name="rating" value="2">
+            <label for="rating2" title="2 bintang">★</label>
+            <input type="radio" id="rating1" name="rating" value="1">
+            <label for="rating1" title="1 bintang">★</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="testimonialMessage">Testimoni *</label>
+          <textarea id="testimonialMessage" name="message" rows="5" maxlength="600" required placeholder="Ceritakan pengalaman Anda bekerja sama dengan Maju Abadi Group..."></textarea>
+          <small class="testimonial-counter"><span id="testimonialCharCount">0</span>/600</small>
+        </div>
+
+        <!-- Honeypot anti-spam: manusia tidak melihat field ini. -->
+        <div class="testimonial-hp" aria-hidden="true">
+          <label for="testimonialWebsite">Website</label>
+          <input id="testimonialWebsite" name="website" type="text" tabindex="-1" autocomplete="off">
+        </div>
+
+        <div class="testimonial-form-actions">
+          <button type="button" class="btn-outline testimonial-cancel" id="cancelTestimonial">Batal</button>
+          <button type="submit" class="btn-primary" id="testimonialSubmit">
+            <span>Kirim Testimoni</span>
+          </button>
+        </div>
+        <p class="testimonial-form-status" id="testimonialFormStatus" role="status" aria-live="polite"></p>
+      </form>
     </div>
   </div>
 </section>
@@ -427,8 +508,9 @@
         <p class="contact-desc">Maju Abadi Group siap membantu kebutuhan konstruksi, pengadaan, maintenance, maupun perjalanan Tour & Travel.</p>
         <div class="contact-details">
           <div class="contact-item"><div class="contact-icon">📍</div><div><strong>Kantor Pusat</strong><p>Jl. Bkt Beringin Bar. II No.45, Wonosari, Kec. Ngaliyan, Kota Semarang, Jawa Tengah 50187</p></div></div>
-          <div class="contact-item"><div class="contact-icon">📞</div><div><strong>WhatsApp</strong><p><a href="https://wa.me/6285100511753" target="_blank">+62 851-0051-1753</a></p></div></div>
-          <div class="contact-item"><div class="contact-icon">✉️</div><div><strong>Email</strong><p><a href="mailto:fadhilahmajuabadi@gmail.com">fadhilahmajuabadi@gmail.com</a></p></div></div>
+          <div class="contact-item"><div class="contact-icon">📞</div><div><strong>WhatsApp</strong><p><a href="https://wa.me/6285100511753" target="_blank">+62 851-0051-1753</a></p></div></div>	  
+		  <div class="contact-item"><div class="contact-icon">📞</div><div><strong>WhatsApp</strong><p><a href="https://wa.me/6289669048175" target="_blank">+6289669048175 PIC FAIQ</a></p></div></div>
+          <div class="contact-item"><div class="contact-icon">✉️</div><div><strong>Email</strong><p><a href="mailto:admin@majuabadigroup.com">admin@majuabadigroup.com</a></p></div></div>
         </div>
       </div>
 
@@ -451,10 +533,10 @@
 
 <footer class="footer">
   <div class="footer-top"><div class="container"><div class="footer-grid">
-    <div class="footer-brand"><span class="logo-text footer-logo">MajuAbadi <span class="logo-accent">Group</span></span><p class="footer-tagline">Solusi profesional Mechanical, Electrical, Pengadaan, Maintenance, Konstruksi, serta Tour & Travel.</p><div class="footer-socials"><a class="social-btn" href="https://wa.me/6285100511753" target="_blank">WA</a><a class="social-btn" href="mailto:fadhilahmajuabadi@gmail.com">✉</a></div></div>
+    <div class="footer-brand"><span class="logo-text footer-logo">MajuAbadi <span class="logo-accent">Group</span></span><p class="footer-tagline">Solusi profesional Mechanical, Electrical, Pengadaan, Maintenance, Konstruksi, serta Tour & Travel.</p><div class="footer-socials"><a class="social-btn" href="https://wa.me/6285100511753" target="_blank">WA</a><a class="social-btn" href="mailto:admin@majuabadigroup.com">✉</a></div></div>
     <div class="footer-col"><h4>Layanan</h4><ul><li><a href="#services">Mechanical & Electrical</a></li><li><a href="#services">Pengadaan</a></li><li><a href="#services">Konstruksi</a></li><li><a href="#services">Maintenance</a></li><li><a href="#tour-travel">Tour & Travel</a></li></ul></div>
     <div class="footer-col"><h4>Tour & Travel</h4><ul><li><a href="#tour-travel">Paket Wisata</a></li><li><a href="#tour-travel">Corporate Trip</a></li><li><a href="#tour-travel">Study Tour</a></li><li><a href="#tour-travel">Wisata Religi</a></li><li><a href="#tour-travel">Gathering</a></li></ul></div>
-    <div class="footer-col"><h4>Kontak</h4><ul><li>Semarang, Jawa Tengah</li><li><a href="https://wa.me/6285100511753">+62 851-0051-1753</a></li><li><a href="mailto:fadhilahmajuabadi@gmail.com">fadhilahmajuabadi@gmail.com</a></li></ul></div>
+    <div class="footer-col"><h4>Kontak</h4><ul><li>Semarang, Jawa Tengah</li><li><a href="https://wa.me/6285100511753">+62 851-0051-1753</a></li><li><a href="mailto:admin@majuabadigroup.com">admin@majuabadigroup.com</a></li></ul></div>
   </div></div></div>
   <div class="footer-bottom"><div class="container"><p>© 2026 Maju Abadi Group. All Rights Reserved.</p><div class="footer-bottom-links"><a href="#about">Tentang Kami</a><a href="#contact">Hubungi Kami</a></div></div></div>
 </footer>
