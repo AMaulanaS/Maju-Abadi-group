@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MA Group | Beranda Administrasi Kantor</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+<header class="topbar">
+  <div class="topbar-left">
+
+    <button class="icon-btn launcher-btn" id="launcherBtn" aria-label="Semua aplikasi">
+      <svg viewBox="0 0 24 24">
+        <path d="M4 4h4v4H4zM10 4h4v4h-4zM16 4h4v4h-4zM4 10h4v4H4zM10 10h4v4h-4zM16 10h4v4h-4zM4 16h4v4H4zM10 16h4v4h-4zM16 16h4v4h-4z"/>
+      </svg>
+    </button>
+
+    <a href="index.html" class="topbar-logo">
+      <span class="logo-text">
+        MA <span class="logo-accent">Group</span>
+      </span>
+      <span class="logo-tag">Admin Kantor</span>
+    </a>
+
+  </div>
+
+  <div class="topbar-search">
+    <svg viewBox="0 0 24 24" class="search-icon">
+      <path d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/>
+    </svg>
+
+    <input
+      type="text"
+      id="appSearch"
+      placeholder="Cari aplikasi..."
+      autocomplete="off"
+    />
+  </div>
+
+  <div class="topbar-right">
+
+    <button class="icon-btn" aria-label="Notifikasi">
+      <svg viewBox="0 0 24 24">
+        <path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 01-3.46 0"/>
+      </svg>
+      <span class="notif-dot"></span>
+    </button>
+
+    <div class="user-menu">
+      <div class="user-avatar">U</div>
+    </div>
+
+  </div>
+</header>
+
+
+<section class="greet-band">
+
+  <div class="greet-grid"></div>
+
+  <div class="greet-content">
+
+    <p class="greet-eyebrow">
+      Selamat datang kembali
+    </p>
+
+    <h1 class="greet-title">
+      Beranda <span class="text-accent">Aplikasi</span>
+    </h1>
+
+    <p class="greet-sub">
+      Pilih aplikasi di bawah untuk mulai bekerja.
+      Sistem administrasi internal Maju Abadi Group.
+    </p>
+
+  </div>
+
+</section>
+
+
+<main class="apps-wrap">
+
+
+  <!-- =========================
+       SURAT & TAMU
+       ========================= -->
+
+  <section class="app-group" data-group>
+
+    <h2 class="group-label">
+      Surat &amp; Tamu
+    </h2>
+
+    <div class="app-grid">
+
+
+      <!-- BUKU NOMOR SURAT -->
+      <a
+        href="Buku Nomor Surat/index.html"
+        class="app-tile"
+        data-name="Buku Nomor Surat"
+      >
+
+        <span class="app-icon tile-gold">
+          <svg viewBox="0 0 24 24">
+            <path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9z"/>
+            <path d="M14 3v6h6"/>
+            <path d="M8 13h8M8 17h5"/>
+          </svg>
+        </span>
+
+        <span class="app-name">
+          Buku Nomor Surat
+        </span>
+
+      </a>
+
+
+      <!-- BUKU TAMU -->
+      <a
+        href="Buku Tamu/index.html"
+        class="app-tile"
+        data-name="Buku Tamu"
+      >
+
+        <span class="app-icon tile-teal">
+          <svg viewBox="0 0 24 24">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+            <path d="M16 3.13a4 4 0 010 7.75"/>
+          </svg>
+        </span>
+
+        <span class="app-name">
+          Buku Tamu
+        </span>
+
+      </a>
+
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       ASET & PERALATAN
+       ========================= -->
+
+  <section class="app-group" data-group>
+
+    <h2 class="group-label">
+      Aset &amp; Peralatan
+    </h2>
+
+    <div class="app-grid">
+
+
+      <!-- BUKU PEMINJAMAN ALAT -->
+      <a
+        href="Buku Peminjaman Alat/index.html"
+        class="app-tile"
+        data-name="Buku Peminjaman Alat"
+      >
+
+        <span class="app-icon tile-gold-dark">
+          <svg viewBox="0 0 24 24">
+            <path d="M14.7 6.3a4 4 0 00-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 005.4-5.4l-2.83 2.83-2.83-.83-.83-2.83z"/>
+          </svg>
+        </span>
+
+        <span class="app-name">
+          Buku Peminjaman Alat
+        </span>
+
+      </a>
+
+
+      <!-- INVENTARIS ASET KANTOR -->
+      <a
+        href="Inventaris aset kantor/index.html"
+        class="app-tile"
+        data-name="Inventaris Aset Kantor"
+      >
+
+        <span class="app-icon tile-dark">
+          <svg viewBox="0 0 24 24">
+            <path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1V9z"/>
+            <path d="M9 21V12h6v9"/>
+          </svg>
+        </span>
+
+        <span class="app-name">
+          Inventaris Aset Kantor
+        </span>
+
+      </a>
+
+
+    </div>
+
+  </section>
+
+
+  <p class="empty-state" id="emptyState" hidden>
+    Tidak ada aplikasi yang cocok dengan pencarian.
+  </p>
+
+
+</main>
+
+
+<footer class="dash-footer">
+  <span>MA Group · Sistem Administrasi Internal</span>
+  <span>v0.1 — Beranda</span>
+</footer>
+
+
+<div class="toast" id="toast"></div>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>

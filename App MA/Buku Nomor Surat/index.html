@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Buku Nomor Surat | MA Group</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="buku-nomor-surat.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <a href="index.html" class="icon-btn" aria-label="Kembali ke beranda">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </a>
+    <div class="crumb">
+      <a href="index.html">Beranda</a>
+      <span>/</span>
+      <span class="crumb-current">Buku Nomor Surat</span>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="user-avatar">U</div>
+  </div>
+</header>
+
+<main class="page-wrap">
+
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">Buku <span class="text-accent">Nomor Surat</span></h1>
+      <p class="page-sub">Pencatatan nomor surat keluar per perusahaan, format: urutan/perusahaan/jenis/bulan romawi/tahun.</p>
+    </div>
+  </div>
+
+  <div class="company-tabs" id="companyTabs" role="tablist">
+    <button class="company-tab active" data-company="rma" role="tab">PT Rizky Maju Abadi</button>
+    <button class="company-tab" data-company="fma" role="tab">PT Fadhilah Maju Abadi</button>
+    <button class="company-tab" data-company="zma" role="tab">PT Zahra Maju Abadi</button>
+  </div>
+
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <label for="yearFilter" class="toolbar-label">Tahun</label>
+      <select id="yearFilter"></select>
+    </div>
+    <div class="toolbar-right">
+      <button class="btn-outline" id="printBtn">
+        <svg viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+        Cetak Laporan Tahun Ini
+      </button>
+      <button class="btn-primary" id="addBtn">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        Tambah Surat
+      </button>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <table class="surat-table">
+      <thead>
+        <tr>
+          <th class="col-no">No</th>
+          <th>Nomor Surat</th>
+          <th>Jenis</th>
+          <th>Perihal</th>
+          <th>Tanggal</th>
+          <th class="col-aksi">Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="suratTableBody"></tbody>
+    </table>
+    <p class="empty-row" id="emptyRow" hidden>Belum ada surat tercatat untuk tahun ini.</p>
+  </div>
+
+</main>
+
+<!-- Modal Tambah/Edit -->
+<div class="modal-overlay" id="modalOverlay" hidden>
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="modalTitle">Tambah Surat</h2>
+      <button class="modal-close" id="modalClose" aria-label="Tutup">×</button>
+    </div>
+    <form id="suratForm">
+      <input type="hidden" id="editId" />
+
+      <div class="form-group">
+        <label for="jenisSelect">Jenis Surat</label>
+        <select id="jenisSelect" required></select>
+        <small class="field-hint" id="jenisHint"></small>
+      </div>
+
+      <div class="form-group">
+        <label for="tanggalInput">Tanggal Surat</label>
+        <input type="date" id="tanggalInput" required />
+      </div>
+
+      <div class="form-group">
+        <label for="perihalInput">Perihal</label>
+        <textarea id="perihalInput" rows="3" required placeholder="Contoh: Permohonan lampu jalan Pramuka"></textarea>
+      </div>
+
+      <div class="form-group preview-group">
+        <label>Nomor Surat</label>
+        <div class="nomor-preview" id="nomorPreview">—</div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-outline" id="cancelBtn">Batal</button>
+        <button type="submit" class="btn-primary" id="saveBtn">Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Area khusus cetak -->
+<div class="print-area" id="printArea">
+  <div class="print-head">
+    <h1 id="printCompany">PT ...</h1>
+    <h2 id="printTitle">Buku Nomor Surat Tahun ...</h2>
+  </div>
+  <table class="print-table">
+    <thead>
+      <tr><th>No</th><th>Nomor Surat</th><th>Jenis</th><th>Perihal</th><th>Tanggal</th></tr>
+    </thead>
+    <tbody id="printTableBody"></tbody>
+  </table>
+  <p class="print-footer" id="printFooter"></p>
+</div>
+
+<script src="buku-nomor-surat.js"></script>
+</body>
+</html>
