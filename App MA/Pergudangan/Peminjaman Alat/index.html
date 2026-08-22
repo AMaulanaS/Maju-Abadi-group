@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manajemen Alat - FMA Group</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div>
+    <h1>🔧 MANAJEMEN ALAT</h1>
+    <p>Master Alat · Peminjaman · Pengembalian · Riwayat</p>
+  </div>
+  <div class="top-actions">
+    <button class="secondary" onclick="refreshAll()">↻ Refresh</button>
+  </div>
+</header>
+
+<main class="container">
+  <nav class="tabs">
+    <button class="tab active" data-tab="dashboard">📊 Dashboard</button>
+    <button class="tab" data-tab="master">🔧 Master Alat</button>
+    <button class="tab" data-tab="pinjam">🔄 Peminjaman</button>
+    <button class="tab" data-tab="kembali">↩ Pengembalian</button>
+    <button class="tab" data-tab="riwayat">📋 Riwayat</button>
+  </nav>
+
+  <section id="dashboard" class="tab-content active">
+    <div class="cards">
+      <div class="stat"><span>Total Alat</span><b id="totalAlat">0</b></div>
+      <div class="stat success"><span>Tersedia</span><b id="tersedia">0</b></div>
+      <div class="stat warning"><span>Dipinjam</span><b id="dipinjam">0</b></div>
+      <div class="stat danger"><span>Maintenance/Rusak</span><b id="rusak">0</b></div>
+    </div>
+    <div class="grid-2">
+      <div class="panel"><h2>Status Alat</h2><div id="statusBars"></div></div>
+      <div class="panel"><h2>Peminjaman Terbaru</h2><div id="recentLoans" class="list"></div></div>
+    </div>
+  </section>
+
+  <section id="master" class="tab-content">
+    <div class="panel">
+      <div class="panel-head"><h2>Master Alat</h2><button class="primary" onclick="openModal('alat')">+ Tambah Alat</button></div>
+      <div class="toolbar"><input id="searchAlat" placeholder="Cari kode / nama / nomor seri..." oninput="renderMaster()"></div>
+      <div class="table-wrap"><table><thead><tr><th>Kode</th><th>Nama Alat</th><th>Kategori</th><th>Merk / Tipe</th><th>No. Seri</th><th>Kondisi</th><th>Status</th><th>Lokasi</th><th>Aksi</th></tr></thead><tbody id="masterBody"></tbody></table></div>
+    </div>
+  </section>
+
+  <section id="pinjam" class="tab-content">
+    <div class="panel form-panel">
+      <h2>Peminjaman Alat</h2>
+      <div class="grid-2">
+        <label>Tanggal Pinjam<input id="pinjamTanggal" type="date"></label>
+        <label>Peminjam<input id="peminjam" placeholder="Nama peminjam"></label>
+        <label>Departemen / Proyek<input id="proyek" placeholder="Departemen / proyek"></label>
+        <label>Keperluan<input id="keperluan" placeholder="Keperluan"></label>
+      </div>
+      <h3>Pilih Alat</h3>
+      <div class="search-picker"><span>🔍</span><input id="alatSearch" autocomplete="off" placeholder="Cari kode, nama alat, merk, nomor seri..." oninput="renderAvailableTools()" onfocus="renderAvailableTools()"></div>
+      <div id="availableTools" class="tool-results"></div>
+      <div class="selected-head"><b>Alat yang akan dipinjam</b><span id="selectedCount">0 alat</span></div>
+      <div id="selectedTools" class="selected-tools"><div class="empty-selected">Belum ada alat dipilih.</div></div>
+      <label>Catatan<textarea id="catatanPinjam" rows="2"></textarea></label>
+      <div class="actions"><button class="primary" onclick="submitPinjam()">Simpan Peminjaman</button></div>
+    </div>
+  </section>
+
+  <section id="kembali" class="tab-content">
+    <div class="panel">
+      <div class="panel-head"><h2>Pengembalian Alat</h2></div>
+      <div class="table-wrap"><table><thead><tr><th>No. Pinjam</th><th>Tanggal</th><th>Peminjam</th><th>Alat</th><th>Kondisi Pinjam</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="returnBody"></tbody></table></div>
+    </div>
+  </section>
+
+  <section id="riwayat" class="tab-content">
+    <div class="panel">
+      <div class="panel-head"><h2>Riwayat Peminjaman</h2><input id="searchRiwayat" placeholder="Cari..." oninput="renderHistory()"></div>
+      <div class="table-wrap"><table><thead><tr><th>No. Pinjam</th><th>Tanggal</th><th>Peminjam</th><th>Proyek</th><th>Alat</th><th>Status</th><th>Lama Dipinjam</th><th>Tgl Kembali</th><th>Kondisi Kembali</th></tr></thead><tbody id="historyBody"></tbody></table></div>
+    </div>
+  </section>
+</main>
+
+<div id="modal" class="modal">
+  <div class="modal-box">
+    <div class="modal-head"><h2 id="modalTitle">Tambah Alat</h2><button onclick="closeModal()">×</button></div>
+    <div class="grid-2">
+      <input id="mId" type="hidden"><label>Nama Alat<input id="mNama"></label>
+      <label>Kategori<input id="mKategori"></label>
+      <label>Merk / Tipe<input id="mMerk"></label>
+      <label>Nomor Seri<input id="mSeri"></label>
+      <label>Tahun Pembelian<input id="mTahun" type="number" min="1900" max="2100"></label>
+      <label>Kondisi<select id="mKondisi"><option>Baik</option><option>Rusak Ringan</option><option>Rusak Berat</option></select></label><label>Status<select id="mStatus"><option>Tersedia</option><option>Maintenance</option><option>Rusak Ringan</option><option>Rusak Berat</option></select></label>
+      <label>Lokasi<input id="mLokasi"></label>
+      <label>Keterangan<input id="mKet"></label>
+    </div>
+    <div class="actions"><button class="secondary" onclick="closeModal()">Batal</button><button class="primary" onclick="saveAlat()">Simpan</button></div>
+  </div>
+</div>
+
+<div id="status" class="toast"></div>
+<script src="script.js"></script>
+</body>
+</html>

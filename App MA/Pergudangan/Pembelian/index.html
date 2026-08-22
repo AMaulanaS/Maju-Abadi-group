@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Purchase Order - FMA Group</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="title"><span>📦</span><div><b>PURCHASE ORDER</b><small>PEMBELIAN DIGITAL · FMA GROUP</small></div></div>
+  <div class="actions">
+    <button onclick="downloadPDF()">⬇ PDF</button>
+    <button class="green" onclick="window.print()">🖨 Cetak</button>
+    <button onclick="savePO()">💾 Simpan</button>
+    <button class="reset" onclick="resetPO()">↻ Reset</button>
+  </div>
+</header>
+
+<main class="layout">
+<section class="form">
+  <h3>1. PT AKTIF</h3>
+  <div id="companies" class="company-list"></div>
+
+  <h3>2. INFORMASI PURCHASE ORDER</h3>
+  <div class="row">
+    <label>No. PO <div class="number-box"><input id="poNumber" readonly><button onclick="generatePONumber()">↻</button></div></label>
+    <label>Tanggal PO<input id="poDate" type="date"></label>
+  </div>
+  <label>Kepada Yth / Supplier<input id="supplier" placeholder="Nama perusahaan supplier"></label>
+  <label>Alamat Supplier<textarea id="supplierAddress" rows="2" placeholder="Alamat supplier"></textarea></label>
+  <label>Up. / PIC<input id="supplierPIC" placeholder="Nama PIC"></label>
+
+  <h3>3. DETAIL BARANG</h3>
+  <div class="table-wrap">
+    <table class="input-table">
+      <thead><tr><th>No</th><th>Uraian</th><th>Qty</th><th>Satuan</th><th>Harga</th><th>Jumlah</th><th></th></tr></thead>
+      <tbody id="items"></tbody>
+    </table>
+  </div>
+  <button class="add" onclick="addRow()">＋ Tambah Barang</button>
+
+  <h3>4. CATATAN</h3>
+  <textarea id="notes" rows="3" placeholder="Catatan / ketentuan PO (opsional)"></textarea>
+
+  <div class="row">
+    <label>Disetujui Oleh<input id="approvedBy" placeholder="Nama Direktur / Penanggung Jawab"></label>
+    <label>Jabatan<input id="approvedTitle" value="Direktur"></label>
+  </div>
+
+  <div id="status"></div>
+</section>
+
+<section class="preview-area">
+  <div id="paper" class="paper"></div>
+</section>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>

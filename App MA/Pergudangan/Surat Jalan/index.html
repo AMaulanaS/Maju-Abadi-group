@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistem Surat Jalan - FMA Group</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="top-title"><span class="truck">🚚</span><div><b>SURAT JALAN</b><small>SISTEM SURAT JALAN DIGITAL</small></div></div>
+  <div class="top-actions">
+    <button onclick="downloadPDF()">⬇ Download PDF</button>
+    <button class="green" onclick="printF4()">🖨 Cetak</button>
+    <button onclick="saveToGoogle()">💾 Simpan</button>
+    <button class="reset" onclick="resetForm()">↻ Reset</button>
+  </div>
+</header>
+
+<main class="app">
+<section class="panel form-panel">
+  <div class="step"><span>1.</span> PILIH PERUSAHAAN (KOP SURAT)</div>
+  <div id="companyCards" class="company-cards"></div>
+
+  <div class="step"><span>2.</span> INFORMASI SURAT JALAN</div>
+  <div class="row">
+    <label>No. Surat Jalan <div class="input-icon"><input id="nomor" readonly><button onclick="generateNumber()">↻</button></div></label>
+    <label>Tanggal <input id="tanggal" type="text" inputmode="numeric" maxlength="10" placeholder="DD/MM/YYYY" autocomplete="off"></label>
+  </div>
+  <label>Tujuan / Customer <input id="tujuan" placeholder="Nama Customer / Tujuan"></label>
+  <label>Alamat Tujuan <textarea id="alamat" rows="2" placeholder="Alamat lengkap tujuan"></textarea></label>
+  <div class="row">
+    <label>No. Kendaraan <input id="kendaraan" placeholder="No. Polisi Kendaraan"></label>
+    <label>Nama Sopir <input id="sopir" placeholder="Nama Sopir"></label>
+  </div>
+
+  <div class="step">3. DATA BARANG</div>
+  <div class="mini-table-wrap">
+    <table class="mini-table">
+      <thead><tr><th>No</th><th>Nama Barang</th><th>Qty</th><th>Satuan</th><th>Aksi</th></tr></thead>
+      <tbody id="itemBody"></tbody>
+    </table>
+  </div>
+  <button class="add" onclick="addItem()">＋ Tambah Barang</button>
+
+  <div class="step">4. CATATAN</div>
+  <textarea id="catatan" rows="3" placeholder="Catatan (opsional)"></textarea>
+
+  <div class="step">5. TANDA TANGAN</div>
+  <div class="sign-grid">
+    <div class="sign-input"><div><b>PENERIMA</b><button onclick="clearSig('penerima')">Clear</button></div><canvas id="sig-penerima"></canvas><input id="nama-penerima" placeholder="Nama Terang"></div>
+    <div class="sign-input"><div><b>PENGIRIM</b><button onclick="clearSig('pengirim')">Clear</button></div><canvas id="sig-pengirim"></canvas><input id="nama-pengirim" placeholder="Nama Terang"></div>
+    <div class="sign-input"><div><b>HORMAT KAMI</b><button onclick="clearSig('hormat')">Clear</button></div><canvas id="sig-hormat"></canvas><input id="nama-hormat" placeholder="Nama Terang"></div>
+  </div>
+  <div id="status"></div>
+  <p class="hint">Setelah klik SIMPAN, data tersimpan ke Google Sheet. Tanda tangan PNG disimpan ke Google Drive.</p>
+</section>
+
+<section class="panel preview-panel">
+  <div id="paper" class="paper"></div>
+</section>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>

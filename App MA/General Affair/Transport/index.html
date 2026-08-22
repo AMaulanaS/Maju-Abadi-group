@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pengingat Perpanjangan Kendaraan</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <span class="eyebrow">SMART REMINDER</span>
+        <h1>Perpanjangan Surat Kendaraan</h1>
+        <p>Kelola jatuh tempo pajak/STNK dan pengingat pelanggan.</p>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-secondary" id="refreshBtn">↻ Refresh</button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="stats-grid">
+        <div class="stat-card"><span>Total Kendaraan</span><strong id="totalCount">0</strong></div>
+        <div class="stat-card"><span>Aman</span><strong id="safeCount">0</strong></div>
+        <div class="stat-card warning"><span>Segera</span><strong id="soonCount">0</strong></div>
+        <div class="stat-card danger"><span>Jatuh Tempo</span><strong id="expiredCount">0</strong></div>
+      </section>
+
+      <section class="panel form-panel">
+        <div class="panel-title">
+          <div>
+            <h2>Tambah Kendaraan</h2>
+            <p>Data akan disimpan ke Google Sheets melalui Apps Script.</p>
+          </div>
+        </div>
+
+        <form id="vehicleForm">
+          <div class="form-grid">
+            <label>Nomor Polisi
+              <input name="plat" required placeholder="H 1234 ABC" maxlength="15">
+            </label>
+            <label>Nama Pemilik
+              <input name="pemilik" required placeholder="Nama pemilik">
+            </label>
+            <label>Jenis Kendaraan
+              <select name="jenis" required>
+                <option value="">Pilih jenis</option>
+                <option>Mobil</option>
+                <option>Motor</option>
+                <option>Truk</option>
+                <option>Bus</option>
+                <option>Lainnya</option>
+              </select>
+            </label>
+            <label>Tanggal Jatuh Tempo
+              <input type="date" name="jatuhTempo" required>
+            </label>
+            <label>Nomor WhatsApp
+              <input name="whatsapp" placeholder="081234567890">
+            </label>
+            <label>Email
+              <input type="email" name="email" placeholder="nama@email.com">
+            </label>
+            <label class="full">Catatan
+              <textarea name="catatan" rows="3" placeholder="Catatan tambahan..."></textarea>
+            </label>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Simpan Kendaraan</button>
+            <button class="btn btn-secondary" type="reset">Reset</button>
+          </div>
+        </form>
+        <div class="notice" id="formNotice"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title table-heading">
+          <div>
+            <h2>Daftar Kendaraan</h2>
+            <p>Pengingat: H-30, H-14, H-7, H-1 dan saat jatuh tempo.</p>
+          </div>
+          <input id="searchInput" class="search" placeholder="Cari plat / pemilik...">
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Plat</th>
+                <th>Pemilik</th>
+                <th>Jenis</th>
+                <th>Jatuh Tempo</th>
+                <th>Sisa</th>
+                <th>Status</th>
+                <th>Kontak</th>
+              </tr>
+            </thead>
+            <tbody id="vehicleBody">
+              <tr><td colspan="7" class="empty">Memuat data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      
+    </main>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

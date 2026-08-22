@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Produk, Persediaan & Proyek | Maju Abadi Group</title>
+<link rel="stylesheet" href="gudang.css">
+<style>
+  .page { animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  
+  .status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  
+  .status-active { background: #e7f5ed; color: #107c10; }
+  .status-inactive { background: #f0f0f0; color: #666; }
+  .status-warning { background: #fff8e1; color: #856404; }
+  
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+  }
+</style>
+</head>
+<body class="app-shell-lock">
+
+<!-- Header utama -->
+<header class="topbar">
+  <div class="brand">
+    <span style="color: var(--text-dark);">MAJU ABADI</span>
+    <span style="color: var(--primary);">GROUP</span>
+    <a class="module-back" href="../../index.html" style="opacity: 0.7;">← Beranda</a>
+  </div>
+  
+  <nav>
+    <button class="nav active" data-page="produk" data-keep="1">Produk</button>
+    <button class="nav" data-page="stok" data-keep="1">Persediaan</button>
+    <button class="nav" data-page="proyek" data-keep="1">Proyek</button>
+  </nav>
+  
+  <div class="top-right">
+    <span id="status" style="font-weight: 600; color: var(--primary);">● Menghubungkan...</span>
+    <button title="Refresh database" onclick="loadData()" style="color: var(--primary);">⟲</button>
+  </div>
+</header>
+
+<!-- Company selector bar -->
+<div class="companybar">
+  <div class="company-title">
+    <b>Perusahaan Aktif</b>
+    <span>Stok dan transaksi mengikuti PT yang dipilih</span>
+  </div>
+  <div id="companySwitch" class="company-switch"></div>
+</div>
+
+<!-- Main shell -->
+<div class="shell">
+
+  <!-- Sidebar - Product list -->
+  <aside class="sidebar">
+    <button class="new" onclick="newProduct()">＋ Produk Baru</button>
+    <input id="search" class="search" placeholder="Cari produk..." oninput="renderProducts()">
+    <div id="productList"></div>
+  </aside>
+
+  <!-- Main content -->
+  <main>
+
+    <!-- PAGE: PRODUK -->
+    <section id="page-produk" class="page">
+      <div class="page-head">
+        <div>
+          <div class="crumb">Produk</div>
+          <h1 id="productHeading">Produk Baru</h1>
+          <p class="subhead" id="productCompanyLabel"></p>
+        </div>
+        <div>
+          <button class="btn light" onclick="newProduct()">Baru</button>
+          <button class="btn gold" onclick="saveProduct()">Simpan Produk</button>
+        </div>
+      </div>
+
+      <div class="checks">
+        <label><input id="forSale" type="checkbox" checked> Untuk Penjualan</label>
+        <label><input id="forPurchase" type="checkbox" checked> Untuk Pembelian</label>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" data-tab="umum">Informasi Umum</button>
+        <button class="tab" data-tab="harga">Harga & Satuan</button>
+        <button class="tab" data-tab="pembelian">Data Pembelian</button>
+        <button class="tab" data-tab="persediaan">Stok Persediaan</button>
+      </div>
+
+      <div class="card">
+        <!-- Tab: Informasi Umum -->
+        <div class="tabpane active" id="tab-umum">
+          <div class="grid">
+            <label>Kode Barang <input id="kode" placeholder="Misal: MAT-001"></label>
+            <label>Nama Produk <input id="nama" placeholder="Nama lengkap produk"></label>
+            <label>Tipe Produk 
+              <select id="tipe">
+                <option>Barang</option>
+                <option>Layanan</option>
+              </select>
+            </label>
+            <label>Kategori <input id="kategori" placeholder="Kabel / Lampu PJU / Pipa"></label>
+            <label>Satuan <input id="satuan" value="PCS" placeholder="Satuan dasar"></label>
+            <label>Lokasi Gudang <input id="lokasi" placeholder="Rak A1 / Zona B"></label>
+            <label class="wide">Spesifikasi <textarea id="spesifikasi" placeholder="Detail teknis produk..."></textarea></label>
+          </div>
+        </div>
+
+        <!-- Tab: Harga & Satuan -->
+        <div class="tabpane" id="tab-harga">
+          <div class="grid">
+            <label>Harga Beli (Rp) <input id="hargaBeli" type="number" placeholder="Harga pembelian"></label>
+            <label>Harga Jual (Rp) <input id="hargaJual" type="number" placeholder="Harga penjualan"></label>
+            <label>PPN (%) <input id="ppn" type="number" value="11" placeholder="Pajak penjualan"></label>
+            <label>Stok Minimum <input id="stokMin" type="number" value="0" placeholder="Batas stok minimal"></label>
+          </div>
+        </div>
+
+        <!-- Tab: Data Pembelian -->
+        <div class="tabpane" id="tab-pembelian">
+          <div class="grid">
+            <label>Supplier Utama <input id="supplier" placeholder="Nama supplier"></label>
+            <label>Kontak Supplier <input id="supplierKontak" placeholder="No. telepon / email"></label>
+            <label>Harga Pembelian Terakhir <input id="hargaTerakhir" type="number" placeholder="Rp"></label>
+            <label>Tanggal Pembelian Terakhir <input id="tanggalBeli" type="date"></label>
+          </div>
+        </div>
+
+        <!-- Tab: Stok Persediaan -->
+        <div class="tabpane" id="tab-persediaan">
+          <div class="stock-cards">
+            <div class="mini-card">
+              <small>Stok PT Aktif</small>
+              <strong id="stokTampil">0</strong>
+              <span id="stokUnit">PCS</span>
+            </div>
+            <div class="mini-card">
+              <small>Total Stok Group</small>
+              <strong id="stokGroupTampil">0</strong>
+              <span id="stokGroupUnit">PCS</span>
+            </div>
+            <div class="mini-card">
+              <small>Stok di Proyek PT Aktif</small>
+              <strong id="stokProyekTampil">0</strong>
+              <span id="stokProyekUnit">PCS</span>
+            </div>
+          </div>
+          <p class="muted">Master produk bersifat bersama. Stok fisik dipisahkan berdasarkan PT pada sheet STOK_PT.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE: PERSEDIAAN -->
+    <section id="page-stok" class="page hidden">
+      <div class="page-head">
+        <div>
+          <div class="crumb">Persediaan</div>
+          <h1>Stok & Mutasi</h1>
+          <p class="subhead">PT aktif: <b id="stockCompanyName">-</b>. Perpindahan antar PT dicatat terpisah.</p>
+        </div>
+        <div class="action-group">
+          <button class="btn light" onclick="movement('MASUK')">＋ Barang Masuk</button>
+          <button class="btn dark" onclick="movement('KELUAR')">− Barang Keluar</button>
+          <button class="btn transferpt" onclick="transferPT()">⇄ Transfer Antar PT</button>
+          <button class="btn gold" onclick="transferProject()">⇢ Transfer ke Proyek</button>
+          <button class="btn project" onclick="useProject()">⚒ Pemakaian</button>
+          <button class="btn return" onclick="returnProject()">↩ Barang Kembali</button>
+        </div>
+      </div>
+
+      <div class="summary-grid">
+        <div class="summary-card">
+          <span>Stok PT Aktif</span>
+          <strong id="sumGudang">0</strong>
+        </div>
+        <div class="summary-card">
+          <span>Stok Proyek PT Aktif</span>
+          <strong id="sumProyek">0</strong>
+        </div>
+        <div class="summary-card">
+          <span>Total Stok Group</span>
+          <strong id="sumGroup">0</strong>
+        </div>
+        <div class="summary-card">
+          <span>Proyek PT Aktif</span>
+          <strong id="sumProjects">0</strong>
+        </div>
+      </div>
+
+      <div class="tabs inventory-tabs">
+        <button class="tab active" data-stocktab="gudang">Stok PT Aktif</button>
+        <button class="tab" data-stocktab="group">Stok 3 PT</button>
+        <button class="tab" data-stocktab="proyek">Stok Proyek</button>
+        <button class="tab" data-stocktab="mutasi">Riwayat Mutasi</button>
+      </div>
+
+      <div class="card">
+        <div id="stockGudangPane"></div>
+        <div id="stockGroupPane" class="hidden"></div>
+        <div id="stockProyekPane" class="hidden"></div>
+        <div id="stockMutasiPane" class="hidden"></div>
+      </div>
+    </section>
+
+    <!-- PAGE: PROYEK -->
+    <section id="page-proyek" class="page hidden">
+      <div class="page-head">
+        <div>
+          <div class="crumb">Proyek</div>
+          <h1>Proyek & Material</h1>
+          <p class="subhead">Proyek harus dimiliki oleh PT yang dipilih. Kelola material dan progress pekerjaan.</p>
+        </div>
+        <button class="btn gold" onclick="newProject()">＋ Proyek Baru</button>
+      </div>
+      <div class="card">
+        <div id="projectList"></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Modal -->
+<div id="modal" class="modal hidden">
+  <div class="modalbox">
+    <div class="modalhead">
+      <h2 id="modalTitle">Modal Title</h2>
+      <button onclick="closeModal()">×</button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<!-- Toast notification -->
+<div id="toast" class="toast"></div>
+
+<script src="gudang.js"></script>
+</body>
+</html>
