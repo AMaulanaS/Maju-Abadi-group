@@ -12,7 +12,7 @@ searchInput.addEventListener('input', () => {
     let groupHasMatch = false;
 
     tiles.forEach((tile) => {
-      const name = tile.dataset.name.toLowerCase();
+      const name = (tile.dataset.name || tile.querySelector('.app-name')?.textContent || '').toLowerCase();
       const match = name.includes(query);
       tile.style.display = match ? '' : 'none';
       if (match) groupHasMatch = true;
@@ -25,24 +25,22 @@ searchInput.addEventListener('input', () => {
   emptyState.hidden = anyVisible;
 });
 
-// Klik tile aplikasi -> toast "segera hadir" (placeholder sebelum aplikasi dibangun)
+// Tile yang belum tersedia menampilkan notifikasi tanpa berpindah halaman.
 const toast = document.getElementById('toast');
 let toastTimer;
 
-document.querySelectorAll('.app-tile').forEach((tile) => {
+document.querySelectorAll('.app-tile.is-placeholder').forEach((tile) => {
   tile.addEventListener('click', (e) => {
-    const href = tile.getAttribute('href');
-    if (href && href !== '#') return; // aplikasi sudah tersedia, biarkan navigasi berjalan
     e.preventDefault();
-    const name = tile.dataset.name;
-    toast.innerHTML = `<strong>${name}</strong> — aplikasi ini sedang dalam pengembangan.`;
+    const name = tile.querySelector('.app-name')?.textContent.trim() || tile.dataset.name;
+    toast.innerHTML = `<strong>${name}</strong> — modul sedang disiapkan.`;
     toast.classList.add('show');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
   });
 });
 
-// Tombol launcher (ikon grid) -> scroll ke atas apps grid
+// Tombol launcher -> kembali ke area aplikasi.
 document.getElementById('launcherBtn').addEventListener('click', () => {
   document.querySelector('.apps-wrap').scrollIntoView({ behavior: 'smooth' });
 });
