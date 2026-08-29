@@ -2033,3 +2033,256 @@ button {
     padding: 26px 20px;
   }
 }
+
+
+/* =========================================================
+   SOCIAL MEDIA — CONTACT & FOOTER PREMIUM
+   ========================================================= */
+
+.contact-social {
+  margin-top: 38px;
+  padding-top: 28px;
+  border-top: 1px solid var(--gray-200);
+}
+
+.contact-social-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  color: var(--gray-500);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+}
+
+.contact-social-line {
+  width: 24px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold), transparent);
+}
+
+.contact-social-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.contact-social-card {
+  position: relative;
+  min-height: 78px;
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--gray-200);
+  border-radius: 14px;
+  background: linear-gradient(135deg, #fff, #f8f8f8);
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.contact-social-card::before {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--gold), #004643);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s ease;
+}
+
+.contact-social-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(212, 168, 67, 0.55);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.09);
+}
+
+.contact-social-card:hover::before {
+  transform: scaleX(1);
+}
+
+.contact-social-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: #101010;
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: 17px;
+  font-weight: 800;
+  transition: var(--transition);
+}
+
+.contact-social-card.instagram:hover .contact-social-icon {
+  background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
+}
+
+.contact-social-card.linkedin:hover .contact-social-icon {
+  background: #0a66c2;
+}
+
+.contact-social-card small {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--gray-500);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.contact-social-card strong {
+  display: block;
+  color: var(--black);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.contact-social-arrow {
+  color: var(--gold-dark);
+  font-size: 18px;
+  transition: var(--transition);
+}
+
+.contact-social-card:hover .contact-social-arrow {
+  transform: translate(2px, -2px);
+  color: var(--black);
+}
+
+
+/* Footer social buttons */
+.footer-socials {
+  align-items: center;
+  gap: 9px;
+  margin-top: 26px;
+}
+
+.footer-socials .social-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.035);
+  color: rgba(255, 255, 255, 0.68);
+  font-weight: 800;
+  transition: var(--transition);
+}
+
+.footer-socials .social-btn:hover {
+  transform: translateY(-4px);
+  border-color: var(--gold);
+  background: rgba(212, 168, 67, 0.12);
+  color: var(--gold);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+}
+
+.footer-socials .social-btn.instagram:hover {
+  color: #fff;
+  background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
+  border-color: transparent;
+}
+
+.footer-socials .social-btn.linkedin:hover {
+  color: #fff;
+  background: #0a66c2;
+  border-color: transparent;
+}
+
+.footer-socials .social-btn.whatsapp:hover {
+  color: #fff;
+  background: #25d366;
+  border-color: transparent;
+}
+
+.footer-socials .social-btn.email:hover {
+  color: #fff;
+  background: #004643;
+  border-color: transparent;
+}
+
+/* Footer contact network */
+.footer-contact-col > a {
+  display: block;
+  margin-bottom: 9px;
+}
+
+.footer-network {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.footer-network > span {
+  display: block;
+  margin-bottom: 10px;
+  color: rgba(255, 255, 255, 0.34);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.footer-network > div {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.footer-network > div a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.025);
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 11px;
+  transition: var(--transition);
+}
+
+.footer-network > div a:hover {
+  color: var(--gold);
+  border-color: rgba(212, 168, 67, 0.28);
+  background: rgba(212, 168, 67, 0.06);
+  transform: translateX(3px);
+}
+
+.footer-network b {
+  color: var(--gold);
+  font-size: 13px;
+}
+
+/* Better footer spacing with the new social/network content */
+.footer-top {
+  padding-bottom: 68px;
+}
+
+.footer-brand > p {
+  max-width: 360px;
+  color: rgba(255, 255, 255, 0.54);
+  line-height: 1.8;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .contact-social-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-social-card {
+    min-height: 74px;
+  }
+
+  .footer-socials .social-btn {
+    width: 40px;
+    height: 40px;
+  }
+}
