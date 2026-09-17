@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Kunjungan Website | Maju Abadi Group</title>
+  <link rel="stylesheet" href="kunjungan.css">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">MAJU ABADI GROUP</div>
+        <h1>Monitoring Kunjungan Website</h1>
+        <p>IP, jaringan, lokasi perkiraan, perangkat, halaman dan referrer.</p>
+      </div>
+      <div class="actions">
+        <a class="btn ghost" href="index.html">← Beranda</a>
+        <button class="btn dark" id="refreshBtn">↻ Refresh</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="stats">
+        <div class="stat"><span>Total Kunjungan</span><strong id="total">0</strong></div>
+        <div class="stat"><span>Hari Ini</span><strong id="today">0</strong></div>
+        <div class="stat"><span>Semarang</span><strong id="semarang">0</strong></div>
+        <div class="stat"><span>Jaringan Pemerintah</span><strong id="government">0</strong></div>
+      </section>
+
+      <section class="toolbar">
+        <input id="search" type="search" placeholder="Cari IP, kota, ISP, ASN, halaman...">
+        <select id="govFilter">
+          <option value="all">Semua jaringan</option>
+          <option value="gov">Jaringan pemerintah</option>
+          <option value="public">Non-pemerintah</option>
+        </select>
+        <select id="limit">
+          <option value="100">100 data</option>
+          <option value="250" selected>250 data</option>
+          <option value="500">500 data</option>
+          <option value="1000">1000 data</option>
+        </select>
+        <span class="status" id="status">Menghubungkan...</span>
+      </section>
+
+      <section class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Waktu</th>
+                <th>IP</th>
+                <th>Lokasi</th>
+                <th>Network / ISP</th>
+                <th>ASN</th>
+                <th>Device</th>
+                <th>Browser / OS</th>
+                <th>Halaman</th>
+                <th>Referrer</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="rows">
+              <tr><td colspan="10" class="empty">Memuat data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycby7rswCTA--Cu2uaTN0X0T-S5C3YIl_6R5F0F7v0HVtjGhlnwQ29QfvTES1v46DZY0l/exec';
+const DASHBOARD_TOKEN = '2d07db287e47456a7788724b582acfa73b3440198f786563214e7f61f31ad83f';
+let allVisits = [];
+
+const $ = id => document.getElementById(id);
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
+  })[c]);
+}
+
+function formatTime(v) { return escapeHtml(v || '-'); }
+
+function isToday(timestamp) {
+  if (!timestamp) return false;
+  const d = new Date(Number(timestamp));
+  const now = new Date();
+  return d.getFullYear() === now.getFullYear() &&
+         d.getMonth() === now.getMonth() &&
+         d.getDate() === now.getDate();
+}
+
+function isSemarang(v) { return /semarang/i.test(String(v.city || '')); }
+
+function render() {
+  const q = $('search').value.trim().toLowerCase();
+  const mode = $('govFilter').value;
+
+  const filtered = allVisits.filter(v => {
+    const hay = [
+      v.ip,v.country,v.region,v.city,v.isp,v.organization,v.asn,
+      v.device,v.browser,v.os,v.page,v.referrer,v.networkLabel
+    ].join(' ').toLowerCase();
+
+    const searchOk = !q || hay.includes(q);
+    const govOk = mode === 'all' ||
+      (mode === 'gov' && String(v.govFlag).toUpperCase() === 'YA') ||
+      (mode === 'public' && String(v.govFlag).toUpperCase() !== 'YA');
+
+    return searchOk && govOk;
+  });
+
+  $('rows').innerHTML = filtered.length ? filtered.map(v => `
+    <tr>
+      <td class="nowrap">${formatTime(v.time)}</td>
+      <td><code>${escapeHtml(v.ip || '-')}</code></td>
+      <td>${escapeHtml([v.city,v.region,v.country].filter(Boolean).join(', ') || '-')}</td>
+      <td>
+        <div class="network">${escapeHtml(v.networkLabel || v.organization || v.isp || '-')}</div>
+        <small>${escapeHtml(v.organization || v.isp || '')}</small>
+      </td>
+      <td><code>${escapeHtml(v.asn || '-')}</code></td>
+      <td>${escapeHtml(v.device || '-')}</td>
+      <td>${escapeHtml([v.browser,v.os].filter(Boolean).join(' / ') || '-')}</td>
+      <td><code>${escapeHtml(v.page || '-')}</code></td>
+      <td class="ref">${escapeHtml(referrerLabel(v.referrer))}</td>
+      <td>${
+        String(v.govFlag).toUpperCase() === 'YA'
+          ? '<span class="badge gov">PEMERINTAH</span>'
+          : '<span class="badge normal">UMUM</span>'
+      }</td>
+    </tr>
+  `).join('') : '<tr><td colspan="10" class="empty">Belum ada data kunjungan.</td></tr>';
+
+  $('total').textContent = allVisits.length.toLocaleString('id-ID');
+  $('today').textContent = allVisits.filter(v => isToday(v.timestamp)).length.toLocaleString('id-ID');
+  $('semarang').textContent = allVisits.filter(isSemarang).length.toLocaleString('id-ID');
+  $('government').textContent = allVisits.filter(v => String(v.govFlag).toUpperCase() === 'YA').length.toLocaleString('id-ID');
+}
+
+function referrerLabel(url) {
+  if (!url) return 'Direct';
+  try {
+    const u = new URL(url);
+    const host = u.hostname.replace(/^www\./,'');
+    if (/google|bing|yahoo|duckduckgo/i.test(host)) return 'Search: ' + host;
+    if (/instagram|facebook|tiktok|youtube/i.test(host)) return 'Social: ' + host;
+    return host;
+  } catch { return url; }
+}
+
+async function loadData() {
+  $('status').textContent = 'Memuat...';
+  $('rows').innerHTML = '<tr><td colspan="10" class="empty">Mengambil data dari Google Sheets...</td></tr>';
+  try {
+    const url = API_URL + '?action=listVisits&limit=' + encodeURIComponent($('limit').value) +
+      '&token=' + encodeURIComponent(DASHBOARD_TOKEN) + '&_=' + Date.now();
+    const res = await fetch(url, { cache:'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error || 'API error');
+    allVisits = Array.isArray(json.data) ? json.data : [];
+    render();
+    $('status').textContent = '● Terhubung • ' + new Date().toLocaleTimeString('id-ID');
+  } catch (err) {
+    $('status').textContent = '● Gagal memuat';
+    $('rows').innerHTML = `<tr><td colspan="10" class="empty error">Gagal mengambil data: ${escapeHtml(err.message)}</td></tr>`;
+  }
+}
+
+$('refreshBtn').addEventListener('click', loadData);
+$('search').addEventListener('input', render);
+$('govFilter').addEventListener('change', render);
+$('limit').addEventListener('change', loadData);
+loadData();
+</script>
+</body>
+</html>
