@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Buku Tamu Digital terintegrasi Google Sheets">
+  <title>Buku Tamu Digital</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div>
+      <div class="eyebrow">ADMINISTRASI KUNJUNGAN</div>
+      <h1>Buku Tamu Digital</h1>
+      <p>Kelola pencatatan kunjungan tamu secara cepat, rapi, dan terintegrasi.</p>
+    </div>
+    <div class="top-actions">
+      <div class="clock" id="clock">--:--:--</div>
+      <button class="btn ghost light" id="refreshBtn">↻ Refresh</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="stats">
+      <div class="stat"><span>Total Tamu</span><b id="statTotal">0</b><small>Seluruh data</small></div>
+      <div class="stat"><span>Hari Ini</span><b id="statToday">0</b><small>Kunjungan hari ini</small></div>
+      <div class="stat"><span>Masih Berkunjung</span><b id="statInside">0</b><small>Belum check-out</small></div>
+      <div class="stat"><span>Database</span><b id="statStatus">...</b><small id="statStatusText">Memeriksa koneksi</small></div>
+    </section>
+
+    <section class="tabs">
+      <button class="tab active" data-tab="dashboard">Dashboard</button>
+      <button class="tab" data-tab="form">Tambah Tamu</button>
+      <button class="tab" data-tab="history">Riwayat Kunjungan</button>
+    </section>
+
+    <section class="tab-panel active" id="tab-dashboard">
+      <div class="panel-grid">
+        <div class="card">
+          <div class="card-head">
+            <div><h2>Ringkasan Keperluan</h2><p>Distribusi kunjungan berdasarkan keperluan.</p></div>
+          </div>
+          <div id="purposeSummary" class="bars"></div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div><h2>Kunjungan Terbaru</h2><p>Lima kunjungan terakhir.</p></div>
+            <button class="btn secondary small" onclick="openTab('history')">Lihat Semua</button>
+          </div>
+          <div id="recentList" class="recent-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="tab-form">
+      <div class="card">
+        <div class="card-head">
+          <div><h2 id="formTitle">Tambah Data Tamu</h2><p>Kolom bertanda * wajib diisi.</p></div>
+          <button class="btn secondary" id="cancelEditBtn" style="display:none">Batal Edit</button>
+        </div>
+        <form id="guestForm">
+          <input type="hidden" name="id" id="guestId">
+          <div class="form-grid">
+            <label>Nama Lengkap *
+              <input name="nama" id="nama" maxlength="100" required placeholder="Nama tamu">
+            </label>
+            <label>No. HP / WhatsApp
+              <input name="telepon" maxlength="30" placeholder="08xxxxxxxxxx">
+            </label>
+            <label>Instansi / Perusahaan
+              <input name="instansi" maxlength="120" placeholder="Nama instansi">
+            </label>
+            <label>Jabatan
+              <input name="jabatan" maxlength="80" placeholder="Jabatan">
+            </label>
+            <label>Bertemu Dengan *
+              <input name="bertemu" maxlength="100" required placeholder="Nama / bagian yang ditemui">
+            </label>
+            <label>Keperluan *
+              <select name="keperluan" required>
+                <option value="">Pilih keperluan</option>
+                <option>Administrasi</option>
+                <option>Meeting / Rapat</option>
+                <option>Pengiriman / Pengambilan Barang</option>
+                <option>Penawaran / Kerja Sama</option>
+                <option>Kunjungan Dinas</option>
+                <option>Interview / Rekrutmen</option>
+                <option>Survey / Observasi</option>
+                <option>Lainnya</option>
+              </select>
+            </label>
+            <label>Jumlah Tamu
+              <input name="jumlah" type="number" min="1" max="999" value="1">
+            </label>
+            <label>Status Saat Masuk
+              <select name="status">
+                <option value="Berada di lokasi">Berada di lokasi</option>
+                <option value="Selesai">Selesai</option>
+              </select>
+            </label>
+            <label class="full">Detail Keperluan
+              <textarea name="detail" rows="4" maxlength="700" placeholder="Keterangan tambahan"></textarea>
+            </label>
+            <label class="check full">
+              <input type="checkbox" id="confirm" required>
+              <span>Data yang dicatat sudah saya periksa dan benar.</span>
+            </label>
+          </div>
+          <div class="actions">
+            <button type="reset" class="btn secondary" id="resetBtn">Reset</button>
+            <button type="submit" class="btn primary" id="saveBtn">Simpan Kunjungan</button>
+          </div>
+          <div id="formMessage" class="message"></div>
+        </form>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="tab-history">
+      <div class="card">
+        <div class="card-head history-head">
+          <div><h2>Riwayat Kunjungan</h2><p>Kelola, cari, filter, dan cetak data tamu.</p></div>
+          <div class="head-actions">
+            <button class="btn secondary small" id="printBtn">🖨 Cetak</button>
+            <button class="btn secondary small" id="csvBtn">⇩ CSV</button>
+          </div>
+        </div>
+
+        <div class="filters">
+          <input id="searchInput" placeholder="Cari nama, instansi, tujuan, keperluan...">
+          <select id="statusFilter">
+            <option value="">Semua status</option>
+            <option value="Berada di lokasi">Berada di lokasi</option>
+            <option value="Selesai">Selesai</option>
+          </select>
+          <input type="date" id="dateFilter" title="Filter tanggal">
+          <button class="btn secondary" id="clearFilterBtn">Bersihkan</button>
+        </div>
+
+        <div class="table-info">
+          <span id="resultInfo">0 data</span>
+          <span id="pageInfo"></span>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+            <tr>
+              <th>No</th><th>Waktu Masuk</th><th>Nama</th><th>Instansi</th>
+              <th>Bertemu Dengan</th><th>Keperluan</th><th>Status</th><th>Aksi</th>
+            </tr>
+            </thead>
+            <tbody id="guestTable"><tr><td colspan="8" class="empty">Memuat data...</td></tr></tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <button class="btn secondary small" id="prevPage">‹ Sebelumnya</button>
+          <button class="btn secondary small" id="nextPage">Berikutnya ›</button>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer>© <span id="year"></span> Buku Tamu Digital</footer>
+</div>
+
+<div class="modal" id="detailModal">
+  <div class="modal-box">
+    <div class="modal-head"><h2>Detail Kunjungan</h2><button class="icon-btn" onclick="closeModal()">×</button></div>
+    <div id="detailContent" class="detail-grid"></div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal()">Tutup</button>
+      <button class="btn primary" id="modalPrintBtn">Cetak Detail</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>
