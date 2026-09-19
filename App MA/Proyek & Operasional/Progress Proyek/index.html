@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Progress Proyek</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <header>
+      <div>
+        <div class="eyebrow">MAJU ABADI GROUP • MONITORING PROYEK</div>
+        <h1>Progress Proyek</h1>
+        <p>Pantau perkembangan pekerjaan secara terpusat.</p>
+      </div>
+      <button id="refreshBtn" class="btn">↻ Refresh</button>
+    </header>
+
+    <section class="stats">
+      <div class="stat"><span>Total Proyek</span><strong id="total">0</strong></div>
+      <div class="stat"><span>Berjalan</span><strong id="running">0</strong></div>
+      <div class="stat"><span>Selesai</span><strong id="done">0</strong></div>
+      <div class="stat"><span>Tertunda</span><strong id="pending">0</strong></div>
+    </section>
+
+    <section class="toolbar">
+      <input id="search" type="search" placeholder="🔎 Cari nama proyek...">
+      <select id="status">
+        <option value="">Semua Status</option>
+        <option>Belum Mulai</option>
+        <option>Berjalan</option>
+        <option>Selesai</option>
+        <option>Tertunda</option>
+      </select>
+    </section>
+
+    <section id="projectList" class="grid">
+      <div class="empty">Belum ada data proyek. Hubungkan Google Apps Script pada <b>script.js</b>.</div>
+    </section>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

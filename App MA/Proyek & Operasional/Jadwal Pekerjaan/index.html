@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jadwal Pekerjaan</title><link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div><p class="eyebrow">MAJU ABADI GROUP • OPERASIONAL</p><h1>📅 Jadwal Pekerjaan</h1><p>Atur jadwal dan agenda pekerjaan.</p></div>
+  <button class="btn secondary" id="refreshBtn">↻ Refresh</button>
+</header>
+<main class="container">
+  <section class="stats">
+    <div class="stat"><span>Total Agenda</span><b id="total">0</b></div>
+    <div class="stat"><span>Hari Ini</span><b id="today">0</b></div>
+    <div class="stat"><span>Minggu Ini</span><b id="week">0</b></div>
+    <div class="stat"><span>Selesai</span><b id="done">0</b></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>Agenda Pekerjaan</h2><button class="btn primary" id="addBtn">+ Tambah Jadwal</button></div>
+    <div class="filters">
+      <input id="search" placeholder="Cari pekerjaan, lokasi, petugas...">
+      <input id="dateFilter" type="date">
+      <select id="statusFilter"><option value="">Semua Status</option><option>Terjadwal</option><option>Berlangsung</option><option>Selesai</option><option>Dibatalkan</option></select>
+    </div>
+    <div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Jam</th><th>Pekerjaan</th><th>Lokasi</th><th>Petugas</th><th>Prioritas</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="body"></tbody></table></div>
+    <div id="empty" class="empty">Belum ada jadwal pekerjaan.</div>
+  </section>
+</main>
+
+<div class="modal hidden" id="modal"><div class="modal-card">
+  <div class="modal-head"><h2 id="modalTitle">Tambah Jadwal</h2><button class="icon" id="closeBtn">×</button></div>
+  <form id="form">
+    <input type="hidden" id="id">
+    <div class="grid">
+      <label>Tanggal<input id="tanggal" type="date" required></label>
+      <label>Jam Mulai<input id="mulai" type="time" required></label>
+      <label>Jam Selesai<input id="selesai" type="time"></label>
+      <label>Nama Pekerjaan<input id="pekerjaan" required placeholder="Contoh: Pemeriksaan PJU"></label>
+      <label>Lokasi<input id="lokasi" required></label>
+      <label>Petugas / Tim<input id="petugas"></label>
+      <label>Prioritas<select id="prioritas"><option>Normal</option><option>Tinggi</option><option>Urgent</option></select></label>
+      <label>Status<select id="status"><option>Terjadwal</option><option>Berlangsung</option><option>Selesai</option><option>Dibatalkan</option></select></label>
+      <label class="full">Keterangan<textarea id="keterangan" rows="3"></textarea></label>
+    </div>
+    <div class="actions"><button type="button" class="btn secondary" id="cancelBtn">Batal</button><button class="btn primary">Simpan Jadwal</button></div>
+  </form>
+</div></div>
+<div id="toast" class="toast"></div>
+<script src="config.js"></script><script src="app.js"></script>
+</body></html>

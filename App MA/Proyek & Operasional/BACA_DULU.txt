@@ -1,0 +1,31 @@
+SUDAH TERINTEGRASI - BACA INI DULU
+====================================
+
+Semua konfigurasi di paket ini sudah otomatis diisi:
+
+1. Backend tunggal: Code_Terpadu.gs (di folder ini) sudah ditempel ke
+   satu Google Spreadsheet & Apps Script, dan sudah di-deploy sebagai
+   Web App. Code.gs lama di tiap folder modul sudah dihapus karena
+   sudah digantikan file ini.
+
+2. URL Web App yang dipakai di SEMUA modul:
+   https://script.google.com/macros/s/AKfycbyCZ2_aVvNwb7z1Tr_PVRpFoBAhNRrldOu4HfIddIKVJPffnWhDDagiswIgT0muJm72DA/exec
+
+3. Token rahasia (untuk modul Dokumentasi Proyek & Tim Lapangan):
+   - Dokumentasi Proyek : ERP2026_5DXF9CXIBR
+   - Tim Lapangan       : ERP2026_FGGZVTU7JX
+   (Token ini harus SAMA dengan yang ada di baris TOKEN_DOKUMENTASI
+   dan TOKEN_TIM pada Code_Terpadu.gs yang sudah Anda deploy.)
+
+4. Kolom penghubung antar modul: "kodeProyek". Isi field ini dengan
+   nilai kolom "Kode" dari Daftar Proyek supaya data Jadwal, Pekerjaan
+   Lapangan, Dokumentasi Proyek, dan Tim Lapangan bisa dikaitkan ke
+   proyek yang sama. Form HTML belum punya input untuk ini -- perlu
+   ditambahkan manual bila Anda ingin memakainya.
+
+5. Progress Proyek tidak punya sheet sendiri -- dia mengambil data
+   langsung dari modul "proyek" (sheet Proyek yang sama dengan
+   Daftar Proyek), jadi tidak ada data ganda.
+
+Tinggal upload folder tiap modul ke hosting (GitHub Pages, dll).
+Tidak perlu edit config.js/app.js lagi -- semua sudah terisi.

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daftar Proyek</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <section class="page-head">
+      <div>
+        <div class="eyebrow">MAJU ABADI GROUP • PROYEK & OPERASIONAL</div>
+        <div class="title-row">
+          <span class="title-icon">📋</span>
+          <div>
+            <h1>Daftar Proyek</h1>
+            <p>Data dan informasi seluruh proyek.</p>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="btnTambah">＋ Tambah Proyek</button>
+    </section>
+
+    <section class="stats">
+      <div class="stat-card"><span>Total Proyek</span><strong id="statTotal">0</strong></div>
+      <div class="stat-card"><span>Berjalan</span><strong id="statBerjalan">0</strong></div>
+      <div class="stat-card"><span>Selesai</span><strong id="statSelesai">0</strong></div>
+      <div class="stat-card"><span>Tertunda</span><strong id="statTertunda">0</strong></div>
+    </section>
+
+    <section class="panel">
+      <div class="toolbar">
+        <div class="search-box">
+          <span>⌕</span>
+          <input id="searchInput" type="search" placeholder="Cari nama, kode, pemilik, kategori...">
+        </div>
+        <select id="statusFilter">
+          <option value="">Semua Status</option>
+          <option value="Berjalan">Berjalan</option>
+          <option value="Selesai">Selesai</option>
+          <option value="Tertunda">Tertunda</option>
+          <option value="Belum Mulai">Belum Mulai</option>
+        </select>
+        <button class="btn btn-light" id="btnRefresh">↻ Refresh</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Kode</th>
+              <th>Nama Proyek</th>
+              <th>Pemilik</th>
+              <th>Kategori</th>
+              <th>Status</th>
+              <th>Progress</th>
+              <th>Deadline</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="projectTable">
+            <tr><td colspan="8" class="empty">Memuat data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-footer" id="tableInfo">0 proyek</div>
+    </section>
+  </main>
+
+  <div class="modal hidden" id="projectModal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <h2 id="modalTitle">Tambah Proyek</h2>
+          <p>Isi data proyek lalu simpan ke Google Sheet.</p>
+        </div>
+        <button class="icon-btn" id="btnClose">×</button>
+      </div>
+
+      <form id="projectForm">
+        <input type="hidden" id="projectId">
+        <div class="form-grid">
+          <label>Kode Proyek<input id="kode" required placeholder="PRJ-001"></label>
+          <label>Nama Proyek<input id="nama" required placeholder="Nama proyek"></label>
+          <label>Pemilik/PIC<input id="pemilik" placeholder="Nama PIC"></label>
+          <label>Kategori<input id="kategori" placeholder="Infrastruktur"></label>
+          <label>Status
+            <select id="status">
+              <option>Belum Mulai</option>
+              <option>Berjalan</option>
+              <option>Selesai</option>
+              <option>Tertunda</option>
+            </select>
+          </label>
+          <label>Progress (%)<input id="progress" type="number" min="0" max="100" value="0"></label>
+          <label>Tanggal Mulai<input id="mulai" type="date"></label>
+          <label>Deadline<input id="deadline" type="date"></label>
+          <label>Anggaran<input id="anggaran" type="number" min="0" placeholder="0"></label>
+          <label class="full">Deskripsi<textarea id="deskripsi" rows="4" placeholder="Deskripsi proyek..."></textarea></label>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-light" id="btnCancel">Batal</button>
+          <button type="submit" class="btn btn-primary" id="btnSave">Simpan Proyek</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast hidden" id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>

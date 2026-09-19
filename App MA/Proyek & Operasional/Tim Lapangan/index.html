@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Dashboard Tim Lapangan - data personel dan penugasan lapangan." />
+  <title>Tim Lapangan | Maju Abadi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">MA</div>
+        <div>
+          <strong>Maju Abadi</strong>
+          <span>Manajemen Lapangan</span>
+        </div>
+      </div>
+
+      <nav class="side-nav">
+        <a class="nav-item active" href="#dashboard">👷 <span>Tim Lapangan</span></a>
+        <a class="nav-item" href="#personel">👤 <span>Personel</span></a>
+        <a class="nav-item" href="#penugasan">📋 <span>Penugasan</span></a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="connection-dot" id="connectionDot"></div>
+        <div>
+          <small>Status Google Sheet</small>
+          <strong id="connectionText">Belum terhubung</strong>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content" id="dashboard">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">OPERASIONAL</p>
+          <h1>Tim Lapangan</h1>
+          <p class="subtitle">Data personel dan penugasan lapangan dalam satu dashboard.</p>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-secondary" id="refreshBtn" type="button">↻ Refresh</button>
+          <button class="btn btn-primary" id="addBtn" type="button">＋ Tambah Personel</button>
+        </div>
+      </header>
+
+      <section class="stats-grid" aria-label="Ringkasan">
+        <article class="stat-card">
+          <div class="stat-icon blue">👥</div>
+          <div><span>Total Personel</span><strong id="totalPersonel">0</strong></div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-icon green">✅</div>
+          <div><span>Aktif Bertugas</span><strong id="aktifBertugas">0</strong></div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-icon orange">📍</div>
+          <div><span>Lokasi Tugas</span><strong id="totalLokasi">0</strong></div>
+        </article>
+        <article class="stat-card">
+          <div class="stat-icon purple">📅</div>
+          <div><span>Hari Ini</span><strong id="hariIni">0</strong></div>
+        </article>
+      </section>
+
+      <section class="panel" id="personel">
+        <div class="panel-head">
+          <div>
+            <h2>Data Personel</h2>
+            <p>Daftar anggota tim lapangan dan penugasan terbarunya.</p>
+          </div>
+          <div class="toolbar">
+            <div class="search-box">
+              <span>⌕</span>
+              <input id="searchInput" type="search" placeholder="Cari nama, jabatan, lokasi..." autocomplete="off" />
+            </div>
+            <select id="statusFilter" class="select-control">
+              <option value="">Semua status</option>
+              <option value="Aktif">Aktif</option>
+              <option value="Selesai">Selesai</option>
+              <option value="Cuti">Cuti</option>
+              <option value="Tidak Aktif">Tidak Aktif</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Personel</th>
+                <th>Jabatan</th>
+                <th>No. HP</th>
+                <th>Lokasi Tugas</th>
+                <th>Tanggal</th>
+                <th>Status</th>
+                <th class="action-col">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="personelTableBody">
+              <tr><td colspan="7" class="empty-state">Belum ada data. Hubungkan Google Sheet lalu tambah personel.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel assignment-panel" id="penugasan">
+        <div class="panel-head compact">
+          <div>
+            <h2>Penugasan Lapangan</h2>
+            <p>Ringkasan penempatan personel berdasarkan lokasi.</p>
+          </div>
+          <span class="chip" id="lastSync">Belum ada sinkronisasi</span>
+        </div>
+        <div class="assignment-grid" id="assignmentGrid">
+          <div class="empty-assignment">Data penugasan akan muncul di sini.</div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <span>© <span id="year"></span> Maju Abadi</span>
+        <span>Tim Lapangan</span>
+      </footer>
+    </main>
+  </div>
+
+  <div class="modal-backdrop hidden" id="modalBackdrop">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-head">
+        <div>
+          <p class="eyebrow">DATA PERSONEL</p>
+          <h2 id="modalTitle">Tambah Personel</h2>
+        </div>
+        <button class="icon-btn" id="closeModal" type="button" aria-label="Tutup">×</button>
+      </div>
+
+      <form id="personelForm">
+        <input type="hidden" id="personelId" />
+        <div class="form-grid">
+          <label>
+            <span>Nama Lengkap *</span>
+            <input id="nama" required maxlength="100" placeholder="Contoh: Budi Santoso" />
+          </label>
+          <label>
+            <span>Jabatan *</span>
+            <input id="jabatan" required maxlength="80" placeholder="Contoh: Teknisi Lapangan" />
+          </label>
+          <label>
+            <span>No. HP</span>
+            <input id="noHp" maxlength="30" inputmode="tel" placeholder="08xxxxxxxxxx" />
+          </label>
+          <label>
+            <span>Lokasi Tugas *</span>
+            <input id="lokasi" required maxlength="120" placeholder="Contoh: Semarang Barat" />
+          </label>
+          <label>
+            <span>Tanggal Tugas *</span>
+            <input id="tanggal" required type="date" />
+          </label>
+          <label>
+            <span>Status</span>
+            <select id="status">
+              <option>Aktif</option>
+              <option>Selesai</option>
+              <option>Cuti</option>
+              <option>Tidak Aktif</option>
+            </select>
+          </label>
+          <label class="full-width">
+            <span>Keterangan</span>
+            <textarea id="keterangan" rows="3" maxlength="250" placeholder="Detail pekerjaan, shift, catatan, dll."></textarea>
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" id="cancelBtn" type="button">Batal</button>
+          <button class="btn btn-primary" id="saveBtn" type="submit">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast hidden" id="toast" role="status"></div>
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

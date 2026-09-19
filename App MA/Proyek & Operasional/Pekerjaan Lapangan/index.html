@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pekerjaan Lapangan</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">MAJU ABADI GROUP • LAPANGAN</p><h1>🔧 Pekerjaan Lapangan</h1>
+      <p>Kelola aktivitas dan pekerjaan lapangan.</p>
+    </div>
+    <button id="refreshBtn" class="btn secondary">↻ Refresh</button>
+  </header>
+
+  <main class="container">
+    <section class="stats">
+      <div class="stat"><span>Total</span><strong id="total">0</strong></div>
+      <div class="stat"><span>Belum Mulai</span><strong id="belum">0</strong></div>
+      <div class="stat"><span>Proses</span><strong id="proses">0</strong></div>
+      <div class="stat"><span>Selesai</span><strong id="selesai">0</strong></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Daftar Pekerjaan</h2>
+        <button id="addBtn" class="btn primary">+ Tambah Pekerjaan</button>
+      </div>
+      <div class="filters">
+        <input id="search" type="search" placeholder="Cari pekerjaan, lokasi, petugas...">
+        <select id="statusFilter">
+          <option value="">Semua Status</option>
+          <option>Belum Mulai</option>
+          <option>Proses</option>
+          <option>Selesai</option>
+          <option>Tertunda</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Tanggal</th><th>Pekerjaan</th><th>Lokasi</th>
+              <th>Petugas</th><th>Prioritas</th><th>Status</th><th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+      <div id="empty" class="empty">Belum ada data pekerjaan.</div>
+    </section>
+  </main>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2 id="modalTitle">Tambah Pekerjaan</h2>
+        <button id="closeBtn" class="icon-btn">×</button>
+      </div>
+      <form id="jobForm">
+        <input type="hidden" id="id">
+        <div class="grid">
+          <label>Tanggal<input id="tanggal" type="date" required></label>
+          <label>Nama Pekerjaan<input id="pekerjaan" required placeholder="Contoh: Perbaikan lampu PJU"></label>
+          <label>Lokasi<input id="lokasi" required placeholder="Lokasi pekerjaan"></label>
+          <label>Petugas<input id="petugas" placeholder="Nama petugas/tim"></label>
+          <label>Prioritas
+            <select id="prioritas"><option>Normal</option><option>Tinggi</option><option>Urgent</option></select>
+          </label>
+          <label>Status
+            <select id="status"><option>Belum Mulai</option><option>Proses</option><option>Selesai</option><option>Tertunda</option></select>
+          </label>
+          <label class="full">Keterangan<textarea id="keterangan" rows="3" placeholder="Catatan pekerjaan..."></textarea></label>
+        </div>
+        <div class="form-actions">
+          <button type="button" id="cancelBtn" class="btn secondary">Batal</button>
+          <button class="btn primary" type="submit">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dokumentasi Proyek</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">📸</div>
+        <div>
+          <strong>Dokumentasi Proyek</strong>
+          <small>Progress & Kegiatan</small>
+        </div>
+      </div>
+      <nav>
+        <a class="active" href="#dashboard">📊 Dashboard</a>
+        <a href="#form">➕ Dokumentasi Baru</a>
+        <a href="#galeri">🖼️ Galeri Proyek</a>
+      </nav>
+      <div class="sidebar-note">
+        <span>☁️</span>
+        <div>
+          <strong>Google Sheet</strong>
+          <p>Data tersimpan online dan foto di Google Drive.</p>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">MANAJEMEN LAPANGAN</p>
+          <h1>Dokumentasi Proyek</h1>
+          <p class="muted">Simpan kegiatan, foto, dan perkembangan pekerjaan dalam satu tempat.</p>
+        </div>
+        <button class="primary-btn" onclick="openForm()">＋ Dokumentasi Baru</button>
+      </header>
+
+      <section id="dashboard" class="stats-grid">
+        <div class="stat-card"><span>📚</span><div><small>Total Dokumentasi</small><strong id="statTotal">0</strong></div></div>
+        <div class="stat-card"><span>🏗️</span><div><small>Proyek Aktif</small><strong id="statActive">0</strong></div></div>
+        <div class="stat-card"><span>📈</span><div><small>Progress Rata-rata</small><strong id="statProgress">0%</strong></div></div>
+        <div class="stat-card"><span>✅</span><div><small>Selesai</small><strong id="statDone">0</strong></div></div>
+      </section>
+
+      <section class="toolbar-card">
+        <div class="search-wrap">
+          <span>🔎</span>
+          <input id="searchInput" type="search" placeholder="Cari judul, proyek, kegiatan, PIC..." />
+        </div>
+        <select id="projectFilter"><option value="">Semua Proyek</option></select>
+        <select id="statusFilter">
+          <option value="">Semua Status</option>
+          <option>Belum Mulai</option>
+          <option>Berjalan</option>
+          <option>Selesai</option>
+          <option>Tertunda</option>
+        </select>
+        <button class="secondary-btn" onclick="loadData()">↻ Muat Ulang</button>
+      </section>
+
+      <section id="galeri" class="section-block">
+        <div class="section-heading">
+          <div><h2>Galeri Dokumentasi</h2><p class="muted">Pilih kartu untuk melihat detail kegiatan.</p></div>
+          <span id="resultCount" class="result-count">0 data</span>
+        </div>
+        <div id="gallery" class="gallery"></div>
+        <div id="emptyState" class="empty-state hidden">
+          <div>📷</div><h3>Belum ada dokumentasi</h3><p>Tambahkan dokumentasi pertama untuk memulai.</p>
+        </div>
+      </section>
+
+      <section id="form" class="form-section hidden">
+        <div class="section-heading"><div><h2 id="formTitle">Dokumentasi Baru</h2><p class="muted">Isi data kegiatan dan unggah foto pekerjaan.</p></div></div>
+        <form id="docForm">
+          <input type="hidden" id="recordId" />
+          <div class="form-grid">
+            <label>Judul Dokumentasi<input id="title" required placeholder="Contoh: Pengecoran Lantai 2" /></label>
+            <label>Nama Proyek<input id="project" required placeholder="Nama proyek" /></label>
+            <label>Tanggal Kegiatan<input id="date" type="date" required /></label>
+            <label>PIC / Penanggung Jawab<input id="pic" placeholder="Nama PIC" /></label>
+            <label class="full">Kegiatan / Progress<input id="activity" required placeholder="Contoh: Pemasangan bekisting dan persiapan pengecoran" /></label>
+            <label>Status
+              <select id="status">
+                <option>Belum Mulai</option><option selected>Berjalan</option><option>Selesai</option><option>Tertunda</option>
+              </select>
+            </label>
+            <label>Progress (%)<input id="progress" type="number" min="0" max="100" value="0" required /></label>
+            <label class="full">Catatan<textarea id="notes" rows="4" placeholder="Kondisi lapangan, kendala, tindak lanjut, dll."></textarea></label>
+            <label class="full">Foto Dokumentasi <span class="small-note">Maks. 3 foto, JPG/PNG, masing-masing 5 MB</span>
+              <input id="photos" type="file" accept="image/*" multiple />
+              <div id="photoPreview" class="photo-preview"></div>
+            </label>
+          </div>
+          <div class="form-actions"><button type="button" class="secondary-btn" onclick="closeForm()">Batal</button><button class="primary-btn" type="submit">💾 Simpan Dokumentasi</button></div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <div id="detailModal" class="modal hidden">
+    <div class="modal-backdrop" onclick="closeDetail()"></div>
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeDetail()">×</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
