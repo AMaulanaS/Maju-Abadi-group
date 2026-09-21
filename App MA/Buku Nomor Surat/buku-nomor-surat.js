@@ -169,9 +169,15 @@ function renderTable() {
     return;
   }
 
+  // Surat terbaru ditampilkan paling atas, sehingga tidak perlu scroll ke bawah
+  // meskipun sudah ada ratusan/ribuan nomor surat.
   const list = (data[activeCompany] || [])
     .filter(e => getYear(e.tanggal) === activeYear)
-    .sort((a, b) => Number(a.urutan) - Number(b.urutan));
+    .sort((a, b) => {
+      const urutanDiff = (Number(b.urutan) || 0) - (Number(a.urutan) || 0);
+      if (urutanDiff !== 0) return urutanDiff;
+      return String(b.tanggal || '').localeCompare(String(a.tanggal || ''));
+    });
 
   empty.hidden = list.length !== 0;
   tbody.innerHTML = list.map((e, index) => `
@@ -368,9 +374,15 @@ function showToast(html) {
 function printReport() {
   if (activeCompany === 'cancel') return;
 
+  // Surat terbaru ditampilkan paling atas, sehingga tidak perlu scroll ke bawah
+  // meskipun sudah ada ratusan/ribuan nomor surat.
   const list = (data[activeCompany] || [])
     .filter(e => getYear(e.tanggal) === activeYear)
-    .sort((a, b) => Number(a.urutan) - Number(b.urutan));
+    .sort((a, b) => {
+      const urutanDiff = (Number(b.urutan) || 0) - (Number(a.urutan) || 0);
+      if (urutanDiff !== 0) return urutanDiff;
+      return String(b.tanggal || '').localeCompare(String(a.tanggal || ''));
+    });
 
   document.getElementById('printCompany').textContent = COMPANIES[activeCompany];
   document.getElementById('printTitle').textContent = `Buku Nomor Surat Tahun ${activeYear}`;
