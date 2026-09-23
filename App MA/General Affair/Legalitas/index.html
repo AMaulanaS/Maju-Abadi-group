@@ -3,182 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Reminder SBU & SERKOM</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="theme-color" content="#b91c1c">
+    <title>Smart Reminder SERKOM & Legal — MA Group</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-gray-100 p-4 md:p-8 font-sans text-gray-800">
 
-    <div class="max-w-7xl mx-auto">
-        <h1 class="text-3xl font-bold text-blue-800 mb-6">Smart Reminder SBU & SERKOM</h1>
+<body>
 
-        <!-- Form Input -->
-        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-            <h2 class="text-xl font-semibold mb-4">Tambah Data Surat Baru</h2>
-            <form id="sertifikatForm" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="page-bg"></div>
+
+    <main class="app-shell">
+
+        <!-- HEADER -->
+        <header class="hero-card">
+            <div class="hero-content">
+                <div class="brand-mark">MA</div>
+
                 <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Nama Perusahaan / Personil</label>
-                    <input type="text" id="namaPerusahaan" placeholder="PT Maju Abadi" class="border p-2 rounded w-full" required>
+                    <div class="eyebrow">MAJU ABADI GROUP</div>
+                    <h1>Smart Reminder <span>SERKOM & Legal</span></h1>
+                    <p>
+                        Monitoring dokumen, sertifikat, legalitas dan masa berlaku
+                        RMA • FMA • ZMA
+                    </p>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Jenis Surat</label>
-                    <select id="jenisSurat" class="border p-2 rounded w-full" required>
-                        <option value="">-- Pilih Jenis --</option>
-                        <option value="SBU">SBU</option>
-                        <option value="SERKOM">SERKOM</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Nomor Surat</label>
-                    <input type="text" id="nomorSurat" placeholder="123/SBU/2026" class="border p-2 rounded w-full" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Tanggal Terbit</label>
-                    <input type="date" id="tanggalTerbit" class="border p-2 rounded w-full" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Tanggal Berakhir</label>
-                    <input type="date" id="tanggalBerakhir" class="border p-2 rounded w-full" required>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Keterangan</label>
-                    <input type="text" id="keterangan" placeholder="Catatan / Sub Bidang" class="border p-2 rounded w-full">
-                </div>
-                <button type="submit" id="btnSubmit" class="bg-blue-600 text-white p-2.5 rounded hover:bg-blue-700 md:col-span-3 font-semibold mt-2">Simpan Data</button>
-            </form>
-            <div id="statusMsg" class="mt-3 text-sm font-semibold hidden"></div>
+            </div>
+
+            <div class="hero-badge">
+                <span class="live-dot"></span>
+                SYSTEM ONLINE
+            </div>
+        </header>
+
+        <!-- WARNING CONNECTION -->
+        <div id="connectionWarning" class="connection-warning hidden">
+            ⚠️ <strong>URL Web App belum diisi.</strong>
+            Buka <code>script.js</code> lalu isi <code>SCRIPT_URL</code>
+            dengan URL Web App Google Apps Script.
         </div>
 
-        <!-- Tabel Monitoring -->
-        <div class="bg-white rounded-lg shadow-md overflow-x-auto">
-            <table class="w-full text-left border-collapse text-sm">
-                <thead class="bg-gray-800 text-white">
-                    <tr>
-                        <th class="p-3">ID</th>
-                        <th class="p-3">Nama Perusahaan</th>
-                        <th class="p-3">Jenis</th>
-                        <th class="p-3">Nomor Surat</th>
-                        <th class="p-3">Tgl Terbit</th>
-                        <th class="p-3">Tgl Berakhir</th>
-                        <th class="p-3">Keterangan</th>
-                        <th class="p-3">Status Pengingat</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    <tr><td colspan="8" class="p-4 text-center">Memuat data...</td></tr>
-                </tbody>
-            </table>
+        <!-- TABS -->
+        <nav id="tabBar" class="tabs"></nav>
+
+        <!-- MAIN CARD -->
+        <section class="main-card">
+
+            <!-- FORM HEADER -->
+            <div class="section-header">
+                <div>
+                    <div id="formTitle" class="section-title"></div>
+                    <div id="formSubtitle" class="section-subtitle"></div>
+                </div>
+
+                <div class="record-counter">
+                    <span id="recordCount">0</span>
+                    <small>Data</small>
+                </div>
+            </div>
+
+            <!-- FORM -->
+            <form id="dataForm">
+                <div id="formFields" class="form-grid"></div>
+
+                <div class="form-actions">
+                    <button type="submit" id="btnSubmit" class="btn-primary">
+                        💾 Simpan Data
+                    </button>
+
+                    <button type="button" id="btnRefresh" class="btn-secondary">
+                        ↻ Refresh Data
+                    </button>
+                </div>
+            </form>
+
+            <!-- TABLE -->
+            <div class="table-section">
+                <div class="table-title">
+                    <div>
+                        <strong>Data Monitoring</strong>
+                        <span>Data tersimpan dari Google Spreadsheet</span>
+                    </div>
+                    <div class="legend">
+                        <span>🟢 Aman</span>
+                        <span>🟡 ≤ 120 Hari</span>
+                        <span>🔴 Expired</span>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead id="tableHead"></thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+
+        <footer>
+            <span>© 2026 Maju Abadi Group</span>
+            <span>Smart Legal Monitoring System</span>
+        </footer>
+
+    </main>
+
+    <div id="loadingOverlay" class="loading-overlay hidden" aria-live="polite" aria-busy="false">
+        <div class="loading-card">
+            <div class="loading-spinner"></div>
+            <div class="loading-title" id="loadingTitle">Sedang memproses...</div>
+            <div class="loading-text" id="loadingText">Mohon tunggu sebentar, jangan klik berulang.</div>
         </div>
     </div>
 
-    <script>
-        // MASUKKAN URL GOOGLE APPS SCRIPT ANDA DI SINI
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwlN-HkUOTcJh9Ur_DZ_HZ413xgqkZueiyOSYRl7vQBque_A2mJgGvQoEJznou0vgCApg/exec'; 
+    <div id="toast" class="toast"></div>
 
-        const form = document.getElementById('sertifikatForm');
-        const tableBody = document.getElementById('tableBody');
-        const statusMsg = document.getElementById('statusMsg');
-        const btnSubmit = document.getElementById('btnSubmit');
-
-        async function loadData() {
-            try {
-                const response = await fetch(SCRIPT_URL);
-                const data = await response.json();
-                renderTable(data);
-            } catch (error) {
-                tableBody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-red-500 font-semibold">Gagal memuat data dari spreadsheet.</td></tr>';
-            }
-        }
-
-        function renderTable(data) {
-            tableBody.innerHTML = '';
-            
-            const validData = data.filter(item => item.namaperusahaan && item.tanggalberakhir);
-
-            if(validData.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="8" class="p-4 text-center text-gray-500">Belum ada data sertifikat tersimpan.</td></tr>';
-                return;
-            }
-
-            const today = new Date();
-            today.setHours(0,0,0,0);
-
-            validData.forEach(item => {
-                const expDate = new Date(item.tanggalberakhir);
-                const terbitDate = item.tanggalterbit ? new Date(item.tanggalterbit).toLocaleDateString('id-ID') : '-';
-                
-                if (isNaN(expDate.getTime())) return;
-
-                const diffTime = expDate - today;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                
-                let statusBadge = '';
-                let rowColor = '';
-
-                if (diffDays < 0) {
-                    statusBadge = '<span class="bg-red-600 text-white px-2.5 py-1 rounded-full text-xs font-bold">ED / Expired</span>';
-                    rowColor = 'bg-red-50';
-                } else if (diffDays <= 90) {
-                    statusBadge = `<span class="bg-yellow-500 text-white px-2.5 py-1 rounded-full text-xs font-bold">Wajib Perpanjang (${diffDays} Hari)</span>`;
-                    rowColor = 'bg-yellow-50';
-                } else {
-                    statusBadge = `<span class="bg-green-600 text-white px-2.5 py-1 rounded-full text-xs font-bold">Aman (${diffDays} Hari)</span>`;
-                }
-
-                const row = `
-                    <tr class="border-b ${rowColor} hover:bg-gray-100 transition">
-                        <td class="p-3 font-mono text-xs text-gray-500">${item.id || '-'}</td>
-                        <td class="p-3 font-medium">${item.namaperusahaan || '-'}</td>
-                        <td class="p-3"><span class="font-bold border px-2 py-0.5 rounded bg-white">${item.jenissurat || '-'}</span></td>
-                        <td class="p-3">${item.nomorsurat || '-'}</td>
-                        <td class="p-3">${terbitDate}</td>
-                        <td class="p-3 font-semibold">${expDate.toLocaleDateString('id-ID')}</td>
-                        <td class="p-3 text-gray-600">${item.keterangan || '-'}</td>
-                        <td class="p-3">${statusBadge}</td>
-                    </tr>
-                `;
-                tableBody.innerHTML += row;
-            });
-        }
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            btnSubmit.disabled = true;
-            btnSubmit.innerText = 'Menyimpan...';
-            statusMsg.classList.remove('hidden');
-            statusMsg.className = 'mt-3 text-sm font-semibold text-blue-600';
-            statusMsg.innerText = 'Mengirim data ke sistem...';
-
-            const formData = new URLSearchParams();
-            formData.append('namaPerusahaan', document.getElementById('namaPerusahaan').value);
-            formData.append('jenisSurat', document.getElementById('jenisSurat').value);
-            formData.append('nomorSurat', document.getElementById('nomorSurat').value);
-            formData.append('tanggalTerbit', document.getElementById('tanggalTerbit').value);
-            formData.append('tanggalBerakhir', document.getElementById('tanggalBerakhir').value);
-            formData.append('keterangan', document.getElementById('keterangan').value);
-
-            try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: formData,
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-                });
-                
-                statusMsg.className = 'mt-3 text-sm font-semibold text-green-600';
-                statusMsg.innerText = 'Data berhasil disimpan!';
-                form.reset();
-                loadData();
-            } catch (error) {
-                statusMsg.className = 'mt-3 text-sm font-semibold text-red-600';
-                statusMsg.innerText = 'Gagal menyimpan data ke sistem.';
-            } finally {
-                btnSubmit.disabled = false;
-                btnSubmit.innerText = 'Simpan Data';
-                setTimeout(() => statusMsg.classList.add('hidden'), 4000);
-            }
-        });
-
-        loadData();
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
