@@ -1,9 +1,112 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MA Group | Modul</title>
-<style>body{font-family:Arial,sans-serif;background:#f7f7f5;margin:0;padding:60px;color:#222}.box{max-width:700px;margin:auto;background:#fff;border:1px solid #ddd;border-radius:16px;padding:32px;box-shadow:0 8px 24px rgba(0,0,0,.06)}a{color:#222}</style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Inventaris Kantor</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 </head>
-<body><div class="box"><h1>Modul Alat Inventaris</h1><p>Halaman modul ini sudah disiapkan. Fitur sedang dikembangkan.</p><p><a href="../../index.html">← Kembali ke Beranda ERP</a></p></div></body></html>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand"><div class="brand-icon"><i class="bi bi-box-seam"></i></div><div><b>INVENTARIS</b><span>KANTOR</span></div></div>
+  <nav>
+    <button class="nav-item active" data-page="dashboard"><i class="bi bi-grid-1x2-fill"></i> Dashboard</button>
+    <button class="nav-item" data-page="inventaris"><i class="bi bi-boxes"></i> Inventaris</button>
+    <button class="nav-item" data-page="kategoriPage"><i class="bi bi-tags"></i> Master Kategori</button>
+    <button class="nav-item" data-page="peminjaman"><i class="bi bi-arrow-left-right"></i> Peminjaman</button>
+    <button class="nav-item" data-page="mutasi"><i class="bi bi-truck"></i> Mutasi Barang</button>
+    <button class="nav-item" data-page="laporan"><i class="bi bi-file-earmark-bar-graph"></i> Laporan</button>
+  </nav>
+  <div class="connection"><span id="connectionDot"></span><span id="connectionText">Menghubungkan...</span></div>
+</aside>
+
+<main class="main">
+<header class="topbar">
+  <div><h1 id="pageTitle">Dashboard</h1><p>Kelola aset dan inventaris kantor dengan mudah.</p></div>
+  <button class="btn primary" onclick="openInventoryModal()"><i class="bi bi-plus-lg"></i> Tambah Aset</button>
+</header>
+
+<section id="dashboardPage" class="page active">
+  <div class="stats">
+    <div class="stat"><div class="stat-icon blue"><i class="bi bi-boxes"></i></div><div><span>Total Aset</span><b id="totalAset">0</b></div></div>
+    <div class="stat"><div class="stat-icon green"><i class="bi bi-check-circle"></i></div><div><span>Tersedia</span><b id="tersedia">0</b></div></div>
+    <div class="stat"><div class="stat-icon orange"><i class="bi bi-person-workspace"></i></div><div><span>Dipinjam</span><b id="dipinjam">0</b></div></div>
+    <div class="stat"><div class="stat-icon red"><i class="bi bi-exclamation-triangle"></i></div><div><span>Rusak</span><b id="rusak">0</b></div></div>
+  </div>
+  <div class="card"><div class="card-head"><h2>Inventaris Terbaru</h2><button class="link-btn" onclick="showPage('inventaris')">Lihat semua <i class="bi bi-arrow-right"></i></button></div>
+  <div class="table-wrap"><table><thead><tr><th>Kode</th><th>Nama Barang</th><th>Kategori</th><th>Lokasi</th><th>Kondisi</th><th>Status</th></tr></thead><tbody id="recentTable"></tbody></table></div></div>
+  <div class="value-card"><span>Total Nilai Inventaris</span><b id="totalNilai">Rp 0</b></div>
+
+  <div class="dashboard-chart-grid">
+    <div class="card chart-card">
+      <div class="chart-head"><div><h2>Jumlah Barang per Kategori</h2><p>Distribusi jumlah unit/barang berdasarkan kategori.</p></div></div>
+      <div class="chart-wrap"><canvas id="categoryChart"></canvas></div>
+    </div>
+    <div class="card chart-card">
+      <div class="chart-head"><div><h2>Nilai Aset per Kategori</h2><p>Total nilai perolehan aset berdasarkan kategori.</p></div></div>
+      <div class="chart-wrap"><canvas id="valueCategoryChart"></canvas></div>
+    </div>
+    <div class="card chart-card chart-full">
+      <div class="chart-head"><div><h2>Kondisi Inventaris</h2><p>Perbandingan kondisi barang yang tercatat.</p></div></div>
+      <div class="chart-wrap small"><canvas id="conditionChart"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<section id="inventarisPage" class="page">
+  <div class="toolbar"><input id="searchInput" type="search" placeholder="Cari nama, kode, merk, nomor seri..." oninput="renderInventory()">
+  <select id="categoryFilter" onchange="renderInventory()"><option value="">Semua Kategori</option></select>
+  <select id="conditionFilter" onchange="renderInventory()"><option value="">Semua Kondisi</option><option>Baik</option><option>Rusak Ringan</option><option>Rusak Berat</option></select></div>
+  <div class="card"><div class="table-wrap"><table><thead><tr><th>Kode</th><th>Nama Barang</th><th>Kategori</th><th>Merk/Type</th><th>Jumlah</th><th>Harga/Barang</th><th>Lokasi</th><th>Kondisi</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="inventoryTable"></tbody></table></div></div>
+</section>
+
+<section id="kategoriPagePage" class="page">
+  <div class="section-head"><div><h2>Master Kategori</h2><p>Kelola kategori barang inventaris.</p></div><button class="btn primary" onclick="openCategoryModal()"><i class="bi bi-plus-lg"></i> Tambah Kategori</button></div>
+  <div class="card"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Nama Kategori</th><th>Status</th><th>Keterangan</th><th>Aksi</th></tr></thead><tbody id="categoryTable"></tbody></table></div></div>
+</section>
+
+<section id="peminjamanPage" class="page placeholder"><i class="bi bi-arrow-left-right"></i><h2>Modul Peminjaman</h2><p>Siap dikembangkan pada tahap berikutnya.</p></section>
+<section id="mutasiPage" class="page placeholder"><i class="bi bi-truck"></i><h2>Modul Mutasi Barang</h2><p>Siap dikembangkan pada tahap berikutnya.</p></section>
+<section id="laporanPage" class="page placeholder"><i class="bi bi-file-earmark-bar-graph"></i><h2>Modul Laporan</h2><p>Siap dikembangkan pada tahap berikutnya.</p></section>
+</main>
+</div>
+
+<div class="modal" id="inventoryModal"><div class="modal-box">
+<div class="modal-head"><h2 id="modalTitle">Tambah Aset</h2><button onclick="closeModal('inventoryModal')"><i class="bi bi-x-lg"></i></button></div>
+<form id="inventoryForm"><input type="hidden" id="editId"><div class="form-grid">
+<label>Nama Barang<input id="nama" required></label><label>Kategori<select id="kategori" required></select></label>
+<label>Merk / Type<input id="merk"></label><label>Nomor Seri<input id="noSeri"></label>
+<label>Jumlah<input id="jumlah" type="number" min="1" value="1" required></label>
+<label>Satuan<select id="satuan" required>
+<option value="pcs">pcs</option><option value="buah">buah</option><option value="unit" selected>unit</option>
+<option value="set">set</option><option value="pak">pak</option><option value="lusin">lusin</option>
+<option value="lembar">lembar</option><option value="meter">meter</option><option value="roll">roll</option><option value="botol">botol</option><option value="box">box</option><option value="lainnya">lainnya</option>
+</select></label>
+<label>Tanggal Pembelian<input id="tanggalPembelian" type="date"></label><label>Harga Perolehan<input id="harga" type="number" min="0" value="0"></label>
+<label>Lokasi<select id="lokasi"></select></label><label>Penanggung Jawab<input id="penanggungJawab"></label>
+<label>Kondisi<select id="kondisi"><option>Baik</option><option>Rusak Ringan</option><option>Rusak Berat</option></select></label>
+<label>Status<select id="status"><option>Tersedia</option><option>Dipinjam</option><option>Rusak</option></select></label>
+<label class="full">Keterangan<textarea id="keterangan"></textarea></label>
+</div><div class="modal-actions"><button type="button" class="btn secondary" onclick="closeModal('inventoryModal')">Batal</button><button class="btn primary">Simpan</button></div></form>
+</div></div>
+
+<div class="modal" id="categoryModal"><div class="modal-box small-modal">
+<div class="modal-head"><h2 id="categoryModalTitle">Tambah Kategori</h2><button onclick="closeModal('categoryModal')"><i class="bi bi-x-lg"></i></button></div>
+<form id="categoryForm"><input type="hidden" id="categoryId">
+<label>Nama Kategori<input id="categoryName" required placeholder="Contoh: Komputer"></label>
+<label style="display:block;margin-top:14px">Status<select id="categoryStatus"><option>Aktif</option><option>Nonaktif</option></select></label>
+<label style="display:block;margin-top:14px">Keterangan<textarea id="categoryNote" placeholder="Keterangan kategori"></textarea></label>
+<div class="modal-actions"><button type="button" class="btn secondary" onclick="closeModal('categoryModal')">Batal</button><button class="btn primary">Simpan</button></div>
+</form></div></div>
+<div id="loadingOverlay" class="loading-overlay" aria-hidden="true">
+  <div class="loading-card">
+    <div class="spinner"></div>
+    <b id="loadingText">Memproses...</b>
+    <span>Mohon tunggu, jangan klik berulang.</span>
+  </div>
+</div>
+<div id="toast"></div>
+<script src="script.js"></script>
+</body></html>
