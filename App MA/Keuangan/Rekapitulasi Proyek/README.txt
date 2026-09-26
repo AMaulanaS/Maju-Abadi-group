@@ -23,3 +23,8 @@ SETUP GOOGLE SHEET
 PENTING
 Jika deployment lama diperbarui, gunakan New version agar Code.gs V5 aktif.
 Tidak perlu membuat ulang sheet PROYEK, PEMBAYARAN, atau PEJABAT.
+
+PERUBAHAN V5.1
+- Field Komitmen (opsional) ditambahkan pada data proyek.
+- Perusahaan/entitas RELASI (kode RLS) ditambahkan. Data proyek RELASI tersimpan terpisah dari tiga perusahaan utama.
+- Google Sheet akan menambahkan kolom komitmen otomatis saat setupDatabase()/akses API berikutnya.

@@ -6,7 +6,7 @@
 // ================================================================
 const SHEETS={projects:'PROYEK',payments:'PEMBAYARAN',officials:'PEJABAT',activities:'LOG_AKTIVITAS'};
 const HEADERS={
- PROYEK:['id','company','tanggal','noKontrak','nama','opd','lokasi','nilai','pph','ppn','tahun','ppkom','pptk','mandor','staff','keterangan','createdAt','updatedAt'],
+ PROYEK:['id','company','tanggal','noKontrak','nama','komitmen','klien','picKlien','lokasi','periodeMulai','periodeSelesai','nilai','pph','ppn','tahun','ppkom','pptk','mandor','staff','statusSPK','nomorBAST','tanggalBAST','statusFaktur','nomorFaktur','statusBupot','nomorBupot','garansiMulai','garansiSelesai','catatanLapangan','keterangan','createdAt','updatedAt'],
  PEMBAYARAN:['id','company','projectId','tanggal','termin','nominal','keterangan','createdAt'],
  PEJABAT:['id','company','nama','nip','jabatan','instansi','createdAt'],
  LOG_AKTIVITAS:['id','waktu','company','aktivitas','data','keterangan']
