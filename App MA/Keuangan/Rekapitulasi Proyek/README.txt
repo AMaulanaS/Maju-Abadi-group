@@ -1,28 +1,25 @@
-KEUANGAN PROYEK MAJU ABADI GROUP — V2 GOOGLE SHEET
+KEUANGAN PROYEK MAJU ABADI GROUP — V5
 
-FITUR V2
-- Tema modern gradient biru-merah.
-- 3 perusahaan: FMA, ZMA, RMA.
-- Master Pejabat memiliki Nama, NIP, Jabatan, Instansi/Wilayah.
-- PPKom/PPTK/Mandor/Staff pada Proyek dipilih dari Master Pejabat.
-- Input Rupiah otomatis tampil 50.000.000.
-- Tabel proyek: Nilai -> PPh -> PPN -> Uang Masuk -> Sisa.
-- Pembayaran/termin tersimpan terpisah dari kontrak.
-- Google Sheet sebagai database utama.
+FITUR V5
+- Dashboard modern gradient biru-merah.
+- Filter dashboard: Tahun Anggaran, Status Pembayaran, OPD/Dinas.
+- Grafik Nilai Kontrak vs Dana Masuk.
+- Grafik pemasukan per bulan.
+- Ringkasan Nilai Kontrak, PPh, PPN, Uang Masuk dan Sisa Piutang.
+- Detail proyek + riwayat termin + cetak per proyek.
+- Menu Aktivitas / audit trail TANPA login.
+- Google Sheet menjadi database utama.
 
-CARA MEMBUAT DATABASE GOOGLE SHEET
-1. Buat Google Spreadsheet baru, misalnya: DATABASE KEUANGAN PROYEK MAG.
-2. Buka Extensions / Ekstensi > Apps Script.
-3. Hapus kode lama lalu tempel seluruh isi file Code.gs.
-4. Save. Pilih fungsi setupDatabase lalu klik Run/Jalankan SATU KALI.
-5. Izinkan akses. Kembali ke Sheet. Otomatis dibuat sheet: PROYEK, PEMBAYARAN, PEJABAT.
-6. Apps Script > Deploy > New deployment > Web app.
-7. Execute as: Me. Who has access: Anyone. Klik Deploy.
-8. Copy URL Web App yang berakhiran /exec.
-9. Buka script.js. Isi baris: const API_URL='URL_ANDA';
-10. Upload index.html, style.css, script.js ke hosting/GitHub Pages lalu refresh.
+SETUP GOOGLE SHEET
+1. Buka Spreadsheet database yang sudah digunakan.
+2. Extensions > Apps Script.
+3. GANTI Code.gs lama dengan Code.gs dari folder ini.
+4. Save lalu jalankan setupDatabase() satu kali.
+5. Sheet LOG_AKTIVITAS akan dibuat otomatis.
+6. Deploy > Manage deployments > Edit deployment > New version > Deploy.
+7. Salin URL Web App /exec.
+8. Buka script.js dan isi const API_URL='URL_ANDA';
 
-CATATAN
-- Jika API_URL masih kosong, aplikasi masuk Mode Lokal agar tampilan tetap dapat dicoba.
-- NIP disimpan sebagai teks agar angka panjang tidak rusak/berubah oleh Google Sheet.
-- Setelah mengubah Code.gs di kemudian hari, deploy versi baru dari Apps Script.
+PENTING
+Jika deployment lama diperbarui, gunakan New version agar Code.gs V5 aktif.
+Tidak perlu membuat ulang sheet PROYEK, PEMBAYARAN, atau PEJABAT.
