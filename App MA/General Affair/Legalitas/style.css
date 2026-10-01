@@ -328,6 +328,38 @@ body {
     box-shadow: 0 0 0 4px rgba(37,99,235,.10);
 }
 
+
+.upload-card {
+    grid-column: 1 / -1;
+    padding: 16px;
+    border: 1px dashed #93c5fd;
+    border-radius: 12px;
+    background: #eff6ff;
+}
+
+.field-group input[type="file"] {
+    height: auto;
+    padding: 10px 12px;
+    background: #fff;
+}
+
+.upload-status {
+    display: block;
+    margin-top: 7px;
+    color: #64748b;
+    font-size: 11px;
+}
+
+.upload-status.uploading { color: #1d4ed8; }
+.upload-status.success { color: #15803d; font-weight: 700; }
+.upload-status.error { color: #b91c1c; font-weight: 700; }
+
+.field-group input:disabled {
+    background: #f1f5f9;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
 .form-actions {
     display: flex;
     gap: 10px;
@@ -742,3 +774,41 @@ body.is-loading button, body.is-loading input { cursor: wait; }
     from { opacity: 0; transform: translateY(8px) scale(.97); }
     to { opacity: 1; transform: translateY(0) scale(1); }
 }
+
+/* TOMBOL GOOGLE DRIVE DI KOLOM STATUS */
+.status-cell {
+    min-width: 145px;
+}
+
+.status-cell > div {
+    margin-top: 7px;
+}
+
+.drive-link-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-height: 28px;
+    padding: 0 9px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    background: #fff;
+    color: #1d4ed8;
+    text-decoration: none;
+    font-size: 10px;
+    font-weight: 800;
+    transition: .2s ease;
+}
+
+.drive-link-btn:hover {
+    border-color: #2563eb;
+    background: #eff6ff;
+    transform: translateY(-1px);
+}
+
+.drive-link-empty {
+    color: #94a3b8;
+    font-size: 11px;
+}
+\n\n/* ================================================================\n   TOMBOL GOOGLE DRIVE DI KOLOM STATUS\n   ================================================================ */\n.status-cell {\n    min-width: 190px;\n    vertical-align: middle;\n}\n\n.status-actions {\n    display: flex;\n    align-items: center;\n    justify-content: flex-start;\n    gap: 8px;\n    flex-wrap: wrap;\n}\n\n.drive-link-btn {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    gap: 5px;\n    min-height: 30px;\n    padding: 5px 10px;\n    border: 1px solid #2563eb;\n    border-radius: 8px;\n    background: #eff6ff;\n    color: #1d4ed8 !important;\n    font-size: 12px;\n    font-weight: 700;\n    line-height: 1;\n    text-decoration: none !important;\n    white-space: nowrap;\n    cursor: pointer;\n    transition: .15s ease;\n}\n\n.drive-link-btn:hover {\n    background: #dbeafe;\n    border-color: #1d4ed8;\n    transform: translateY(-1px);\n}\n\n.drive-link-disabled,\n.drive-link-disabled:hover {\n    border-color: #d1d5db;\n    background: #f3f4f6;\n    color: #9ca3af !important;\n    cursor: not-allowed;\n    transform: none;\n}\n\n@media (max-width: 900px) {\n    .status-actions {\n        align-items: flex-start;\n        flex-direction: column;\n    }\n}\n

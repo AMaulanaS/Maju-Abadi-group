@@ -10,6 +10,7 @@ Di file `code.gs`, cari bagian paling atas:
 
 ```javascript
 const SPREADSHEET_ID = 'TEMPEL_ID_SPREADSHEET_DI_SINI';
+const DRIVE_FOLDER_ID = ''; // opsional, isi ID folder Drive untuk penyimpanan PDF
 ```
 
 Misalnya alamat Google Spreadsheet Anda:
@@ -231,3 +232,29 @@ Periksa berurutan:
 - Peringatan expired menjadi **120 hari**.
 
 > Catatan: jika Spreadsheet lama sudah memiliki kolom/header versi sebelumnya, sesuaikan header tab agar sama dengan struktur baru sebelum dipakai menyimpan data baru. Data lama tidak dihapus otomatis oleh versi ini.
+
+
+## BAGIAN L — Upload PDF sebelum mengisi field
+
+- Semua menu (SERKOM, LEGAL RMA, LEGAL FMA, LEGAL ZMA) sekarang mewajibkan upload PDF terlebih dahulu.
+- Setelah PDF berhasil tersimpan di Google Drive, field isian baru aktif.
+- Maksimal ukuran PDF: 10 MB.
+- Nama file dan URL file disimpan ke Spreadsheet pada kolom `UploadFileName` dan `UploadFileUrl`.
+- Untuk menyimpan file ke folder Drive tertentu, isi `DRIVE_FOLDER_ID` dengan ID folder tersebut.
+- Setelah mengubah `code.gs`, lakukan deploy ulang Web App sebagai versi baru.
+
+## TROUBLESHOOTING UPLOAD PDF
+
+Jika muncul pesan `Unexpected token 'E' ... is not valid JSON` saat upload PDF:
+
+1. Buka project Google Apps Script.
+2. Pastikan `SPREADSHEET_ID` sudah benar.
+3. Pada dropdown fungsi, pilih `testDriveAccess` lalu klik **Run/Jalankan**.
+4. Berikan izin Google Drive/Spreadsheet jika Google meminta otorisasi.
+5. Pastikan hasil eksekusi menunjukkan `Akses Google Drive OK`.
+6. Buka **Deploy > Manage deployments > Edit**.
+7. Pastikan Web App dijalankan sebagai **Me/pemilik script** dan akses sesuai kebutuhan aplikasi (umumnya **Anyone** bila aplikasi dibuka publik).
+8. Pilih **New version**, lalu **Deploy**.
+9. Gunakan URL `/exec` deployment terbaru pada `SCRIPT_URL` di `script.js`.
+
+Versi frontend terbaru juga sudah memperbaiki parser respons sehingga jika Apps Script mengembalikan error, pesan error asli akan ditampilkan, bukan `Unexpected token E`.

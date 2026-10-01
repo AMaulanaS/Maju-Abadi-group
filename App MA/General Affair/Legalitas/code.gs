@@ -14,7 +14,13 @@
 //
 // ================================================================
 
-const SPREADSHEET_ID = 'TEMPEL_ID_SPREADSHEET_DI_SINI';
+const SPREADSHEET_ID = '159mTMvDbnLM1Tx0SFL_yBs3RqlCpfwBsrIA_NkwWrd8';
+
+// ID folder Google Drive tempat PDF diupload.
+// Isi dengan ID folder Google Drive jika ingin file masuk ke folder tertentu.
+// Jika kosong, file akan disimpan di My Drive milik akun yang menjalankan Web App.
+const DRIVE_FOLDER_ID = '';
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 
 // ================================================================
 // PEMETAAN KATEGORI -> NAMA TAB & HEADER
@@ -24,26 +30,26 @@ const REMINDER_DAYS = 120;
 const SHEET_CONFIG = {
   serkom: {
     sheetName: 'SERKOM',
-    headers: ['Timestamp', 'ID', 'Nama', 'Serkom', 'KodeKualifikasi', 'TglBuat', 'ExpiredDate',
+    headers: ['Timestamp', 'ID', 'UploadFileName', 'UploadFileUrl', 'Nama', 'Serkom', 'KodeKualifikasi', 'TglBuat', 'ExpiredDate',
               'Bidang', 'SubBidang', 'Keterangan'],
     statusCols: ['ExpiredDate'],
     identCols: ['Nama', 'Serkom']
   },
   legal_rma: {
     sheetName: 'LEGAL RMA',
-    headers: ['Timestamp', 'ID', 'Legal', 'NoDokumen', 'TglDokumen', 'TglExpired', 'Keterangan'],
+    headers: ['Timestamp', 'ID', 'UploadFileName', 'UploadFileUrl', 'Legal', 'NoDokumen', 'TglDokumen', 'TglExpired', 'Keterangan'],
     statusCols: ['TglExpired'],
     identCols: ['Legal']
   },
   legal_fma: {
     sheetName: 'LEGAL FMA',
-    headers: ['Timestamp', 'ID', 'Legal', 'NoDokumen', 'TglDokumen', 'TglExpired', 'Keterangan'],
+    headers: ['Timestamp', 'ID', 'UploadFileName', 'UploadFileUrl', 'Legal', 'NoDokumen', 'TglDokumen', 'TglExpired', 'Keterangan'],
     statusCols: ['TglExpired'],
     identCols: ['Legal']
   },
   legal_zma: {
     sheetName: 'LEGAL ZMA',
-    headers: ['Timestamp', 'ID', 'Legal', 'NoDokumen', 'TglDokumen', 'TglExpired', 'Keterangan'],
+    headers: ['Timestamp', 'ID', 'UploadFileName', 'UploadFileUrl', 'Legal', 'NoDokumen', 'TglDokumen', 'TglExpired', 'Keterangan'],
     statusCols: ['TglExpired'],
     identCols: ['Legal']
   }
@@ -196,7 +202,9 @@ function migrasikanBaris_(kategori, oldHeaders, row, newHeaders) {
     ]);
 
     const ket = [keteranganTambahan].filter(Boolean).join(' | ');
-    return [timestamp, id, nama, serkom, kode, tglBuat, expired, bidang, subBidang, ket];
+    const uploadFileName = nilaiLama_(oldHeaders, row, ['UploadFileName', 'NamaFile', 'FileName']);
+    const uploadFileUrl = nilaiLama_(oldHeaders, row, ['UploadFileUrl', 'FileUrl', 'URLFile', 'LinkFile']);
+    return [timestamp, id, uploadFileName, uploadFileUrl, nama, serkom, kode, tglBuat, expired, bidang, subBidang, ket];
   }
 
   // LEGAL RMA/FMA/ZMA
@@ -206,7 +214,9 @@ function migrasikanBaris_(kategori, oldHeaders, row, newHeaders) {
   const tglExpired = nilaiLama_(oldHeaders, row, ['TglExpired', 'Tgl Expired', 'Tanggal Expired', 'ExpiredDate', 'Expired Date']);
   const keterangan = nilaiLama_(oldHeaders, row, ['Keterangan']);
 
-  return [timestamp, id, legal, noDokumen, tglDokumen, tglExpired, keterangan];
+  const uploadFileName = nilaiLama_(oldHeaders, row, ['UploadFileName', 'NamaFile', 'FileName']);
+  const uploadFileUrl = nilaiLama_(oldHeaders, row, ['UploadFileUrl', 'FileUrl', 'URLFile', 'LinkFile']);
+  return [timestamp, id, uploadFileName, uploadFileUrl, legal, noDokumen, tglDokumen, tglExpired, keterangan];
 }
 
 function buatNamaBackup_(sheetName) {
@@ -227,6 +237,47 @@ function formatHeader_(sheet, jumlahKolom) {
     .setBackground('#172554')
     .setFontColor('#ffffff');
   sheet.autoResizeColumns(1, jumlahKolom);
+}
+
+function getUploadFolder_() {
+  try {
+    if (DRIVE_FOLDER_ID) {
+      return DriveApp.getFolderById(DRIVE_FOLDER_ID);
+    }
+    return DriveApp.getRootFolder();
+  } catch (err) {
+    throw new Error(
+      'Google Drive belum diberi izin. Buka Apps Script, pilih fungsi authorizeApp, klik Run, lalu izinkan akses Google Drive. ' +
+      'Setelah itu deploy ulang Web App dengan Execute as: Me. Detail: ' +
+      (err && err.message ? err.message : err)
+    );
+  }
+}
+
+function uploadPdf_(e) {
+  const fileName = String(e.parameter.fileName || '').trim();
+  const mimeType = String(e.parameter.mimeType || '').toLowerCase();
+  const base64 = String(e.parameter.fileBase64 || '');
+
+  if (!fileName || !base64) throw new Error('File PDF belum diterima.');
+  if (mimeType !== 'application/pdf' && !fileName.toLowerCase().endsWith('.pdf')) {
+    throw new Error('File harus berupa PDF.');
+  }
+
+  const bytes = Utilities.base64Decode(base64);
+  if (bytes.length > MAX_UPLOAD_BYTES) throw new Error('Ukuran PDF maksimal 10 MB.');
+
+  const safeName = fileName.replace(/[^a-zA-Z0-9._ -]/g, '_');
+  const blob = Utilities.newBlob(bytes, 'application/pdf', safeName);
+  const file = getUploadFolder_().createFile(blob);
+
+  return {
+    success: true,
+    fileId: file.getId(),
+    fileName: file.getName(),
+    fileUrl: file.getUrl(),
+    uploadedAt: new Date().toISOString()
+  };
 }
 
 function doGet(e) {
@@ -276,32 +327,72 @@ function doGet(e) {
 
 function doPost(e) {
   try {
+    const action = String(e && e.parameter && e.parameter.action || '').toLowerCase();
+
+    if (action === 'upload') {
+      return jsonOutput_(uploadPdf_(e));
+    }
+
     const kategori = (e && e.parameter && e.parameter.kategori || '').toLowerCase();
     const cfg = SHEET_CONFIG[kategori];
 
     if (!cfg) {
-      return textOutput_('Error: kategori tidak dikenal');
+      return jsonOutput_({ success: false, error: 'Kategori tidak dikenal: ' + kategori });
+    }
+
+    if (!e.parameter.fileId || !e.parameter.fileUrl) {
+      return jsonOutput_({ success: false, error: 'PDF wajib diupload terlebih dahulu.' });
     }
 
     const sheet = getOrCreateSheet_(cfg);
     const timestamp = new Date();
     const id = 'ID-' + Date.now().toString().slice(-8);
+    const row = [timestamp, id,
+      (e.parameter.fileName || '').toString().trim(),
+      (e.parameter.fileUrl || '').toString().trim()];
 
-    const dataHeaders = cfg.headers.slice(2);
-    const row = [timestamp, id];
-
-    dataHeaders.forEach(h => {
+    cfg.headers.slice(4).forEach(h => {
       const paramKey = h.charAt(0).toLowerCase() + h.slice(1);
       row.push((e.parameter[paramKey] || '').toString().trim());
     });
 
     sheet.appendRow(row);
-
-    return textOutput_('Success');
+    return jsonOutput_({ success: true, message: 'Success', id: id });
 
   } catch (error) {
-    return textOutput_('Error: ' + error.toString());
+    console.error(error);
+    return jsonOutput_({
+      success: false,
+      error: String(error && error.message ? error.message : error),
+      detail: String(error && error.stack ? error.stack : '')
+    });
   }
+}
+
+// ================================================================
+// OTORISASI GOOGLE
+// Jalankan authorizeApp() SEKALI dari editor Apps Script setelah
+// menempel code.gs ini. Pilih akun pemilik/akun yang dipakai pada
+// setting 'Execute as: Me' pada Web App, lalu izinkan akses.
+// ================================================================
+function authorizeApp() {
+  const ss = getSpreadsheet_();
+  const sheetName = ss.getName();
+  const folder = getUploadFolder_();
+  const folderName = folder.getName();
+
+  Logger.log('Spreadsheet OK: ' + sheetName);
+  Logger.log('Google Drive OK: ' + folderName);
+  return 'OTORISASI OK | Spreadsheet: ' + sheetName + ' | Folder: ' + folderName;
+}
+
+// Jalankan sekali secara manual setelah menambahkan DriveApp atau mengganti akun/deployment.
+// Fungsi ini hanya untuk memicu otorisasi Drive dan memastikan folder upload dapat diakses.
+function testDriveAccess() {
+  const folder = getUploadFolder_();
+  const result = 'Akses Google Drive OK. Folder: ' + folder.getName();
+  Logger.log(result);
+  return result;
 }
 
 function jsonOutput_(obj) {
