@@ -20,7 +20,7 @@ const SPREADSHEET_ID = '159mTMvDbnLM1Tx0SFL_yBs3RqlCpfwBsrIA_NkwWrd8';
 // Isi dengan ID folder Google Drive jika ingin file masuk ke folder tertentu.
 // Jika kosong, file akan disimpan di My Drive milik akun yang menjalankan Web App.
 const DRIVE_FOLDER_ID = '';
-const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+// Tidak ada batas ukuran PDF dari sisi aplikasi (batas hanya dari Google).
 
 // ================================================================
 // PEMETAAN KATEGORI -> NAMA TAB & HEADER
@@ -141,6 +141,69 @@ function migrasiHeaderLamaKeBaru() {
 
   Logger.log(laporan.join('\n'));
   return laporan.join('\n');
+}
+
+// ================================================================
+// PERBAIKI DATA SERKOM YANG KOLOMNYA TERTUKAR
+// Pola yang diperbaiki: kolom Bidang/SubBidang berisi TANGGAL,
+// sedangkan TglBuat/ExpiredDate berisi TEKS (isinya tertukar).
+// Jalankan SATU KALI dari editor Apps Script. Backup dibuat otomatis.
+// Hanya baris yang cocok dengan pola di atas yang diubah.
+// ================================================================
+function perbaikiKolomTertukarSerkom() {
+  const ss = getSpreadsheet_();
+  const cfg = SHEET_CONFIG.serkom;
+  const sheet = ss.getSheetByName(cfg.sheetName);
+  if (!sheet) throw new Error('Tab ' + cfg.sheetName + ' tidak ditemukan.');
+
+  const values = sheet.getDataRange().getValues();
+  if (values.length < 2) return 'Tidak ada data untuk diperbaiki.';
+
+  const headers = values[0].map(h => String(h || '').trim());
+  const iBuat = indexHeader_(headers, 'TglBuat');
+  const iExp = indexHeader_(headers, 'ExpiredDate');
+  const iBid = indexHeader_(headers, 'Bidang');
+  const iSub = indexHeader_(headers, 'SubBidang');
+  if ([iBuat, iExp, iBid, iSub].some(i => i < 0)) {
+    throw new Error('Header TglBuat / ExpiredDate / Bidang / SubBidang tidak lengkap di tab SERKOM.');
+  }
+
+  const adaTanggal = v => v instanceof Date || /^\d{4}-\d{2}-\d{2}/.test(String(v).trim());
+
+  // Cari baris yang cocok dengan pola tertukar.
+  const target = [];
+  for (let r = 1; r < values.length; r++) {
+    const row = values[r];
+    const bidangBerisiTanggal = adaTanggal(row[iBid]) || adaTanggal(row[iSub]);
+    const tglBerisiTanggal = adaTanggal(row[iBuat]) || adaTanggal(row[iExp]);
+    if (bidangBerisiTanggal && !tglBerisiTanggal) target.push(r);
+  }
+
+  if (!target.length) {
+    const info = 'Tidak ada baris yang tertukar. Tidak ada yang diubah.';
+    Logger.log(info);
+    return info;
+  }
+
+  // Backup dulu.
+  const backupName = buatNamaBackup_(cfg.sheetName);
+  const backup = ss.insertSheet(backupName);
+  backup.getRange(1, 1, values.length, values[0].length).setValues(values);
+  backup.setFrozenRows(1);
+
+  // Tukar: TglBuat <- Bidang, ExpiredDate <- SubBidang, Bidang <- TglBuat, SubBidang <- ExpiredDate
+  target.forEach(r => {
+    const row = values[r];
+    const [buat, exp, bid, sub] = [row[iBuat], row[iExp], row[iBid], row[iSub]];
+    sheet.getRange(r + 1, iBuat + 1).setValue(bid);
+    sheet.getRange(r + 1, iExp + 1).setValue(sub);
+    sheet.getRange(r + 1, iBid + 1).setValue(buat);
+    sheet.getRange(r + 1, iSub + 1).setValue(exp);
+  });
+
+  const hasil = target.length + ' baris diperbaiki. Backup: ' + backupName;
+  Logger.log(hasil);
+  return hasil;
 }
 
 function normalisasiHeader_(h) {
@@ -265,7 +328,6 @@ function uploadPdf_(e) {
   }
 
   const bytes = Utilities.base64Decode(base64);
-  if (bytes.length > MAX_UPLOAD_BYTES) throw new Error('Ukuran PDF maksimal 10 MB.');
 
   const safeName = fileName.replace(/[^a-zA-Z0-9._ -]/g, '_');
   const blob = Utilities.newBlob(bytes, 'application/pdf', safeName);
@@ -325,12 +387,133 @@ function doGet(e) {
   }
 }
 
+// ================================================================
+// EDIT & HAPUS DATA (dicari berdasarkan kolom ID)
+// ================================================================
+// Pastikan semua header yang dibutuhkan ada di sheet (ditambah di ujung bila belum ada),
+// lalu kembalikan header sebenarnya. Penulisan data selalu mengikuti NAMA header,
+// bukan urutan kolom, sehingga isian form selalu masuk ke kolom yang benar.
+function ensureHeaders_(sheet, cfg) {
+  const lastCol = Math.max(sheet.getLastColumn(), 1);
+  const headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0].map(h => String(h || '').trim());
+  while (headers.length && headers[headers.length - 1] === '') headers.pop();
+
+  let changed = false;
+  cfg.headers.forEach(h => {
+    if (indexHeader_(headers, h) < 0) {
+      headers.push(h);
+      changed = true;
+    }
+  });
+
+  if (changed) {
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    formatHeader_(sheet, headers.length);
+  }
+  return headers;
+}
+
+function indexHeader_(headers, name) {
+  const target = normalisasiHeader_(name);
+  return headers.findIndex(h => normalisasiHeader_(h) === target);
+}
+
+function cariBarisById_(sheet, id, headers) {
+  const last = sheet.getLastRow();
+  if (last < 2 || !id) return -1;
+  const idCol = indexHeader_(headers, 'ID');
+  if (idCol < 0) return -1;
+  const ids = sheet.getRange(2, idCol + 1, last - 1, 1).getValues();
+  for (let i = 0; i < ids.length; i++) {
+    if (String(ids[i][0]).trim() === id) return i + 2;
+  }
+  return -1;
+}
+
+function updateData_(e) {
+  const kategori = String(e.parameter.kategori || '').toLowerCase();
+  const cfg = SHEET_CONFIG[kategori];
+  if (!cfg) return { success: false, error: 'Kategori tidak dikenal: ' + kategori };
+
+  const id = String(e.parameter.id || '').trim();
+  if (!id) return { success: false, error: 'ID data tidak ditemukan.' };
+
+  const lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    const sheet = getOrCreateSheet_(cfg);
+    const headers = ensureHeaders_(sheet, cfg);
+    const rowNum = cariBarisById_(sheet, id, headers);
+    if (rowNum < 0) return { success: false, error: 'Data dengan ID ' + id + ' tidak ditemukan.' };
+
+    const fieldHeaders = cfg.headers.slice(4);
+    const values = fieldHeaders.map(h => {
+      const paramKey = h.charAt(0).toLowerCase() + h.slice(1);
+      return (e.parameter[paramKey] || '').toString().trim();
+    });
+
+    const adaIdent = cfg.identCols.some(c => {
+      const i = fieldHeaders.indexOf(c);
+      return i >= 0 && values[i] !== '';
+    });
+    if (!adaIdent) return { success: false, error: 'Nama / jenis dokumen wajib diisi.' };
+
+    // Timestamp & ID tidak diubah. Kolom PDF hanya diganti bila PDF baru diupload.
+    if (e.parameter.fileUrl) {
+      sheet.getRange(rowNum, indexHeader_(headers, 'UploadFileName') + 1)
+        .setValue((e.parameter.fileName || '').toString().trim());
+      sheet.getRange(rowNum, indexHeader_(headers, 'UploadFileUrl') + 1)
+        .setValue((e.parameter.fileUrl || '').toString().trim());
+    }
+    // Setiap field ditulis ke kolom dengan nama header yang sama.
+    fieldHeaders.forEach((h, i) => {
+      sheet.getRange(rowNum, indexHeader_(headers, h) + 1).setValue(values[i]);
+    });
+
+    return { success: true, message: 'Updated', id: id };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function deleteData_(e) {
+  const kategori = String(e.parameter.kategori || '').toLowerCase();
+  const cfg = SHEET_CONFIG[kategori];
+  if (!cfg) return { success: false, error: 'Kategori tidak dikenal: ' + kategori };
+
+  const id = String(e.parameter.id || '').trim();
+  if (!id) return { success: false, error: 'ID data tidak ditemukan.' };
+
+  const lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    const sheet = getOrCreateSheet_(cfg);
+    const headers = ensureHeaders_(sheet, cfg);
+    const rowNum = cariBarisById_(sheet, id, headers);
+    if (rowNum < 0) return { success: false, error: 'Data dengan ID ' + id + ' tidak ditemukan.' };
+
+    // Hanya baris di Spreadsheet yang dihapus. File PDF di Google Drive dibiarkan.
+    sheet.deleteRow(rowNum);
+    return { success: true, message: 'Deleted', id: id };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
 function doPost(e) {
   try {
     const action = String(e && e.parameter && e.parameter.action || '').toLowerCase();
 
     if (action === 'upload') {
       return jsonOutput_(uploadPdf_(e));
+    }
+
+    if (action === 'update') {
+      return jsonOutput_(updateData_(e));
+    }
+
+    if (action === 'delete') {
+      return jsonOutput_(deleteData_(e));
     }
 
     const kategori = (e && e.parameter && e.parameter.kategori || '').toLowerCase();
@@ -345,15 +528,24 @@ function doPost(e) {
     }
 
     const sheet = getOrCreateSheet_(cfg);
-    const timestamp = new Date();
+    const headers = ensureHeaders_(sheet, cfg);
     const id = 'ID-' + Date.now().toString().slice(-8);
-    const row = [timestamp, id,
-      (e.parameter.fileName || '').toString().trim(),
-      (e.parameter.fileUrl || '').toString().trim()];
 
+    const nilai = {
+      Timestamp: new Date(),
+      ID: id,
+      UploadFileName: (e.parameter.fileName || '').toString().trim(),
+      UploadFileUrl: (e.parameter.fileUrl || '').toString().trim()
+    };
     cfg.headers.slice(4).forEach(h => {
       const paramKey = h.charAt(0).toLowerCase() + h.slice(1);
-      row.push((e.parameter[paramKey] || '').toString().trim());
+      nilai[h] = (e.parameter[paramKey] || '').toString().trim();
+    });
+
+    // Susun baris sesuai urutan header yang ADA di sheet.
+    const row = headers.map(h => {
+      const kunci = cfg.headers.find(x => normalisasiHeader_(x) === normalisasiHeader_(h));
+      return kunci ? nilai[kunci] : '';
     });
 
     sheet.appendRow(row);

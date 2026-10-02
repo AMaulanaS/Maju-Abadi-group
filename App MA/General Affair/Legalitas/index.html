@@ -115,6 +115,44 @@
         </div>
     </div>
 
+    <!-- MODAL EDIT -->
+    <div id="editModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="editTitle">
+        <div class="modal-card">
+            <div class="modal-head">
+                <strong id="editTitle">Edit Data</strong>
+                <button type="button" id="editClose" class="modal-x" aria-label="Tutup">✕</button>
+            </div>
+            <form id="editForm">
+                <div id="editFields" class="form-grid"></div>
+
+                <div class="field-group upload-card edit-upload">
+                    <label for="e_upload">Ganti PDF (opsional)</label>
+                    <input type="file" id="e_upload" accept="application/pdf,.pdf">
+                    <small id="editUploadStatus" class="upload-status">Kosongkan jika PDF tidak diganti.</small>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" id="btnEditSave" class="btn-primary">💾 Simpan Perubahan</button>
+                    <button type="button" id="btnEditCancel" class="btn-secondary">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL HAPUS -->
+    <div id="deleteModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="deleteTitle">
+        <div class="modal-card modal-small">
+            <div class="modal-head">
+                <strong id="deleteTitle">Hapus Data?</strong>
+            </div>
+            <p id="deleteText" class="delete-text"></p>
+            <div class="form-actions">
+                <button type="button" id="btnDeleteConfirm" class="btn-danger">🗑️ Ya, Hapus</button>
+                <button type="button" id="btnDeleteCancel" class="btn-secondary">Batal</button>
+            </div>
+        </div>
+    </div>
+
     <div id="toast" class="toast"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
