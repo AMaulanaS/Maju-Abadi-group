@@ -238,7 +238,7 @@ Periksa berurutan:
 
 - Semua menu (SERKOM, LEGAL RMA, LEGAL FMA, LEGAL ZMA) sekarang mewajibkan upload PDF terlebih dahulu.
 - Setelah PDF berhasil tersimpan di Google Drive, field isian baru aktif.
-- Ukuran PDF tidak dibatasi oleh aplikasi (batas hanya dari Google Apps Script, kira-kira puluhan MB per file).
+- Maksimal ukuran PDF: 10 MB.
 - Nama file dan URL file disimpan ke Spreadsheet pada kolom `UploadFileName` dan `UploadFileUrl`.
 - Untuk menyimpan file ke folder Drive tertentu, isi `DRIVE_FOLDER_ID` dengan ID folder tersebut.
 - Setelah mengubah `code.gs`, lakukan deploy ulang Web App sebagai versi baru.
@@ -258,24 +258,3 @@ Jika muncul pesan `Unexpected token 'E' ... is not valid JSON` saat upload PDF:
 9. Gunakan URL `/exec` deployment terbaru pada `SCRIPT_URL` di `script.js`.
 
 Versi frontend terbaru juga sudah memperbaiki parser respons sehingga jika Apps Script mengembalikan error, pesan error asli akan ditampilkan, bukan `Unexpected token E`.
-
-
-## BAGIAN M — Edit, Hapus, dan Urutan Abjad
-
-- Setiap baris di tabel punya tombol **Edit** dan **Hapus** (kolom Aksi).
-- **Edit**: membuka form berisi data lama. PDF boleh diganti (opsional); jika tidak diganti, PDF lama tetap dipakai.
-- **Hapus**: menghapus baris di Spreadsheet setelah konfirmasi. File PDF di Google Drive tidak ikut terhapus.
-- Edit/hapus mencari data lewat kolom **ID**. Data lama yang kolom ID-nya kosong tidak bisa diedit/dihapus dari website (tombolnya nonaktif).
-- Tabel otomatis diurutkan A–Z: SERKOM menurut Nama Personil, LEGAL menurut Legal / Jenis Dokumen.
-- Karena `code.gs` berubah, **wajib deploy ulang**: Deploy > Manage deployments > Edit > New version > Deploy.
-
-## BAGIAN N — Memperbaiki data SERKOM yang kolomnya tertukar
-
-Jika di tabel SERKOM kolom Bidang/Sub Bidang berisi tanggal, sedangkan Tgl Buat/Expired Date berisi teks:
-
-1. Tempel `code.gs` terbaru ke Apps Script, klik Save.
-2. Pilih fungsi `perbaikiKolomTertukarSerkom`, klik Run (beri izin jika diminta).
-3. Cek Execution log: tertulis jumlah baris yang diperbaiki dan nama tab backup.
-4. Refresh website.
-
-Fungsi hanya mengubah baris yang cocok dengan pola tertukar, dan selalu membuat tab BACKUP terlebih dahulu.

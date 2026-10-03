@@ -636,6 +636,58 @@ footer {
 }
 
 /* RESPONSIVE */
+/* TOMBOL TAMBAH DATA */
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.btn-add {
+    min-height: 44px;
+    padding: 0 20px;
+    border: 0;
+    border-radius: 11px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 800;
+    color: #fff;
+    background: linear-gradient(110deg, var(--red-dark), var(--red), var(--blue));
+    box-shadow: 0 8px 18px rgba(185,28,28,.20);
+    transition: .2s ease;
+}
+
+.btn-add:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 24px rgba(37,99,235,.23);
+}
+
+.btn-refresh {
+    min-height: 44px;
+}
+
+@media (max-width: 680px) {
+    .section-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .header-right {
+        justify-content: stretch;
+    }
+
+    .btn-add,
+    .btn-refresh {
+        flex: 1 1 100%;
+    }
+
+    .record-counter {
+        flex: 1 1 100%;
+    }
+}
+
 @media (max-width: 1000px) {
     .form-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -812,100 +864,3 @@ body.is-loading button, body.is-loading input { cursor: wait; }
     font-size: 11px;
 }
 \n\n/* ================================================================\n   TOMBOL GOOGLE DRIVE DI KOLOM STATUS\n   ================================================================ */\n.status-cell {\n    min-width: 190px;\n    vertical-align: middle;\n}\n\n.status-actions {\n    display: flex;\n    align-items: center;\n    justify-content: flex-start;\n    gap: 8px;\n    flex-wrap: wrap;\n}\n\n.drive-link-btn {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    gap: 5px;\n    min-height: 30px;\n    padding: 5px 10px;\n    border: 1px solid #2563eb;\n    border-radius: 8px;\n    background: #eff6ff;\n    color: #1d4ed8 !important;\n    font-size: 12px;\n    font-weight: 700;\n    line-height: 1;\n    text-decoration: none !important;\n    white-space: nowrap;\n    cursor: pointer;\n    transition: .15s ease;\n}\n\n.drive-link-btn:hover {\n    background: #dbeafe;\n    border-color: #1d4ed8;\n    transform: translateY(-1px);\n}\n\n.drive-link-disabled,\n.drive-link-disabled:hover {\n    border-color: #d1d5db;\n    background: #f3f4f6;\n    color: #9ca3af !important;\n    cursor: not-allowed;\n    transform: none;\n}\n\n@media (max-width: 900px) {\n    .status-actions {\n        align-items: flex-start;\n        flex-direction: column;\n    }\n}\n
-
-/* ================================================================
-   EDIT & HAPUS DATA
-   ================================================================ */
-.aksi-cell { min-width: 170px; vertical-align: middle; }
-
-.row-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-
-.btn-edit,
-.btn-delete {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    min-height: 30px;
-    padding: 5px 10px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 1;
-    white-space: nowrap;
-    cursor: pointer;
-    transition: .15s ease;
-}
-
-.btn-edit { border: 1px solid #d97706; background: #fffbeb; color: #b45309; }
-.btn-edit:hover:not(:disabled) { background: #fef3c7; transform: translateY(-1px); }
-
-.btn-delete { border: 1px solid #dc2626; background: #fef2f2; color: #b91c1c; }
-.btn-delete:hover:not(:disabled) { background: #fee2e2; transform: translateY(-1px); }
-
-.btn-edit:disabled,
-.btn-delete:disabled {
-    border-color: #d1d5db;
-    background: #f3f4f6;
-    color: #9ca3af;
-    cursor: not-allowed;
-}
-
-.btn-danger {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 12px 20px;
-    border: 0;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #dc2626, #991b1b);
-    color: #fff;
-    font-weight: 800;
-    cursor: pointer;
-}
-.btn-danger:disabled { opacity: .6; cursor: not-allowed; }
-
-.modal {
-    position: fixed;
-    inset: 0;
-    z-index: 800;
-    display: grid;
-    place-items: center;
-    padding: 16px;
-    background: rgba(15, 23, 42, .55);
-    overflow-y: auto;
-}
-.modal.hidden { display: none !important; }
-
-.modal-card {
-    width: min(920px, 100%);
-    max-height: 92vh;
-    overflow-y: auto;
-    padding: 22px;
-    border-radius: 18px;
-    background: #fff;
-    box-shadow: var(--shadow);
-}
-.modal-small { width: min(440px, 100%); }
-
-.modal-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-    font-size: 18px;
-}
-
-.modal-x {
-    border: 0;
-    background: transparent;
-    font-size: 18px;
-    color: var(--muted);
-    cursor: pointer;
-}
-
-.edit-upload { margin-top: 14px; }
-.delete-text { margin: 0 0 18px; line-height: 1.6; color: var(--text); }
-
-.toast { z-index: 10000; }

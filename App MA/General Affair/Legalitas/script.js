@@ -98,6 +98,26 @@ function setLoading(show, title = 'Sedang memproses...', message = 'Mohon tunggu
 }
 
 // ---------------------------------------------------------------
+// TAMPIL / SEMBUNYIKAN FORM (tombol Tambah Data)
+// ---------------------------------------------------------------
+function showForm() {
+    const form = document.getElementById('dataForm');
+    const btnAdd = document.getElementById('btnTambahData');
+    buildForm(activeCategory);
+    form.classList.remove('hidden');
+    if (btnAdd) btnAdd.classList.add('hidden');
+    form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function hideForm() {
+    const form = document.getElementById('dataForm');
+    const btnAdd = document.getElementById('btnTambahData');
+    form.classList.add('hidden');
+    if (btnAdd) btnAdd.classList.remove('hidden');
+    window.uploadedFile = null;
+}
+
+// ---------------------------------------------------------------
 // TABS
 // ---------------------------------------------------------------
 function buildTabs() {
@@ -129,6 +149,7 @@ function switchTab(key) {
         btn.classList.toggle('active', btn.dataset.key === key);
     });
 
+    hideForm();
     buildForm(key);
     renderTable(key);
 
@@ -213,6 +234,13 @@ async function handleUpload(key) {
     if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
         input.value = '';
         showToast('File harus berupa PDF.', 'error');
+        return;
+    }
+
+    const maxSize = 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+        input.value = '';
+        showToast('Ukuran PDF maksimal 10 MB.', 'error');
         return;
     }
 
@@ -444,7 +472,6 @@ function buildTableHead(key) {
                 `<th>${escapeHtml(f.label.split('(')[0].trim())}</th>`
             ).join('')}
             <th>Status</th>
-            <th>Aksi</th>
         </tr>
     `;
 }
@@ -519,22 +546,6 @@ function formatVal(val, type) {
 // ---------------------------------------------------------------
 // DATA
 // ---------------------------------------------------------------
-// Urutan abjad A-Z: SERKOM berdasarkan Nama Personil (lalu SERKOM),
-// LEGAL berdasarkan Legal / Jenis Dokumen (lalu Nomer Dokumen).
-function sortAlphabetically(list, key) {
-    const [primary, secondary] = key === 'serkom'
-        ? ['nama', 'serkom']
-        : ['legal', 'nodokumen'];
-
-    const cmp = (a, b) => String(a ?? '').trim().localeCompare(
-        String(b ?? '').trim(), 'id', { sensitivity: 'base', numeric: true }
-    );
-
-    return [...list].sort((a, b) =>
-        cmp(a[primary], b[primary]) || cmp(a[secondary], b[secondary])
-    );
-}
-
 async function loadData(key) {
     const tableBody = document.getElementById('tableBody');
     setLoading(true, 'Memuat data...', 'Mengambil data dari Google Spreadsheet. Jangan klik berulang.');
@@ -559,7 +570,7 @@ async function loadData(key) {
             throw new Error(data.error);
         }
 
-        dataCache[key] = Array.isArray(data) ? sortAlphabetically(data, key) : [];
+        dataCache[key] = Array.isArray(data) ? data : [];
 
     } catch (error) {
         console.error(error);
@@ -654,225 +665,9 @@ function renderTable(key) {
                         ${driveButton}
                     </div>
                 </td>
-                <td class="aksi-cell">
-                    <div class="row-actions">
-                        <button type="button" class="btn-edit" data-action="edit" data-id="${escapeHtml(item.id || '')}" ${item.id ? '' : 'disabled title="Data lama tanpa ID tidak bisa diedit"'}>✏️ Edit</button>
-                        <button type="button" class="btn-delete" data-action="delete" data-id="${escapeHtml(item.id || '')}" ${item.id ? '' : 'disabled title="Data lama tanpa ID tidak bisa dihapus"'}>🗑️ Hapus</button>
-                    </div>
-                </td>
             </tr>
         `;
     }).join('');
-}
-
-// ---------------------------------------------------------------
-// EDIT & HAPUS
-// ---------------------------------------------------------------
-let editingId = null;
-let editNewFile = null;
-let deletingId = null;
-
-function toInputDate(val) {
-    if (!val) return '';
-    const v = String(val).trim();
-    if (/^\d{4}-\d{2}-\d{2}/.test(v)) return v.slice(0, 10);
-    const d = new Date(v);
-    if (isNaN(d.getTime())) return '';
-    const p = n => String(n).padStart(2, '0');
-    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
-}
-
-function findItemById(key, id) {
-    return (dataCache[key] || []).find(x => String(x.id) === String(id));
-}
-
-function itemLabel(item) {
-    return item.nama || item.legal || item.serkom || item.id || 'data ini';
-}
-
-function openEditModal(id) {
-    const key = activeCategory;
-    const cfg = CATEGORY_CONFIG[key];
-    const item = findItemById(key, id);
-    if (!item) return showToast('Data tidak ditemukan. Coba Refresh Data.', 'error');
-
-    editingId = id;
-    editNewFile = null;
-
-    document.getElementById('editTitle').textContent = `Edit Data ${cfg.label}`;
-    document.getElementById('editFields').innerHTML = cfg.fields.map(f => {
-        const raw = item[f.id.toLowerCase()];
-        const value = f.type === 'date' ? toInputDate(raw) : (raw ?? '');
-        return `
-            <div class="field-group">
-                <label for="e_${f.id}">${escapeHtml(f.label)} ${f.required ? '<span class="required">*</span>' : ''}</label>
-                <input type="${f.type}" id="e_${f.id}" value="${escapeHtml(value)}" ${f.required ? 'required' : ''}>
-            </div>`;
-    }).join('');
-
-    const up = document.getElementById('e_upload');
-    up.value = '';
-    const st = document.getElementById('editUploadStatus');
-    const currentName = item.uploadfilename ? ` PDF saat ini: ${item.uploadfilename}.` : '';
-    st.textContent = `Kosongkan jika PDF tidak diganti.${currentName}`;
-    st.className = 'upload-status';
-
-    document.getElementById('editModal').classList.remove('hidden');
-}
-
-function closeEditModal() {
-    document.getElementById('editModal').classList.add('hidden');
-    editingId = null;
-    editNewFile = null;
-}
-
-async function handleEditUpload() {
-    const input = document.getElementById('e_upload');
-    const status = document.getElementById('editUploadStatus');
-    const file = input.files && input.files[0];
-    if (!file) { editNewFile = null; return; }
-
-    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
-        input.value = '';
-        showToast('File harus berupa PDF.', 'error');
-        return;
-    }
-
-    status.textContent = 'Sedang mengupload PDF...';
-    status.className = 'upload-status uploading';
-    setLoading(true, 'Mengupload PDF...', 'PDF sedang disimpan ke Google Drive.');
-
-    try {
-        const payload = new URLSearchParams();
-        payload.append('action', 'upload');
-        payload.append('kategori', activeCategory);
-        payload.append('fileName', file.name);
-        payload.append('mimeType', 'application/pdf');
-        payload.append('fileBase64', await fileToBase64(file));
-
-        const response = await fetch(SCRIPT_URL, { method: 'POST', body: payload });
-        const result = await readJsonResponse(response);
-        if (!response.ok || !result.success) throw new Error(result.error || 'Upload gagal.');
-
-        editNewFile = { id: result.fileId, name: result.fileName || file.name, url: result.fileUrl };
-        status.textContent = `✓ PDF baru siap: ${editNewFile.name}. Tekan Simpan Perubahan.`;
-        status.className = 'upload-status success';
-    } catch (error) {
-        console.error(error);
-        input.value = '';
-        editNewFile = null;
-        status.textContent = 'Upload gagal. Silakan pilih PDF lagi.';
-        status.className = 'upload-status error';
-        showToast(error.message || 'Gagal mengupload PDF.', 'error');
-    } finally {
-        setLoading(false);
-    }
-}
-
-async function submitEdit(e) {
-    e.preventDefault();
-    if (!editingId) return;
-
-    const key = activeCategory;
-    const cfg = CATEGORY_CONFIG[key];
-    const btn = document.getElementById('btnEditSave');
-
-    const body = new URLSearchParams();
-    body.append('action', 'update');
-    body.append('kategori', key);
-    body.append('id', editingId);
-    cfg.fields.forEach(f => body.append(f.id, document.getElementById(`e_${f.id}`).value));
-    if (editNewFile) {
-        body.append('fileId', editNewFile.id || '');
-        body.append('fileName', editNewFile.name || '');
-        body.append('fileUrl', editNewFile.url || '');
-    }
-
-    btn.disabled = true;
-    setLoading(true, 'Menyimpan perubahan...', 'Sedang memperbarui Google Spreadsheet.');
-    try {
-        const response = await fetch(SCRIPT_URL, { method: 'POST', body });
-        const result = await readJsonResponse(response);
-        if (!response.ok || !result.success) throw new Error(result.error || 'Gagal menyimpan perubahan.');
-
-        showToast('Perubahan berhasil disimpan.', 'success');
-        closeEditModal();
-        dataCache[key] = null;
-        await loadData(key);
-    } catch (error) {
-        console.error(error);
-        showToast(error.message || 'Gagal menyimpan perubahan.', 'error');
-    } finally {
-        setLoading(false);
-        btn.disabled = false;
-    }
-}
-
-function openDeleteModal(id) {
-    const item = findItemById(activeCategory, id);
-    if (!item) return showToast('Data tidak ditemukan. Coba Refresh Data.', 'error');
-    deletingId = id;
-    document.getElementById('deleteText').textContent =
-        `Data "${itemLabel(item)}" akan dihapus dari Spreadsheet. File PDF di Google Drive tidak ikut terhapus. Lanjutkan?`;
-    document.getElementById('deleteModal').classList.remove('hidden');
-}
-
-function closeDeleteModal() {
-    document.getElementById('deleteModal').classList.add('hidden');
-    deletingId = null;
-}
-
-async function confirmDelete() {
-    if (!deletingId) return;
-    const key = activeCategory;
-    const id = deletingId;
-    const btn = document.getElementById('btnDeleteConfirm');
-
-    const body = new URLSearchParams();
-    body.append('action', 'delete');
-    body.append('kategori', key);
-    body.append('id', id);
-
-    btn.disabled = true;
-    setLoading(true, 'Menghapus data...', 'Sedang menghapus dari Google Spreadsheet.');
-    try {
-        const response = await fetch(SCRIPT_URL, { method: 'POST', body });
-        const result = await readJsonResponse(response);
-        if (!response.ok || !result.success) throw new Error(result.error || 'Gagal menghapus data.');
-
-        showToast('Data berhasil dihapus.', 'success');
-        closeDeleteModal();
-        dataCache[key] = null;
-        await loadData(key);
-    } catch (error) {
-        console.error(error);
-        showToast(error.message || 'Gagal menghapus data.', 'error');
-    } finally {
-        setLoading(false);
-        btn.disabled = false;
-    }
-}
-
-function initEditDelete() {
-    document.getElementById('tableBody').addEventListener('click', ev => {
-        const btn = ev.target.closest('button[data-action]');
-        if (!btn || btn.disabled || document.body.classList.contains('is-loading')) return;
-        if (btn.dataset.action === 'edit') openEditModal(btn.dataset.id);
-        if (btn.dataset.action === 'delete') openDeleteModal(btn.dataset.id);
-    });
-
-    document.getElementById('editForm').addEventListener('submit', submitEdit);
-    document.getElementById('e_upload').addEventListener('change', handleEditUpload);
-    document.getElementById('editClose').addEventListener('click', closeEditModal);
-    document.getElementById('btnEditCancel').addEventListener('click', closeEditModal);
-    document.getElementById('btnDeleteConfirm').addEventListener('click', confirmDelete);
-    document.getElementById('btnDeleteCancel').addEventListener('click', closeDeleteModal);
-
-    document.addEventListener('keydown', ev => {
-        if (ev.key !== 'Escape' || document.body.classList.contains('is-loading')) return;
-        closeEditModal();
-        closeDeleteModal();
-    });
 }
 
 // ---------------------------------------------------------------
@@ -883,7 +678,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('connectionWarning').classList.remove('hidden');
     }
 
-    initEditDelete();
     buildTabs();
     buildForm(activeCategory);
     buildTableHead(activeCategory);
@@ -936,6 +730,7 @@ document.addEventListener('DOMContentLoaded', () => {
             form.reset();
             window.uploadedFile = null;
             buildForm(activeCategory);
+            hideForm();
             dataCache[activeCategory] = null;
             await loadData(activeCategory);
 
@@ -950,6 +745,17 @@ document.addEventListener('DOMContentLoaded', () => {
             btnSubmit.disabled = false;
             btnSubmit.innerHTML = '💾 Simpan Data';
         }
+    });
+
+    document.getElementById('btnTambahData').addEventListener('click', () => {
+        if (document.body.classList.contains('is-loading')) return;
+        showForm();
+    });
+
+    document.getElementById('btnCancel').addEventListener('click', () => {
+        if (document.body.classList.contains('is-loading')) return;
+        form.reset();
+        hideForm();
     });
 
     document.getElementById('btnRefresh').addEventListener('click', () => {

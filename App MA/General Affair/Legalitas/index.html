@@ -55,14 +55,24 @@
                     <div id="formSubtitle" class="section-subtitle"></div>
                 </div>
 
-                <div class="record-counter">
-                    <span id="recordCount">0</span>
-                    <small>Data</small>
+                <div class="header-right">
+                    <button type="button" id="btnTambahData" class="btn-add">
+                        ➕ Tambah Data
+                    </button>
+
+                    <button type="button" id="btnRefresh" class="btn-secondary btn-refresh">
+                        ↻ Refresh Data
+                    </button>
+
+                    <div class="record-counter">
+                        <span id="recordCount">0</span>
+                        <small>Data</small>
+                    </div>
                 </div>
             </div>
 
             <!-- FORM -->
-            <form id="dataForm">
+            <form id="dataForm" class="hidden">
                 <div id="formFields" class="form-grid"></div>
 
                 <div class="form-actions">
@@ -70,8 +80,8 @@
                         💾 Simpan Data
                     </button>
 
-                    <button type="button" id="btnRefresh" class="btn-secondary">
-                        ↻ Refresh Data
+                    <button type="button" id="btnCancel" class="btn-secondary">
+                        ✕ Batal
                     </button>
                 </div>
             </form>
@@ -112,44 +122,6 @@
             <div class="loading-spinner"></div>
             <div class="loading-title" id="loadingTitle">Sedang memproses...</div>
             <div class="loading-text" id="loadingText">Mohon tunggu sebentar, jangan klik berulang.</div>
-        </div>
-    </div>
-
-    <!-- MODAL EDIT -->
-    <div id="editModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="editTitle">
-        <div class="modal-card">
-            <div class="modal-head">
-                <strong id="editTitle">Edit Data</strong>
-                <button type="button" id="editClose" class="modal-x" aria-label="Tutup">✕</button>
-            </div>
-            <form id="editForm">
-                <div id="editFields" class="form-grid"></div>
-
-                <div class="field-group upload-card edit-upload">
-                    <label for="e_upload">Ganti PDF (opsional)</label>
-                    <input type="file" id="e_upload" accept="application/pdf,.pdf">
-                    <small id="editUploadStatus" class="upload-status">Kosongkan jika PDF tidak diganti.</small>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" id="btnEditSave" class="btn-primary">💾 Simpan Perubahan</button>
-                    <button type="button" id="btnEditCancel" class="btn-secondary">Batal</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL HAPUS -->
-    <div id="deleteModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="deleteTitle">
-        <div class="modal-card modal-small">
-            <div class="modal-head">
-                <strong id="deleteTitle">Hapus Data?</strong>
-            </div>
-            <p id="deleteText" class="delete-text"></p>
-            <div class="form-actions">
-                <button type="button" id="btnDeleteConfirm" class="btn-danger">🗑️ Ya, Hapus</button>
-                <button type="button" id="btnDeleteCancel" class="btn-secondary">Batal</button>
-            </div>
         </div>
     </div>
 
