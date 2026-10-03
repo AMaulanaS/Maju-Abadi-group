@@ -1,640 +1,149 @@
 <!doctype html>
-<html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MA Group | ERP Maju Abadi</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="style.css" />
-    <style>
-      .ma-division-page {
-        padding: 2rem 0 3rem;
-        background: #ffffff;
-      }
+<html lang="id" data-bs-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MA Group | ERP Maju Abadi</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230078d4'/><text x='50' y='67' font-size='40' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'>MA</text></svg>" />
 
-      .ma-division-head {
-        margin-bottom: 1.5rem;
-        padding-bottom: 1rem;
-        border-bottom: 2px solid #f0f0f0;
-      }
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
 
-      .ma-division-head .eyebrow {
-        letter-spacing: 0.08em;
-        font-size: 0.75rem;
-        font-weight: 700;
-        color: #0078d4;
-        text-transform: uppercase;
-      }
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
 
-      .ma-division-head h2 {
-        font-size: 26px;
-        color: #333;
-        font-weight: 300;
-        letter-spacing: -0.5px;
-      }
+  <!-- ================= TOPBAR ================= -->
+  <header class="ma-topbar">
+    <div class="ma-topbar-inner">
 
-      .ma-module-card {
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        transition: all 0.25s ease;
-        height: 100%;
-        overflow: hidden;
-        background: #ffffff;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-        position: relative;
-      }
+      <button class="icon-btn" type="button" data-bs-toggle="offcanvas"
+              data-bs-target="#launcherCanvas" aria-label="Semua aplikasi">
+        <i class="bi bi-grid-3x3-gap-fill"></i>
+      </button>
 
-      .ma-module-card::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #0078d4, #107c10);
-        transform: scaleX(0);
-        transition: transform 0.25s ease;
-      }
+      <a href="index.html" class="ma-brand" id="brandLink">
+        <span class="ma-logo">MA</span>
+        <span class="ma-brand-text">MA Group<small>ERP Internal</small></span>
+      </a>
 
-      .ma-module-card:hover {
-        transform: translateY(-6px);
-        border-color: #b3d9ff;
-        box-shadow: 0 8px 24px rgba(0, 120, 212, 0.15) !important;
-      }
-
-      .ma-module-card:hover::before {
-        transform: scaleX(1);
-      }
-
-      .ma-module-icon {
-        font-size: 2.5rem;
-        line-height: 1;
-        margin-bottom: 1rem;
-        opacity: 0.9;
-      }
-
-      .ma-module-card .btn {
-        border-radius: 4px;
-        font-size: 12px;
-        font-weight: 600;
-        letter-spacing: 0.3px;
-        text-transform: uppercase;
-      }
-
-      .ma-module-card .btn-dark {
-        background: #0078d4;
-        border-color: #0078d4;
-        color: #ffffff;
-      }
-
-      .ma-module-card .btn-dark:hover {
-        background: #106ebe;
-        border-color: #106ebe;
-      }
-
-      .ma-division-nav {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0;
-        margin-bottom: 1.5rem;
-        border-bottom: 2px solid #e0e0e0;
-        background: #ffffff;
-        padding: 0;
-      }
-
-      .ma-division-nav .btn {
-        border-radius: 0;
-        border-bottom: 3px solid transparent;
-        background: transparent;
-        color: #333;
-        font-size: 13px;
-        font-weight: 500;
-        padding: 12px 18px;
-        margin-bottom: -2px;
-      }
-
-      .ma-division-nav .btn:hover {
-        background: #f5f5f5;
-        color: #0078d4;
-      }
-
-      .ma-division-nav .btn.btn-dark {
-        background: transparent;
-        color: #0078d4;
-        border-bottom-color: #0078d4;
-        font-weight: 600;
-      }
-
-      .ma-division-nav .btn.btn-outline-dark {
-        background: transparent;
-        color: #333;
-        border: none;
-      }
-
-      .ma-status {
-        font-size: 0.72rem;
-        padding: 0.22rem 0.55rem;
-        border-radius: 2px;
-        background: #fff8e1;
-        color: #856404;
-        display: inline-block;
-        border: 1px solid #ffe082;
-        font-weight: 600;
-      }
-
-      .card-body {
-        padding: 24px !important;
-      }
-
-      h5 {
-        font-size: 15px !important;
-        font-weight: 600 !important;
-        color: #333 !important;
-      }
-
-      .text-secondary {
-        color: #777 !important;
-        font-size: 13px !important;
-        line-height: 1.6 !important;
-      }
-    </style>
-  </head>
-  <body>
-    <header class="topbar">
-      <div class="topbar-left">
-        <button
-          class="icon-btn launcher-btn"
-          id="launcherBtn"
-          aria-label="Semua aplikasi"
-        >
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M4 4h4v4H4zM10 4h4v4h-4zM16 4h4v4h-4zM4 10h4v4H4zM10 10h4v4h-4zM16 10h4v4h-4zM4 16h4v4H4zM10 16h4v4h-4zM16 16h4v4h-4z"
-            />
-          </svg>
-        </button>
-        <a href="index.html" class="topbar-logo">
-          <span class="logo-text"
-            >MA <span class="logo-accent">Group</span></span
-          >
-          <span class="logo-tag">ERP Internal</span>
-        </a>
-      </div>
-
-      <div class="topbar-search">
-        <svg viewBox="0 0 24 24" class="search-icon">
-          <path d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
-        </svg>
-        <input
-          type="text"
-          id="appSearch"
-          placeholder="Cari aplikasi..."
-          autocomplete="off"
-        />
+      <div class="ma-search">
+        <i class="bi bi-search"></i>
+        <input type="search" id="searchInput" placeholder="Cari modul di divisi ini…"
+               autocomplete="off" aria-label="Cari modul" />
+        <kbd>/</kbd>
       </div>
 
       <div class="topbar-right">
-        <button class="icon-btn" aria-label="Notifikasi">
-          <svg viewBox="0 0 24 24">
-            <path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
-            <path d="M13.73 21a2 2 0 01-3.46 0" />
-          </svg>
-          <span class="notif-dot"></span>
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Ganti tema">
+          <i class="bi bi-moon-stars" id="themeIcon"></i>
         </button>
-        <div class="user-menu"><div class="user-avatar">U</div></div>
-      </div>
-    </header>
 
-    <section class="greet-band">
-      <div class="greet-content">
-        <p class="greet-eyebrow">Selamat datang kembali</p>
-        <h1 class="greet-title">
-          Beranda <span class="text-accent">ERP</span>
-        </h1>
-        <p class="greet-sub">
-          Pusat aplikasi internal Maju Abadi Group. Pilih modul sesuai
-          pekerjaanmu untuk mulai bekerja.
-        </p>
-      </div>
-    </section>
-
-    <section class="container ma-division-page" id="erp-divisions">
-      <div class="ma-division-nav">
-        <button
-          class="btn btn-dark btn-sm"
-          data-division="gudang"
-          onclick="maShowDivision('gudang')"
-        >
-          Pergudangan
-        </button>
-        <button
-          class="btn btn-outline-dark btn-sm"
-          data-division="generalaffair"
-          onclick="maShowDivision('generalaffair')"
-        >
-          General Affair
-        </button>
-        <button
-          class="btn btn-outline-dark btn-sm"
-          data-division="surat"
-          onclick="maShowDivision('surat')"
-        >
-          Surat & Admin
-        </button>
-        <button
-          class="btn btn-outline-dark btn-sm"
-          data-division="keuangan"
-          onclick="maShowDivision('keuangan')"
-        >
-          Keuangan
-        </button>
-        <button
-          class="btn btn-outline-dark btn-sm"
-          data-division="sdm"
-          onclick="maShowDivision('sdm')"
-        >
-          SDM
-        </button>
-        <button
-          class="btn btn-outline-dark btn-sm"
-          data-division="proyek"
-          onclick="maShowDivision('proyek')"
-        >
-          Proyek
-        </button>
-        <button
-          class="btn btn-outline-dark btn-sm"
-          data-division="laporan"
-          onclick="maShowDivision('laporan')"
-        >
-          Laporan
-        </button>
-      </div>
-      <div id="maDivisionContent"></div>
-    </section>
-
-    <div class="toast-container position-fixed bottom-0 end-0 p-3">
-      <div id="futureToast" class="toast">
-        <div class="toast-header">
-          <strong class="me-auto">MA Group ERP</strong>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="toast"
-          ></button>
-        </div>
-        <div class="toast-body">
-          Modul ini sedang disiapkan dan akan dikembangkan pada tahap
-          berikutnya.
-        </div>
-      </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="script.js"></script>
-
-    <script>
-      const MA_DIVISIONS = {
-        gudang: {
-          label: "PERGUDANGAN",
-          title: "Gudang & Peralatan",
-          desc: "Pantau persediaan, alat kerja, dan aktivitas gudang.",
-          cards: [
-            {
-              icon: "📦",
-              title: "Master Barang",
-              desc: "Material, satuan, kategori, dan stok minimum.",
-              href: "Pergudangan/Produk Persediaan Proyek/index.html",
-              active: true,
-            },
-            {
-              icon: "🔧",
-              title: "Peminjaman Alat",
-              desc: "Peminjaman, pengembalian, kondisi, dan riwayat.",
-              href: "Pergudangan/Peminjaman Alat/index.html",
-              active: true,
-            },
-            {
-              icon: "🚚",
-              title: "Surat Jalan",
-              desc: "Buat dan pantau dokumen pengiriman barang.",
-              href: "Pergudangan/Surat Jalan/index.html",
-              active: true,
-            },
-            {
-              icon: "🧾",
-              title: "Pembelian",
-              desc: "Price Order dan administrasi pembelian barang.",
-              href: "Pergudangan/Pembelian/index.html",
-              active: true,
-            },
-          ],
-        },
-        generalaffair: {
-          label: "GENERAL AFFAIR",
-          title: "General Affair",
-          desc: "Pantau persediaan alat inventaris dan kebutuhan operasional.",
-          cards: [
-            {
-              icon: "🔧",
-              title: "Inventaris",
-              desc: "Identitas alat, nomor seri, kondisi, dan status.",
-              href: "General Affair/Alat Inventaris/index.html",
-              active: true,
-            },
-            {
-              icon: "🚚",
-              title: "Transport",
-              desc: "Perpanjangan : Pajak, KIR dan Service.",
-              href: "General Affair/Transport/index.html",
-              active: true,
-            },
-            {
-              icon: "📋",
-              title: "Legalitas",
-              desc: "Perpanjangan Serkom, SBU.",
-              href: "General Affair/Legalitas/index.html",
-              active: true,
-            },
-          ],
-        },
-        surat: {
-          label: "SURAT & ADMINISTRASI",
-          title: "Surat & Administrasi",
-          desc: "Kelola surat, tamu, dokumen, dan arsip perusahaan.",
-          cards: [
-            {
-              icon: "📄",
-              title: "Buku Nomor Surat",
-              desc: "Pencatatan dan pengelolaan nomor surat.",
-              href: "Surat & Administrasi/Buku Nomor Surat/index.html",
-              active: true,
-            },
-            {
-              icon: "👥",
-              title: "Buku Tamu",
-              desc: "Pencatatan kunjungan tamu dan kebutuhan administrasi.",
-              href: "Surat & Administrasi/Buku Tamu/index.html",
-              active: true,
-            },
-          ],
-        },
-        keuangan: {
-          label: "KEUANGAN",
-          title: "Keuangan",
-          desc: "Kelola transaksi, tagihan, kas, dan administrasi keuangan perusahaan.",
-          cards: [
-            {
-              icon: "🏦",
-              title: "Rekapitulasi Proyek",
-              desc: "Tracking Pekerjaan Proyek Yang Berjalan.",
-              href: "Keuangan/Rekapitulasi Proyek/index.html",
-              active: true,
-            },
-            {
-              icon: "🧾",
-              title: "Invoice",
-              desc: "Kelola invoice dan tagihan perusahaan.",
-              href: "#",
-              active: false,
-            },
-            {
-              icon: "💸",
-              title: "Pengeluaran",
-              desc: "Catat dan pantau pengeluaran perusahaan.",
-              href: "#",
-              active: false,
-            },
-            {
-              icon: "💰",
-              title: "Penerimaan",
-              desc: "Catat penerimaan pembayaran dari pelanggan.",
-              href: "#",
-              active: false,
-            },
-            {
-              icon: "📒",
-              title: "Jurnal Keuangan",
-              desc: "Pencatatan transaksi dan jurnal perusahaan.",
-              href: "#",
-              active: false,
-            },
-            {
-              icon: "📊",
-              title: "Rekap Keuangan",
-              desc: "Ringkasan kondisi keuangan perusahaan.",
-              href: "#",
-              active: false,
-            },
-          ],
-        },
-        sdm: {
-          label: "SUMBER DAYA MANUSIA",
-          title: "Sumber Daya Manusia",
-          desc: "Kelola data, kehadiran, cuti, dan administrasi karyawan.",
-          cards: [
-            {
-              icon: "👤",
-              title: "Data Karyawan",
-              desc: "Database karyawan perusahaan.",
-              href: "#",
-              active: false,
-            },
-            {
-              icon: "🕐",
-              title: "Absensi",
-              desc: "Pencatatan kehadiran karyawan.",
-              href: "#",
-              active: false,
-            },
-            {
-              icon: "📝",
-              title: "Cuti & Izin",
-              desc: "Kelola pengajuan cuti dan izin.",
-              href: "#",
-              active: false,
-            },
-            {
-              icon: "💼",
-              title: "Kontrak Kerja",
-              desc: "Kelola data kontrak dan masa kerja karyawan.",
-              href: "#",
-              active: false,
-            },
-            {
-              icon: "💵",
-              title: "Penggajian",
-              desc: "Administrasi gaji dan tunjangan karyawan.",
-              href: "#",
-              active: false,
-            },
-            {
-              icon: "📋",
-              title: "Dokumen Karyawan",
-              desc: "Pusat dokumen administrasi karyawan.",
-              href: "#",
-              active: false,
-            },
-          ],
-        },
-        proyek: {
-          label: "PROYEK & OPERASIONAL",
-          title: "Proyek & Operasional",
-          desc: "Pantau proyek, pekerjaan lapangan, dan aktivitas operasional.",
-          cards: [
-            {
-              icon: "📋",
-              title: "Daftar Proyek",
-              desc: "Data dan informasi seluruh proyek.",
-              href: "Proyek & Operasional/Daftar Proyek/index.html",
-              active: true,
-            },
-            {
-              icon: "📈",
-              title: "Progress Proyek",
-              desc: "Pantau perkembangan pekerjaan.",
-              href: "Proyek & Operasional/Progress Proyek/index.html",
-              active: true,
-            },
-            {
-              icon: "🔧",
-              title: "Pekerjaan Lapangan",
-              desc: "Kelola aktivitas dan pekerjaan lapangan.",
-              href: "Proyek & Operasional/Pekerjaan Lapangan/index.html",
-              active: true,
-            },
-            {
-              icon: "👷",
-              title: "Tim Lapangan",
-              desc: "Data personel dan penugasan lapangan.",
-              href: "Proyek & Operasional/Tim Lapangan/index.html",
-              active: true,
-            },
-            {
-              icon: "📅",
-              title: "Jadwal Pekerjaan",
-              desc: "Atur jadwal dan agenda pekerjaan.",
-              href: "Proyek & Operasional/Jadwal Pekerjaan/index.html",
-              active: true,
-            },
-            {
-              icon: "📸",
-              title: "Dokumentasi Proyek",
-              desc: "Simpan dokumentasi kegiatan dan progress pekerjaan.",
-              href: "Proyek & Operasional/Dokumentasi Proyek/index.html",
-              active: true,
-            },
-          ],
-        },
-        laporan: {
-          label: "LAPORAN",
-          title: "Laporan",
-          desc: "Pantau kondisi perusahaan melalui laporan terintegrasi.",
-          cards: [
-            {
-              icon: "📊",
-              title: "Dashboard Manajemen",
-              desc: "Ringkasan kondisi perusahaan.",
-              href: "#",
-              active: false,
-            },
-            {
-              icon: "💰",
-              title: "Laporan Keuangan",
-              desc: "Laporan transaksi dan keuangan.",
-              href: "#",
-              active: false,
-            },
-            {
-              icon: "📦",
-              title: "Laporan Gudang",
-              desc: "Laporan persediaan dan aktivitas gudang.",
-              href: "#",
-              active: false,
-            },
-            {
-              icon: "👥",
-              title: "Laporan SDM",
-              desc: "Ringkasan data dan aktivitas karyawan.",
-              href: "#",
-              active: false,
-            },
-            {
-              icon: "🏗️",
-              title: "Laporan Proyek",
-              desc: "Ringkasan progress dan pekerjaan proyek.",
-              href: "#",
-              active: false,
-            },
-            {
-              icon: "📑",
-              title: "Laporan Operasional",
-              desc: "Laporan kegiatan operasional perusahaan.",
-              href: "#",
-              active: false,
-            },
-          ],
-        },
-      };
-
-      function maShowDivision(key) {
-        const d = MA_DIVISIONS[key];
-        const nav = document.querySelectorAll(".ma-division-nav .btn");
-        nav.forEach((b) => {
-          const active = b.dataset.division === key;
-          b.classList.toggle("btn-dark", active);
-          b.classList.toggle("btn-outline-dark", !active);
-        });
-
-        document.getElementById("maDivisionContent").innerHTML = `
-    <div class="ma-division-head">
-      <div class="eyebrow">${d.label}</div>
-      <h2 class="mt-2 mb-1">${d.title}</h2>
-      <p class="text-secondary mb-0">${d.desc}</p>
-    </div>
-
-    <div class="row g-4">
-      ${d.cards
-        .map(
-          (c) => `
-        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-          <div class="card ma-module-card shadow-sm">
-            <div class="card-body d-flex flex-column">
-              <div class="ma-module-icon">${c.icon}</div>
-              <h5 class="mb-2">${c.title}</h5>
-              <p class="text-secondary flex-grow-1">${c.desc}</p>
-              ${
-                c.active
-                  ? `<a href="${c.href}" class="btn btn-dark btn-sm align-self-start">Buka Modul →</a>`
-                  : `<button class="btn btn-light border btn-sm align-self-start" onclick="maComingSoon()">Segera Hadir</button>`
-              }
+        <div class="dropdown">
+          <button class="icon-btn" type="button" data-bs-toggle="dropdown" aria-label="Notifikasi">
+            <i class="bi bi-bell"></i>
+            <span class="ma-notif-dot" id="notifDot"></span>
+          </button>
+          <div class="dropdown-menu dropdown-menu-end ma-notif-menu shadow">
+            <div class="ma-notif-head">Notifikasi <span class="badge text-bg-primary">3</span></div>
+            <div class="ma-notif-item">
+              <span class="nt"><i class="bi bi-truck"></i></span>
+              <div><p>Surat Jalan #SJ-2451 menunggu persetujuan Anda.</p><time>2 menit lalu</time></div>
             </div>
+            <div class="ma-notif-item">
+              <span class="nt"><i class="bi bi-box-seam"></i></span>
+              <div><p>Stok "Semen 50kg" mendekati batas minimum gudang.</p><time>1 jam lalu</time></div>
+            </div>
+            <div class="ma-notif-item">
+              <span class="nt"><i class="bi bi-calendar-week"></i></span>
+              <div><p>Jadwal pekerjaan Proyek Tower A diperbarui.</p><time>3 jam lalu</time></div>
+            </div>
+            <button class="ma-notif-foot" id="markReadBtn" type="button">
+              <i class="bi bi-check2-all me-1"></i> Tandai semua dibaca
+            </button>
           </div>
         </div>
-      `,
-        )
-        .join("")}
-    </div>`;
-      }
 
-      function maComingSoon() {
-        bootstrap.Toast.getOrCreateInstance(
-          document.getElementById("futureToast"),
-        ).show();
-      }
+        <div class="dropdown">
+          <button class="ma-avatar" type="button" data-bs-toggle="dropdown" aria-label="Menu pengguna">MA</button>
+          <div class="dropdown-menu dropdown-menu-end ma-user-menu shadow">
+            <div class="ma-user-head">
+              <span class="ma-avatar" style="cursor:default">MA</span>
+              <div>
+                <div class="name">Admin MA</div>
+                <div class="mail">admin@magroup.co.id</div>
+              </div>
+            </div>
+            <button class="ma-user-item" type="button" data-soon="Profil Saya"><i class="bi bi-person"></i> Profil Saya</button>
+            <button class="ma-user-item" type="button" data-soon="Pengaturan Akun"><i class="bi bi-gear"></i> Pengaturan Akun</button>
+            <button class="ma-user-item danger" type="button" data-soon="Sesi Keluar"><i class="bi bi-box-arrow-right"></i> Keluar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
 
-      document.addEventListener("DOMContentLoaded", () =>
-        maShowDivision("gudang"),
-      );
-    </script>
-  </body>
+  <!-- ================= HERO ================= -->
+  <section class="ma-hero">
+    <div class="container-xxl">
+      <span class="ma-chip mb-3"><i class="bi bi-hand-thumbs-up"></i> <span id="greetEyebrow">Selamat datang kembali</span></span>
+      <h1 class="ma-hero-title">Beranda <span class="text-accent">ERP</span></h1>
+      <p class="ma-hero-sub">
+        Pusat aplikasi internal Maju Abadi Group. Pilih modul sesuai
+        pekerjaanmu untuk mulai bekerja.
+      </p>
+      <div class="ma-hero-chips">
+        <span class="ma-chip"><i class="bi bi-calendar3"></i> <span id="heroDate">—</span></span>
+        <span class="ma-chip"><i class="bi bi-grid"></i> <b id="statTotal">0</b>&nbsp;Modul</span>
+        <span class="ma-chip"><i class="bi bi-check2-circle"></i> <b id="statActive">0</b>&nbsp;Aktif</span>
+        <span class="ma-chip"><i class="bi bi-diagram-3"></i> <b id="statDiv">0</b>&nbsp;Divisi</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= NAVIGASI DIVISI ================= -->
+  <div class="container-xxl ma-nav-wrap">
+    <div class="ma-nav-card">
+      <div class="ma-tabs" id="divisionNav" role="tablist"></div>
+    </div>
+  </div>
+
+  <!-- ================= KONTEN MODUL ================= -->
+  <main class="container-xxl ma-content" id="divisionContent"></main>
+
+  <!-- ================= LAUNCHER ================= -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="launcherCanvas"
+       style="--bs-offcanvas-width:350px">
+    <div class="offcanvas-header border-bottom">
+      <h5 class="offcanvas-title fw-bold"><i class="bi bi-grid-3x3-gap-fill text-primary me-2"></i>Semua Aplikasi</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Tutup"></button>
+    </div>
+    <div class="offcanvas-body" id="launcherBody"></div>
+  </div>
+
+  <!-- ================= TOAST ================= -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:1090">
+    <div id="comingSoonToast" class="toast ma-toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3400">
+      <div class="toast-body">
+        <i class="bi bi-hourglass-split"></i>
+        <div>
+          <strong>Modul sedang disiapkan</strong>
+          <span id="toastMsg">…</span>
+        </div>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="toast" aria-label="Tutup"></button>
+      </div>
+      <span class="ma-toast-progress"></span>
+    </div>
+  </div>
+
+  <footer class="ma-footer">
+    © 2025 MA Group · ERP Internal — untuk penggunaan internal perusahaan
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="script.js"></script>
+</body>
 </html>
