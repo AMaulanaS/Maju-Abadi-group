@@ -16,15 +16,39 @@
 
     <main class="container">
       <section class="hero"><div><span class="eyebrow">PUBLIC ACCESS</span><h1>Pengajuan dana lebih sederhana.</h1><p>Ajukan kebutuhan dana, pantau status, dan lihat riwayat permohonan tanpa akun atau login.</p></div><div class="hero-badge"><span>Database</span><strong>Google Sheets</strong><small>Terhubung via Apps Script</small></div></section>
-
       <section class="stats" id="stats"></section>
-
       <section class="toolbar"><div><h2>Daftar Permohonan</h2><p id="listSubtitle">Memuat data...</p></div><div class="filters" id="filters"><button class="filter active" data-filter="all">Semua</button><button class="filter" data-filter="pending">Menunggu</button><button class="filter" data-filter="approved">Disetujui</button><button class="filter" data-filter="paid">Dibayar</button><button class="filter" data-filter="rejected">Ditolak</button></div></section>
       <div class="search-row"><input id="searchInput" class="search" placeholder="Cari nomor, nama, judul, departemen..."/><select id="sortSelect" class="select"><option value="newest">Terbaru</option><option value="oldest">Terlama</option><option value="amount_desc">Nominal terbesar</option><option value="amount_asc">Nominal terkecil</option></select></div>
       <section id="requestList" class="request-grid"></section>
     </main>
 
-    <div class="modal hidden" id="requestModal"><div class="modal-card"><div class="modal-head"><div><span class="eyebrow">FORM PENGAJUAN</span><h2>Permohonan Dana Baru</h2></div><button class="icon-btn" data-close="requestModal">×</button></div><form id="requestForm" class="form"><div class="form-grid"><label>Nama Pemohon<input name="name" required placeholder="Nama lengkap"></label><label>Departemen / Bagian<input name="department" placeholder="Contoh: Operasional"></label></div><label>Judul Permohonan<input name="title" required placeholder="Contoh: Pembelian ATK bulanan"></label><div class="form-grid"><label>Kategori<select name="category" required><option value="operasional">Operasional</option><option value="transportasi">Transportasi</option><option value="pembelian">Pembelian</option><option value="lainnya">Lainnya</option></select></label><label>Jumlah Dana (Rp)<input name="amount" type="number" min="1" required placeholder="0"></label></div><label>Keterangan / Detail<textarea name="description" required rows="4" placeholder="Jelaskan kebutuhan dana secara detail..."></textarea></label><label>Upload Nota / Bukti <span class="muted">(opsional, JPG/PNG/WEBP/PDF maks. 5 MB)</span><input id="receipt" name="receipt" type="file" accept="image/jpeg,image/png,image/webp,application/pdf"></label><div id="formError" class="alert error hidden"></div><div class="modal-actions"><button type="button" class="btn btn-light" data-close="requestModal">Batal</button><button class="btn btn-primary" type="submit" id="submitBtn">Kirim Permohonan</button></div></form></div></div>
+    <div class="modal hidden" id="requestModal">
+      <div class="modal-card request-form-card">
+        <div class="modal-head"><div><span class="eyebrow">FORM PENGAJUAN</span><h2>Permohonan Dana Baru</h2></div><button class="icon-btn" data-close="requestModal">×</button></div>
+        <form id="requestForm" class="form">
+          <div class="form-grid"><label>Nama Pemohon<input name="name" required placeholder="Nama lengkap"></label><label>Departemen / Bagian<input name="department" placeholder="Contoh: Operasional"></label></div>
+          <label>Judul Permohonan<input name="title" required placeholder="Contoh: Pembelian ATK bulanan"></label>
+          <div class="form-grid"><label>Kategori<select name="category" required><option value="operasional">Operasional</option><option value="transportasi">Transportasi</option><option value="pembelian">Pembelian</option><option value="lainnya">Lainnya</option></select></label><div class="form-summary"><span>Total Dana</span><strong id="totalAmountPreview">Rp0</strong><small>Otomatis dari daftar item</small></div></div>
+
+          <div class="items-section">
+            <div class="items-header"><div><h3>Rincian Item</h3><p>Tambahkan kebutuhan dan harga seperti format pada contoh.</p></div><button type="button" class="btn btn-light btn-add-item" id="addItemBtn">＋ Tambah Item</button></div>
+            <div class="item-table-wrap">
+              <table class="item-table">
+                <thead><tr><th class="col-no">No</th><th>Keterangan / Item</th><th class="col-price">Harga (Rp)</th><th class="col-action">Aksi</th></tr></thead>
+                <tbody id="itemRows"></tbody>
+                <tfoot><tr><td colspan="2" class="total-label">TOTAL</td><td class="total-value" id="itemTotal">Rp0</td><td></td></tr></tfoot>
+              </table>
+            </div>
+            <div id="itemError" class="item-error hidden"></div>
+          </div>
+
+          <label>Keterangan Tambahan <span class="muted">(opsional)</span><textarea name="description" rows="3" placeholder="Catatan tambahan tentang pengajuan..."></textarea></label>
+          <label>Upload Nota / Bukti <span class="muted">(opsional, JPG/PNG/WEBP/PDF maks. 5 MB)</span><input id="receipt" name="receipt" type="file" accept="image/jpeg,image/png,image/webp,application/pdf"></label>
+          <div id="formError" class="alert error hidden"></div>
+          <div class="modal-actions"><button type="button" class="btn btn-light" data-close="requestModal">Batal</button><button class="btn btn-primary" type="submit" id="submitBtn">Kirim Permohonan</button></div>
+        </form>
+      </div>
+    </div>
 
     <div class="modal hidden" id="detailModal"><div class="modal-card detail-card"><div id="detailContent"></div></div></div>
     <div class="modal hidden" id="financeModal"><div class="modal-card"><div class="modal-head"><div><span class="eyebrow">PENGELOLA</span><h2>Panel Keuangan</h2><p>PIN digunakan hanya untuk aksi persetujuan.</p></div><button class="icon-btn" data-close="financeModal">×</button></div><div id="financeContent"></div></div></div>
