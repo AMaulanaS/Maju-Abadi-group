@@ -12,7 +12,8 @@ const CONFIG = {
   SHEET_NAME: 'Permohonan Dana',
   DRIVE_FOLDER_ID: '',
   ADMIN_PIN: '123456',
-  MAX_FILE_BYTES: 5 * 1024 * 1024
+  // Tidak ada batas jumlah gambar. Ukuran dibatasi per file agar upload tetap aman/stabil.
+  MAX_FILE_BYTES: 10 * 1024 * 1024
 };
 
 const HEADERS = ['ID','No Pengajuan','Nama Pemohon','Departemen','Judul','Kategori','Jumlah','Keterangan','Status','Bukti URL','Nama File Bukti','Catatan Keuangan','Disetujui Oleh','Tanggal Persetujuan','Tanggal Dibuat','Tanggal Diperbarui','Items JSON'];
@@ -24,6 +25,8 @@ function doPost(e){
     switch(p.action){
       case 'listRequests': return json_({ok:true,data:listRequests_()});
       case 'createRequest': return json_(createRequest_(p));
+      case 'uploadItemImage': return json_(uploadItemImage_(p));
+      case 'deleteItemImage': return json_(deleteItemImage_(p));
       case 'getRequest': return json_(getRequest_(p.id));
       case 'adminCheck': return json_({ok:true,authorized:String(p.pin||'')===String(CONFIG.ADMIN_PIN)});
       case 'updateStatus': return json_(updateStatus_(p));
@@ -49,7 +52,19 @@ function ensureHeaders_(sh){
 function listRequests_(){const sh=sheet_(),last=sh.getLastRow();if(last<2)return [];const vals=sh.getRange(2,1,last-1,HEADERS.length).getValues();return vals.map(rowToObj_).filter(x=>x.id).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));}
 function parseItems_(raw){
   if(!raw)return [];
-  try{const parsed=typeof raw==='string'?JSON.parse(raw):raw;return Array.isArray(parsed)?parsed.map(x=>({description:String(x.description||'').trim(),price:Number(x.price)||0})).filter(x=>x.description):[];}catch(e){return []}
+  try{
+    const parsed=typeof raw==='string'?JSON.parse(raw):raw;
+    return Array.isArray(parsed)?parsed.map(x=>({
+      description:String(x.description||'').trim(),
+      price:Number(x.price)||0,
+      images:Array.isArray(x.images)?x.images.map(img=>({
+        id:String(img.id||''),
+        name:String(img.name||''),
+        url:String(img.url||''),
+        type:String(img.type||'')
+      })).filter(img=>img.url):[]
+    })).filter(x=>x.description):[];
+  }catch(e){return []}
 }
 function rowToObj_(r){
   return {
@@ -64,6 +79,7 @@ function createRequest_(p){
   if(!items.length)throw new Error('Minimal 1 item harus ditambahkan.');
   if(items.some(x=>!x.description))throw new Error('Keterangan semua item wajib diisi.');
   if(items.some(x=>!(x.price>0)))throw new Error('Harga setiap item harus lebih dari Rp0.');
+  items=items.map(x=>({description:x.description,price:x.price,images:[]}));
   const amount=items.reduce((sum,x)=>sum+x.price,0);
   if(!(amount>0))throw new Error('Total jumlah dana tidak valid.');
   let receiptUrl='',receiptName='';
@@ -79,6 +95,59 @@ function createRequest_(p){
   const sh=sheet_(),now=new Date(),id=Utilities.getUuid(),number=nextNumber_(sh);
   sh.appendRow([id,number,name,String(p.department||''),title,String(p.category||'operasional'),amount,String(p.description||''),'pending',receiptUrl,receiptName,'','','',now,now,JSON.stringify(items)]);
   return {ok:true,id,request_number:number,amount,items};
+}
+function findRequestRow_(id){
+  const sh=sheet_(),last=sh.getLastRow();
+  if(last<2)throw new Error('Data belum tersedia.');
+  const vals=sh.getRange(2,1,last-1,HEADERS.length).getValues();
+  for(let i=0;i<vals.length;i++){
+    if(String(vals[i][0])===String(id))return {sh,row:i+2,values:vals[i]};
+  }
+  throw new Error('Permohonan tidak ditemukan.');
+}
+function uploadItemImage_(p){
+  const id=String(p.id||'').trim();
+  const itemIndex=Number(p.item_index);
+  if(!id)throw new Error('ID permohonan tidak valid.');
+  if(!Number.isInteger(itemIndex)||itemIndex<0)throw new Error('Nomor item tidak valid.');
+  if(!p.file||!p.file.data)throw new Error('File gambar tidak ditemukan.');
+  const decoded=Utilities.base64Decode(String(p.file.data));
+  if(decoded.length>CONFIG.MAX_FILE_BYTES)throw new Error('Ukuran file maksimal '+Math.round(CONFIG.MAX_FILE_BYTES/1024/1024)+' MB per gambar.');
+  const found=findRequestRow_(id), items=parseItems_(found.values[16]);
+  if(!items[itemIndex])throw new Error('Item tidak ditemukan.');
+  const type=String(p.file.type||'image/jpeg').toLowerCase();
+  if(['image/jpeg','image/png','image/webp','image/gif'].indexOf(type)<0)throw new Error('File harus berupa JPG, PNG, WEBP, atau GIF.');
+  const originalName=String(p.file.name||('bukti-'+Date.now()+'.jpg'));
+  const safeName=Date.now()+'_'+String(itemIndex+1)+'_'+originalName.replace(/[^a-zA-Z0-9._-]/g,'_');
+  const blob=Utilities.newBlob(decoded,type,safeName);
+  const folder=getRequestFolder_(found.values[1]);
+  const file=folder.createFile(blob);
+  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK,DriveApp.Permission.VIEW);
+  const image={id:file.getId(),name:originalName,url:'https://drive.google.com/uc?export=view&id='+file.getId(),type:type};
+  items[itemIndex].images=items[itemIndex].images||[];
+  items[itemIndex].images.push(image);
+  found.sh.getRange(found.row,17).setValue(JSON.stringify(items));
+  found.sh.getRange(found.row,16).setValue(new Date());
+  return {ok:true,id, item_index:itemIndex, image:image, images:items[itemIndex].images};
+}
+function deleteItemImage_(p){
+  const id=String(p.id||'').trim(), itemIndex=Number(p.item_index), imageId=String(p.image_id||'').trim();
+  if(!id||!Number.isInteger(itemIndex)||itemIndex<0||!imageId)throw new Error('Data gambar tidak valid.');
+  const found=findRequestRow_(id), items=parseItems_(found.values[16]);
+  if(!items[itemIndex])throw new Error('Item tidak ditemukan.');
+  const image=items[itemIndex].images.find(x=>x.id===imageId);
+  if(!image)throw new Error('Gambar tidak ditemukan.');
+  try{DriveApp.getFileById(imageId).setTrashed(true);}catch(e){}
+  items[itemIndex].images=items[itemIndex].images.filter(x=>x.id!==imageId);
+  found.sh.getRange(found.row,17).setValue(JSON.stringify(items));
+  found.sh.getRange(found.row,16).setValue(new Date());
+  return {ok:true,images:items[itemIndex].images};
+}
+function getRequestFolder_(requestNumber){
+  const root=getFolder_();
+  const name='Bukti '+String(requestNumber||'Permohonan');
+  const existing=root.getFoldersByName(name);
+  return existing.hasNext()?existing.next():root.createFolder(name);
 }
 function nextNumber_(sh){const year=Utilities.formatDate(new Date(),Session.getScriptTimeZone()||'Asia/Jakarta','yyyy');const prefix='PD-'+year+'-';const last=sh.getLastRow();if(last<2)return prefix+'00001';const nums=sh.getRange(2,2,last-1,1).getValues().map(x=>String(x[0])).filter(x=>x.indexOf(prefix)===0).map(x=>Number(x.slice(prefix.length))||0);return prefix+String((nums.length?Math.max.apply(null,nums):0)+1).padStart(5,'0');}
 function getRequest_(id){const r=listRequests_().find(x=>x.id===String(id));if(!r)throw new Error('Permohonan tidak ditemukan.');return {ok:true,data:r};}

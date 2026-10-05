@@ -31,19 +31,20 @@
           <div class="form-grid"><label>Kategori<select name="category" required><option value="operasional">Operasional</option><option value="transportasi">Transportasi</option><option value="pembelian">Pembelian</option><option value="lainnya">Lainnya</option></select></label><div class="form-summary"><span>Total Dana</span><strong id="totalAmountPreview">Rp0</strong><small>Otomatis dari daftar item</small></div></div>
 
           <div class="items-section">
-            <div class="items-header"><div><h3>Rincian Item</h3><p>Tambahkan kebutuhan dan harga seperti format pada contoh.</p></div><button type="button" class="btn btn-light btn-add-item" id="addItemBtn">＋ Tambah Item</button></div>
+            <div class="items-header"><div><h3>Rincian Item & Bukti</h3><p>Setiap item bisa memiliki banyak gambar bukti. Pilih beberapa gambar sekaligus.</p></div><button type="button" class="btn btn-light btn-add-item" id="addItemBtn">＋ Tambah Item</button></div>
             <div class="item-table-wrap">
               <table class="item-table">
-                <thead><tr><th class="col-no">No</th><th>Keterangan / Item</th><th class="col-price">Harga (Rp)</th><th class="col-action">Aksi</th></tr></thead>
+                <thead><tr><th class="col-no">No</th><th>Keterangan / Item + Bukti Gambar</th><th class="col-price">Harga (Rp)</th><th class="col-action">Aksi</th></tr></thead>
                 <tbody id="itemRows"></tbody>
                 <tfoot><tr><td colspan="2" class="total-label">TOTAL</td><td class="total-value" id="itemTotal">Rp0</td><td></td></tr></tfoot>
               </table>
             </div>
+            <div class="upload-note">Batas jumlah gambar: <strong>tidak dibatasi</strong>. Maksimal <strong>10 MB per gambar</strong>. Gambar disimpan ke Google Drive dan akan tampil kembali saat data dibuka.</div>
             <div id="itemError" class="item-error hidden"></div>
           </div>
 
           <label>Keterangan Tambahan <span class="muted">(opsional)</span><textarea name="description" rows="3" placeholder="Catatan tambahan tentang pengajuan..."></textarea></label>
-          <label>Upload Nota / Bukti <span class="muted">(opsional, JPG/PNG/WEBP/PDF maks. 5 MB)</span><input id="receipt" name="receipt" type="file" accept="image/jpeg,image/png,image/webp,application/pdf"></label>
+          <div class="form-info">Bukti gambar diunggah pada masing-masing item di tabel rincian di atas.</div>
           <div id="formError" class="alert error hidden"></div>
           <div class="modal-actions"><button type="button" class="btn btn-light" data-close="requestModal">Batal</button><button class="btn btn-primary" type="submit" id="submitBtn">Kirim Permohonan</button></div>
         </form>

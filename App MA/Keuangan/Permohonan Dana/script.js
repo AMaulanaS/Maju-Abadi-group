@@ -1,6 +1,6 @@
 /*
  * FRONTEND PUBLIC - Google Apps Script API
- * Dynamic item + price rows are stored as an item list and total automatically.
+ * Rincian item + harga + banyak gambar per item.
  */
 const API_URL = 'https://script.google.com/macros/s/AKfycbwt87pA-3UE_rbHXxTX1KaBckKKkwHIvXDZM1lCdJSAvZIGrvU_h8zHQcC9F7pjbs9f/exec';
 const ADMIN_PIN = '123456';
@@ -11,7 +11,7 @@ const rupiah = (n) => new Intl.NumberFormat('id-ID',{style:'currency',currency:'
 const dateFmt = (v) => { if(!v) return '-'; const d=new Date(v); return isNaN(d) ? String(v) : d.toLocaleString('id-ID',{dateStyle:'medium',timeStyle:'short'}); };
 const statusLabel = {pending:'Menunggu',approved:'Disetujui',rejected:'Ditolak',paid:'Sudah Dibayar'};
 const categoryLabel = {operasional:'Operasional',transportasi:'Transportasi',pembelian:'Pembelian',lainnya:'Lainnya'};
-function toast(msg, ok=true){const t=$('#toast');t.textContent=msg;t.className='toast '+(ok?'ok':'bad');clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.className='toast hidden',3500)}
+function toast(msg, ok=true){const t=$('#toast');t.textContent=msg;t.className='toast '+(ok?'ok':'bad');clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.className='toast hidden',4500)}
 function openModal(id){$('#'+id).classList.remove('hidden')}
 function closeModal(id){$('#'+id).classList.add('hidden')}
 document.addEventListener('click',e=>{const c=e.target.closest('[data-close]');if(c)closeModal(c.dataset.close);});
@@ -45,77 +45,121 @@ function render(){
   renderStats(state.requests);const rows=getFiltered();$('#listSubtitle').textContent=`Menampilkan ${rows.length} dari ${state.requests.length} permohonan`;$('#requestList').innerHTML=rows.length?rows.map(card).join(''):'<div class="empty">Tidak ada permohonan yang sesuai.</div>';
 }
 function card(r){
-  const itemCount=(r.items||[]).length;
-  return `<article class="request-card" onclick="showDetail('${r.id}')"><div class="card-top"><span class="number">${escapeHtml(r.request_number)}</span><span class="status ${r.status}">${statusLabel[r.status]||r.status}</span></div><h3>${escapeHtml(r.title)}</h3><div class="meta">${escapeHtml(r.name||'-')}${r.department?' · '+escapeHtml(r.department):''}</div><div class="amount">${rupiah(r.amount)}</div><div class="description">${itemCount?`${itemCount} item rincian`:escapeHtml(r.description||'Belum ada rincian item')}</div><span class="category">${categoryLabel[r.category]||r.category||'-'}</span></article>`;
+  const items=r.items||[];const itemCount=items.length;const imageCount=items.reduce((n,x)=>n+(x.images||[]).length,0);
+  return `<article class="request-card" onclick="showDetail('${escapeAttr(r.id)}')"><div class="card-top"><span class="number">${escapeHtml(r.request_number)}</span><span class="status ${escapeAttr(r.status)}">${statusLabel[r.status]||r.status}</span></div><h3>${escapeHtml(r.title)}</h3><div class="meta">${escapeHtml(r.name||'-')}${r.department?' · '+escapeHtml(r.department):''}</div><div class="amount">${rupiah(r.amount)}</div><div class="description">${itemCount?`${itemCount} item rincian · ${imageCount} gambar bukti`:escapeHtml(r.description||'Belum ada rincian item')}</div><span class="category">${categoryLabel[r.category]||r.category||'-'}</span></article>`;
 }
+
 function renderItems(items){
-  const rows=Array.isArray(items)&&items.length?items:[{description:'',price:''}];
+  const rows=Array.isArray(items)&&items.length?items:[{description:'',price:'',files:[]}];
   $('#itemRows').innerHTML=rows.map((item,i)=>itemRow(item,i)).join('');
+  rows.forEach((_,i)=>renderSelectedFiles(i));
   recalcTotal();
 }
 function itemRow(item={},index=0){
-  return `<tr class="item-row"><td class="col-no item-number">${index+1}</td><td><input class="item-name" type="text" placeholder="Contoh: Pembelian ATK" value="${escapeAttr(item.description||'')}" aria-label="Keterangan item"></td><td class="col-price"><input class="item-price" type="number" min="0" step="1" placeholder="0" value="${item.price!==undefined&&item.price!==null&&item.price!==''?Number(item.price):''}" aria-label="Harga item"></td><td class="col-action"><button type="button" class="remove-item" title="Hapus item">×</button></td></tr>`;
+  return `<tr class="item-row" data-index="${index}"><td class="col-no item-number">${index+1}</td><td><input class="item-name" type="text" placeholder="Contoh: Pembelian ATK" value="${escapeAttr(item.description||'')}" aria-label="Keterangan item"><div class="item-file-box"><input class="item-files" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple aria-label="Bukti gambar item"><small>Pilih banyak gambar sekaligus</small><div class="selected-files" data-preview-for="${index}"></div></div></td><td class="col-price"><input class="item-price" type="number" min="0" step="1" placeholder="0" value="${item.price!==undefined&&item.price!==null&&item.price!==''?Number(item.price):''}" aria-label="Harga item"></td><td class="col-action"><button type="button" class="remove-item" title="Hapus item">×</button></td></tr>`;
 }
 function addItem(){
   $('#itemRows').insertAdjacentHTML('beforeend',itemRow({},$('#itemRows').querySelectorAll('.item-row').length));
   renumberItems();
-  const inputs=$('#itemRows').querySelectorAll('.item-name');
-  if(inputs.length)inputs[inputs.length-1].focus();
+  const rows=$('#itemRows').querySelectorAll('.item-row');
+  const last=rows[rows.length-1];
+  last?.querySelector('.item-name')?.focus();
 }
-function renumberItems(){document.querySelectorAll('#itemRows .item-number').forEach((el,i)=>el.textContent=i+1)}
+function renumberItems(){
+  document.querySelectorAll('#itemRows .item-row').forEach((row,i)=>{row.dataset.index=i;row.querySelector('.item-number').textContent=i+1;const p=row.querySelector('.selected-files');if(p)p.dataset.previewFor=i;});
+}
 function recalcTotal(){
-  let total=0;
-  document.querySelectorAll('#itemRows .item-price').forEach(input=>total+=Math.max(0,Number(input.value)||0));
+  let total=0;document.querySelectorAll('#itemRows .item-price').forEach(input=>total+=Math.max(0,Number(input.value)||0));
   $('#itemTotal').textContent=rupiah(total);$('#totalAmountPreview').textContent=rupiah(total);return total;
 }
 function collectItems(){
-  return [...document.querySelectorAll('#itemRows .item-row')].map(row=>({description:row.querySelector('.item-name').value.trim(),price:Number(row.querySelector('.item-price').value)||0})).filter(x=>x.description||x.price>0);
+  return [...document.querySelectorAll('#itemRows .item-row')].map(row=>({
+    description:row.querySelector('.item-name').value.trim(),
+    price:Number(row.querySelector('.item-price').value)||0,
+    files:[...row.querySelector('.item-files').files]
+  })).filter(x=>x.description||x.price>0||x.files.length);
 }
 function validateItems(items){
-  if(!items.length) return 'Tambahkan minimal 1 item dan isi keterangan serta harga.';
-  if(items.some(x=>!x.description)) return 'Keterangan semua item wajib diisi.';
-  if(items.some(x=>!(x.price>0))) return 'Harga setiap item harus lebih dari Rp0.';
+  if(!items.length)return 'Tambahkan minimal 1 item dan isi keterangan serta harga.';
+  if(items.some(x=>!x.description))return 'Keterangan semua item wajib diisi.';
+  if(items.some(x=>!(x.price>0)))return 'Harga setiap item harus lebih dari Rp0.';
   return '';
 }
 function showItemError(msg=''){const el=$('#itemError');if(!msg){el.classList.add('hidden');el.textContent='';}else{el.textContent=msg;el.classList.remove('hidden')}}
 
+function renderSelectedFiles(index){
+  const row=$('#itemRows')?.querySelectorAll('.item-row')[index];if(!row)return;
+  const box=row.querySelector('.selected-files');const input=row.querySelector('.item-files');if(!box||!input)return;
+  const files=[...input.files];
+  box.innerHTML=files.length?files.map((file,i)=>`<div class="selected-file"><span class="selected-file-name">${escapeHtml(file.name)}</span><button type="button" class="remove-selected-file" data-file-index="${i}" title="Hapus gambar ini">×</button></div>`).join(''):'<span class="no-files">Belum ada gambar dipilih</span>';
+}
+function removeSelectedFile(rowIndex,fileIndex){
+  const row=$('#itemRows').querySelectorAll('.item-row')[rowIndex];if(!row)return;
+  const input=row.querySelector('.item-files');const files=[...input.files];files.splice(fileIndex,1);
+  const dt=new DataTransfer();files.forEach(f=>dt.items.add(f));input.files=dt.files;renderSelectedFiles(rowIndex);
+}
+
 function showDetail(id){
   const r=state.requests.find(x=>String(x.id)===String(id));if(!r)return;
-  let receipt='';
-  if(r.receipt_url){const isImg=/\.(jpg|jpeg|png|webp)(\?|$)/i.test(r.receipt_url);receipt=`<div class="detail-section"><h4>Nota / Bukti</h4><div class="receipt">${isImg?`<a href="${r.receipt_url}" target="_blank"><img src="${r.receipt_url}" alt="Nota"></a>`:''}<a href="${r.receipt_url}" target="_blank">Buka ${escapeHtml(r.receipt_filename||'file bukti')}</a></div></div>`}
-  const items=(r.items||[]).map((x,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(x.description)}</td><td class="money">${rupiah(x.price)}</td></tr>`).join('');
-  const itemTable=items?`<div class="detail-section"><h4>Rincian Item</h4><div class="item-table-wrap"><table class="item-table detail-items"><thead><tr><th class="col-no">No</th><th>Keterangan / Item</th><th class="col-price">Harga</th></tr></thead><tbody>${items}</tbody><tfoot><tr><td colspan="2" class="total-label">TOTAL</td><td class="total-value">${rupiah(r.amount)}</td></tr></tfoot></table></div></div>`:'';
-  $('#detailContent').innerHTML=`<div class="modal-head"><div><span class="number">${escapeHtml(r.request_number)}</span><h2>${escapeHtml(r.title)}</h2></div><button class="icon-btn" data-close="detailModal">×</button></div><div class="detail-body"><div class="detail-head"><div><span class="status ${r.status}">${statusLabel[r.status]||r.status}</span></div><strong>${rupiah(r.amount)}</strong></div><div class="detail-section"><div class="detail-grid"><div><div class="detail-label">Pemohon</div><div class="detail-value">${escapeHtml(r.name||'-')}</div></div><div><div class="detail-label">Departemen</div><div class="detail-value">${escapeHtml(r.department||'-')}</div></div><div><div class="detail-label">Kategori</div><div class="detail-value">${categoryLabel[r.category]||r.category}</div></div><div><div class="detail-label">Tanggal</div><div class="detail-value">${dateFmt(r.created_at)}</div></div></div></div>${itemTable}${r.description?`<div class="detail-section"><h4>Keterangan Tambahan</h4><p>${escapeHtml(r.description)}</p></div>`:''}${r.finance_note?`<div class="detail-section"><h4>Catatan Keuangan</h4><p>${escapeHtml(r.finance_note)}</p></div>`:''}${receipt}${state.admin?adminActions(r):''}</div>`;
+  const itemBlocks=(r.items||[]).map((x,i)=>{
+    const imgs=x.images||[];
+    const gallery=imgs.length?`<div class="image-gallery">${imgs.map((img,j)=>`<div class="detail-image-wrap"><a href="${escapeAttr(img.url)}" target="_blank" rel="noopener"><img src="${escapeAttr(img.url)}" alt="Bukti ${i+1}-${j+1}" loading="lazy"></a>${state.admin?`<button type="button" class="delete-saved-image" onclick="deleteSavedImage('${escapeAttr(r.id)}',${i},'${escapeAttr(img.id)}')">Hapus</button>`:''}<div class="detail-image-name">${escapeHtml(img.name||'Gambar '+(j+1))}</div></div>`).join('')}</div>`:'<div class="no-saved-images">Belum ada bukti gambar untuk item ini.</div>';
+    return `<div class="detail-item"><div class="detail-item-head"><span class="detail-item-no">${i+1}</span><div class="detail-item-title">${escapeHtml(x.description)}</div><strong>${rupiah(x.price)}</strong></div><div class="detail-item-images">${gallery}</div></div>`;
+  }).join('');
+  const legacyReceipt=r.receipt_url?`<div class="detail-section"><h4>Nota / Bukti Lama</h4><div class="receipt">${/\.(jpg|jpeg|png|webp|gif)(\?|$)/i.test(r.receipt_url)?`<a href="${escapeAttr(r.receipt_url)}" target="_blank" rel="noopener"><img src="${escapeAttr(r.receipt_url)}" alt="Nota"></a>`:''}<a href="${escapeAttr(r.receipt_url)}" target="_blank" rel="noopener">Buka ${escapeHtml(r.receipt_filename||'file bukti')}</a></div></div>`:'';
+  const itemTable=`<div class="detail-section"><h4>Rincian Item & Bukti</h4><div class="detail-items-list">${itemBlocks||'<div class="empty">Belum ada rincian item.</div>'}</div></div>`;
+  $('#detailContent').innerHTML=`<div class="modal-head"><div><span class="number">${escapeHtml(r.request_number)}</span><h2>${escapeHtml(r.title)}</h2></div><button class="icon-btn" data-close="detailModal">×</button></div><div class="detail-body"><div class="detail-head"><div><span class="status ${escapeAttr(r.status)}">${statusLabel[r.status]||r.status}</span></div><strong>${rupiah(r.amount)}</strong></div><div class="detail-section"><div class="detail-grid"><div><div class="detail-label">Pemohon</div><div class="detail-value">${escapeHtml(r.name||'-')}</div></div><div><div class="detail-label">Departemen</div><div class="detail-value">${escapeHtml(r.department||'-')}</div></div><div><div class="detail-label">Kategori</div><div class="detail-value">${categoryLabel[r.category]||r.category}</div></div><div><div class="detail-label">Tanggal</div><div class="detail-value">${dateFmt(r.created_at)}</div></div></div></div>${itemTable}${r.description?`<div class="detail-section"><h4>Keterangan Tambahan</h4><p>${escapeHtml(r.description)}</p></div>`:''}${r.finance_note?`<div class="detail-section"><h4>Catatan Keuangan</h4><p>${escapeHtml(r.finance_note)}</p></div>`:''}${legacyReceipt}${state.admin?adminActions(r):''}</div>`;
   openModal('detailModal');
 }
 function adminActions(r){
-  if(r.status==='pending')return `<div class="detail-section"><h4>Aksi Keuangan</h4><textarea id="financeNote" class="search" rows="3" placeholder="Catatan approval / penolakan"></textarea><div class="finance-actions"><button class="btn btn-success" onclick="changeStatus('${r.id}','approved')">✓ Setujui</button><button class="btn btn-danger" onclick="changeStatus('${r.id}','rejected')">✕ Tolak</button></div></div>`;
-  if(r.status==='approved')return `<div class="detail-section"><h4>Aksi Keuangan</h4><button class="btn btn-blue" onclick="changeStatus('${r.id}','paid')">Rp Tandai Sudah Dibayar</button></div>`;
+  if(r.status==='pending')return `<div class="detail-section"><h4>Aksi Keuangan</h4><textarea id="financeNote" class="search" rows="3" placeholder="Catatan approval / penolakan"></textarea><div class="finance-actions"><button class="btn btn-success" onclick="changeStatus('${escapeAttr(r.id)}','approved')">✓ Setujui</button><button class="btn btn-danger" onclick="changeStatus('${escapeAttr(r.id)}','rejected')">✕ Tolak</button></div></div>`;
+  if(r.status==='approved')return `<div class="detail-section"><h4>Aksi Keuangan</h4><button class="btn btn-blue" onclick="changeStatus('${escapeAttr(r.id)}','paid')">Rp Tandai Sudah Dibayar</button></div>`;
   return '';
 }
 async function changeStatus(id,status){
   const note=$('#financeNote')?.value||'';if(status==='rejected'&&!note.trim()){toast('Isi catatan saat menolak permohonan.',false);return}
   try{await api('updateStatus',{id,status,finance_note:note,pin:state.pin});toast('Status berhasil diperbarui.');closeModal('detailModal');await load();}catch(e){toast(e.message,false)}
 }
+async function deleteSavedImage(requestId,itemIndex,imageId){
+  if(!state.admin)return;
+  if(!confirm('Hapus gambar bukti ini dari Drive?'))return;
+  try{await api('deleteItemImage',{id:requestId,item_index:itemIndex,image_id:imageId});toast('Gambar berhasil dihapus.');await load();showDetail(requestId);}catch(e){toast(e.message,false)}
+}
+
 async function submitRequest(e){
   e.preventDefault();
   const form=e.target,btn=$('#submitBtn'),err=$('#formError');err.classList.add('hidden');showItemError('');
-  const items=collectItems(), itemError=validateItems(items);
-  if(itemError){showItemError(itemError);return}
+  const items=collectItems(), itemError=validateItems(items);if(itemError){showItemError(itemError);return}
   const total=items.reduce((sum,x)=>sum+x.price,0);if(!(total>0)){showItemError('Total dana harus lebih dari Rp0.');return}
-  btn.disabled=true;btn.textContent='Mengirim...';
+  btn.disabled=true;
   try{
-    const file=$('#receipt').files[0];if(file&&file.size>5*1024*1024)throw new Error('Ukuran file maksimal 5MB.');
-    let receipt=null;if(file)receipt={name:file.name,type:file.type,data:await fileToBase64(file)};
-    const fd=new FormData(form);const data=Object.fromEntries(fd.entries());delete data.receipt;data.amount=total;data.items=items;data.receipt=receipt;
-    const r=await api('createRequest',data);form.reset();renderItems([]);closeModal('requestModal');toast('Permohonan berhasil dikirim. Nomor: '+r.request_number);await load();
+    const cleanItems=items.map(x=>({description:x.description,price:x.price}));
+    const fd=new FormData(form);const data=Object.fromEntries(fd.entries());delete data.receipt;data.amount=total;data.items=cleanItems;
+    btn.textContent='Menyimpan permohonan...';
+    const created=await api('createRequest',data);
+    const uploadJobs=[];
+    items.forEach((item,itemIndex)=>item.files.forEach(file=>uploadJobs.push({itemIndex,file})));
+    let done=0,failed=[];
+    for(const job of uploadJobs){
+      btn.textContent=`Mengunggah bukti ${done+1}/${uploadJobs.length}...`;
+      try{
+        if(fileTooLarge(job.file))throw new Error('Ukuran lebih dari 10 MB');
+        await api('uploadItemImage',{id:created.id,item_index:job.itemIndex,file:{name:job.file.name,type:job.file.type,data:await fileToBase64(job.file)}});
+      }catch(ex){failed.push(job.file.name+': '+ex.message)}
+      done++;
+    }
+    form.reset();renderItems([]);closeModal('requestModal');await load();
+    if(failed.length)toast(`Permohonan tersimpan, tetapi ${failed.length} gambar gagal diunggah.`,false);
+    else toast(`Permohonan berhasil dikirim. ${uploadJobs.length} gambar tersimpan.`);
   }catch(e){err.textContent=e.message;err.classList.remove('hidden')}
   finally{btn.disabled=false;btn.textContent='Kirim Permohonan'}
 }
+function fileTooLarge(file){return file.size>10*1024*1024}
 function fileToBase64(file){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result).split(',')[1]);r.onerror=reject;r.readAsDataURL(file)})}
+
 async function openFinance(){
   const pin=prompt('Masukkan PIN Panel Keuangan:');if(!pin)return;
-  try{const r=await api('adminCheck',{pin});if(!r.authorized)throw new Error('PIN salah.');state.admin=true;state.pin=pin;$('#financeContent').innerHTML=`<div class="finance-list"><div class="alert">Panel aktif. Klik salah satu permohonan untuk meninjau dan mengubah status.</div>${state.requests.length?state.requests.map(x=>`<div class="finance-item"><div><strong>${escapeHtml(x.request_number)}</strong><br><span class="meta">${escapeHtml(x.name||'-')} · ${escapeHtml(x.title)}</span></div><button class="btn btn-light" onclick="closeModal('financeModal');showDetail('${x.id}')">Buka</button></div>`).join(''):'<div class="empty">Belum ada data.</div>'}</div>`;openModal('financeModal')}
+  try{const r=await api('adminCheck',{pin});if(!r.authorized)throw new Error('PIN salah.');state.admin=true;state.pin=pin;$('#financeContent').innerHTML=`<div class="finance-list"><div class="alert">Panel aktif. Klik salah satu permohonan untuk meninjau, melihat semua bukti gambar, dan mengubah status.</div>${state.requests.length?state.requests.map(x=>`<div class="finance-item"><div><strong>${escapeHtml(x.request_number)}</strong><br><span class="meta">${escapeHtml(x.name||'-')} · ${escapeHtml(x.title)}</span></div><button class="btn btn-light" onclick="closeModal('financeModal');showDetail('${escapeAttr(x.id)}')">Buka</button></div>`).join(''):'<div class="empty">Belum ada data.</div>'}</div>`;openModal('financeModal')}
   catch(e){toast(e.message,false)}
 }
 function escapeHtml(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
@@ -127,7 +171,15 @@ $('#financeBtn').onclick=openFinance;
 $('#addItemBtn').onclick=addItem;
 $('#requestForm').onsubmit=submitRequest;
 $('#itemRows').addEventListener('input',e=>{if(e.target.classList.contains('item-price'))recalcTotal()});
-$('#itemRows').addEventListener('click',e=>{const btn=e.target.closest('.remove-item');if(!btn)return;const rows=$('#itemRows').querySelectorAll('.item-row');if(rows.length<=1){rows[0].querySelector('.item-name').value='';rows[0].querySelector('.item-price').value='';}else{btn.closest('tr').remove();}renumberItems();recalcTotal();showItemError('')});
+$('#itemRows').addEventListener('change',e=>{if(e.target.classList.contains('item-files')){const row=e.target.closest('.item-row');renderSelectedFiles([...$('#itemRows').querySelectorAll('.item-row')].indexOf(row));}});
+$('#itemRows').addEventListener('click',e=>{
+  const removeFile=e.target.closest('.remove-selected-file');
+  if(removeFile){const row=removeFile.closest('.item-row');removeSelectedFile([...$('#itemRows').querySelectorAll('.item-row')].indexOf(row),Number(removeFile.dataset.fileIndex));return;}
+  const btn=e.target.closest('.remove-item');if(!btn)return;
+  const rows=$('#itemRows').querySelectorAll('.item-row');
+  if(rows.length<=1){rows[0].querySelector('.item-name').value='';rows[0].querySelector('.item-price').value='';rows[0].querySelector('.item-files').value='';renderSelectedFiles(0);}else{btn.closest('tr').remove();}
+  renumberItems();recalcTotal();showItemError('');
+});
 $('#searchInput').oninput=e=>{state.search=e.target.value;render()};
 $('#sortSelect').onchange=e=>{state.sort=e.target.value;render()};
 document.querySelectorAll('.filter').forEach(b=>b.onclick=()=>{document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.filter=b.dataset.filter;render()});
