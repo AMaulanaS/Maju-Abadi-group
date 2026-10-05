@@ -1,44 +1,37 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Progress Proyek</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f4f7f9">
+<title>Maju Abadi Group — Dasbor Operasional</title>
+<meta name="description" content="Sistem operasional Maju Abadi Group">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <main class="container">
-    <header>
+
+<div id="app">
+<div class="app">
+  <aside>
+    <div class="br">
+      <i>MA</i>
       <div>
-        <div class="eyebrow">MAJU ABADI GROUP • MONITORING PROYEK</div>
-        <h1>Progress Proyek</h1>
-        <p>Pantau perkembangan pekerjaan secara terpusat.</p>
+        <b>Maju Abadi Group</b>
+        <small>Proyek &amp; Operasional</small>
       </div>
-      <button id="refreshBtn" class="btn">↻ Refresh</button>
-    </header>
+    </div>
+    <nav></nav>
+    <div class="sy" id="sy">Menghubungkan...</div>
+  </aside>
+  <main id="view"></main>
+</div>
+</div>
 
-    <section class="stats">
-      <div class="stat"><span>Total Proyek</span><strong id="total">0</strong></div>
-      <div class="stat"><span>Berjalan</span><strong id="running">0</strong></div>
-      <div class="stat"><span>Selesai</span><strong id="done">0</strong></div>
-      <div class="stat"><span>Tertunda</span><strong id="pending">0</strong></div>
-    </section>
-
-    <section class="toolbar">
-      <input id="search" type="search" placeholder="🔎 Cari nama proyek...">
-      <select id="status">
-        <option value="">Semua Status</option>
-        <option>Belum Mulai</option>
-        <option>Berjalan</option>
-        <option>Selesai</option>
-        <option>Tertunda</option>
-      </select>
-    </section>
-
-    <section id="projectList" class="grid">
-      <div class="empty">Belum ada data proyek. Hubungkan Google Apps Script pada <b>script.js</b>.</div>
-    </section>
-  </main>
-  <script src="script.js"></script>
+<div class="ov" id="ov" hidden><div class="md" id="md" role="dialog" aria-modal="true"></div></div>
+<div class="ts" id="ts" hidden role="status"></div>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
