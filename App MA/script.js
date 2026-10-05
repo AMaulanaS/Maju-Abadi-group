@@ -41,11 +41,11 @@ const MA_DIVISIONS = {
     desc: "Kelola transaksi, tagihan, kas, dan administrasi keuangan perusahaan.",
     cards: [
       { icon: "bi-kanban",           title: "Rekapitulasi Proyek", desc: "Tracking Pekerjaan Proyek Yang Berjalan.", href: "Keuangan/Rekapitulasi Proyek/index.html", active: true },
-      { icon: "bi-receipt",          title: "Invoice",         desc: "Kelola invoice dan tagihan perusahaan.", href: "#", active: false },
-      { icon: "bi-cash-coin",        title: "Pengeluaran",     desc: "Catat dan pantau pengeluaran perusahaan.", href: "#", active: false },
-      { icon: "bi-cash-stack",       title: "Penerimaan",      desc: "Catat penerimaan pembayaran dari pelanggan.", href: "#", active: false },
-      { icon: "bi-journal-bookmark", title: "Jurnal Keuangan", desc: "Pencatatan transaksi dan jurnal perusahaan.", href: "#", active: false },
-      { icon: "bi-graph-up",         title: "Rekap Keuangan",  desc: "Ringkasan kondisi keuangan perusahaan.", href: "#", active: false }
+      { icon: "bi-receipt",          title: "Permohonan Dana",         desc: "Kelola permohonan dana perusahaan.", href: "Keuangan/Permohonan Dana/index.html", active: true },
+     // { icon: "bi-cash-coin",        title: "Pengeluaran",     desc: "Catat dan pantau pengeluaran perusahaan.", href: "#", active: false },
+     // { icon: "bi-cash-stack",       title: "Penerimaan",      desc: "Catat penerimaan pembayaran dari pelanggan.", href: "#", active: false },
+     // { icon: "bi-journal-bookmark", title: "Jurnal Keuangan", desc: "Pencatatan transaksi dan jurnal perusahaan.", href: "#", active: false },
+     // { icon: "bi-graph-up",         title: "Rekap Keuangan",  desc: "Ringkasan kondisi keuangan perusahaan.", href: "#", active: false }
     ]
   },
   sdm: {
