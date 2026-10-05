@@ -66,12 +66,12 @@ const MA_DIVISIONS = {
     title: "Proyek & Operasional",
     desc: "Pantau proyek, pekerjaan lapangan, dan aktivitas operasional.",
     cards: [
-      { icon: "bi-kanban",         title: "Daftar Proyek",      desc: "Data dan informasi seluruh proyek.", href: "Proyek & Operasional/Daftar Proyek/index.html", active: true },
+     // { icon: "bi-kanban",         title: "Daftar Proyek",      desc: "Data dan informasi seluruh proyek.", href: "Proyek & Operasional/Daftar Proyek/index.html", active: true },
       { icon: "bi-graph-up-arrow", title: "Progress Proyek",    desc: "Pantau perkembangan pekerjaan.", href: "Proyek & Operasional/Progress Proyek/index.html", active: true },
-      { icon: "bi-hammer",         title: "Pekerjaan Lapangan", desc: "Kelola aktivitas dan pekerjaan lapangan.", href: "Proyek & Operasional/Pekerjaan Lapangan/index.html", active: true },
-      { icon: "bi-people",         title: "Tim Lapangan",       desc: "Data personel dan penugasan lapangan.", href: "Proyek & Operasional/Tim Lapangan/index.html", active: true },
-      { icon: "bi-calendar-week",  title: "Jadwal Pekerjaan",   desc: "Atur jadwal dan agenda pekerjaan.", href: "Proyek & Operasional/Jadwal Pekerjaan/index.html", active: true },
-      { icon: "bi-camera",         title: "Dokumentasi Proyek", desc: "Simpan dokumentasi kegiatan dan progress pekerjaan.", href: "Proyek & Operasional/Dokumentasi Proyek/index.html", active: true }
+     // { icon: "bi-hammer",         title: "Pekerjaan Lapangan", desc: "Kelola aktivitas dan pekerjaan lapangan.", href: "Proyek & Operasional/Pekerjaan Lapangan/index.html", active: true },
+     // { icon: "bi-people",         title: "Tim Lapangan",       desc: "Data personel dan penugasan lapangan.", href: "Proyek & Operasional/Tim Lapangan/index.html", active: true },
+     // { icon: "bi-calendar-week",  title: "Jadwal Pekerjaan",   desc: "Atur jadwal dan agenda pekerjaan.", href: "Proyek & Operasional/Jadwal Pekerjaan/index.html", active: true },
+     // { icon: "bi-camera",         title: "Dokumentasi Proyek", desc: "Simpan dokumentasi kegiatan dan progress pekerjaan.", href: "Proyek & Operasional/Dokumentasi Proyek/index.html", active: true }
     ]
   },
   laporan: {
