@@ -5,7 +5,7 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycbwt87pA-3UE_rbHXxTX1KaBckKKkwHIvXDZM1lCdJSAvZIGrvU_h8zHQcC9F7pjbs9f/exec';
 const ADMIN_PIN = '123456';
 
-const state = { requests: [], filter: 'all', search: '', sort: 'newest', admin: false, pin: '' };
+const state = { requests: [], filter: 'all', search: '', sort: 'newest', admin: false, pin: '', editingId: '' };
 const $ = (s) => document.querySelector(s);
 const rupiah = (n) => new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',minimumFractionDigits:0}).format(Number(n||0));
 const dateFmt = (v) => { if(!v) return '-'; const d=new Date(v); return isNaN(d) ? String(v) : d.toLocaleString('id-ID',{dateStyle:'medium',timeStyle:'short'}); };
@@ -50,13 +50,15 @@ function card(r){
 }
 
 function renderItems(items){
-  const rows=Array.isArray(items)&&items.length?items:[{description:'',price:'',files:[]}];
+  const rows=Array.isArray(items)&&items.length?items:[{description:'',price:'',files:[],images:[]}];
   $('#itemRows').innerHTML=rows.map((item,i)=>itemRow(item,i)).join('');
+  $('#itemRows').querySelectorAll('.item-row').forEach((row,i)=>{row._existingImages=Array.isArray(rows[i].images)?rows[i].images:[];});
   rows.forEach((_,i)=>renderSelectedFiles(i));
   recalcTotal();
 }
 function itemRow(item={},index=0){
-  return `<tr class="item-row" data-index="${index}"><td class="col-no item-number">${index+1}</td><td><input class="item-name" type="text" placeholder="Contoh: Pembelian ATK" value="${escapeAttr(item.description||'')}" aria-label="Keterangan item"><div class="item-file-box"><input class="item-files" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple aria-label="Bukti gambar item"><small>Pilih banyak gambar sekaligus</small><div class="selected-files" data-preview-for="${index}"></div></div></td><td class="col-price"><input class="item-price" type="number" min="0" step="1" placeholder="0" value="${item.price!==undefined&&item.price!==null&&item.price!==''?Number(item.price):''}" aria-label="Harga item"></td><td class="col-action"><button type="button" class="remove-item" title="Hapus item">×</button></td></tr>`;
+  const saved=Array.isArray(item.images)?item.images:[];
+  return `<tr class="item-row" data-index="${index}"><td class="col-no item-number">${index+1}</td><td><input class="item-name" type="text" placeholder="Contoh: Pembelian ATK" value="${escapeAttr(item.description||'')}" aria-label="Keterangan item"><div class="item-file-box"><input class="item-files" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple aria-label="Bukti gambar item"><small>${saved.length?'Bukti tersimpan akan tetap dipertahankan. Tambah gambar baru bila diperlukan.':'Pilih banyak gambar sekaligus'}</small><div class="selected-files" data-preview-for="${index}"></div>${saved.length?`<div class="existing-files">${saved.map(img=>`<span class="existing-file">✓ ${escapeHtml(img.name||'Bukti tersimpan')}</span>`).join('')}</div>`:''}</div></td><td class="col-price"><input class="item-price" type="number" min="0" step="1" placeholder="0" value="${item.price!==undefined&&item.price!==null&&item.price!==''?Number(item.price):''}" aria-label="Harga item"></td><td class="col-action"><button type="button" class="remove-item" title="Hapus item">×</button></td></tr>`;
 }
 function addItem(){
   $('#itemRows').insertAdjacentHTML('beforeend',itemRow({},$('#itemRows').querySelectorAll('.item-row').length));
@@ -76,8 +78,9 @@ function collectItems(){
   return [...document.querySelectorAll('#itemRows .item-row')].map(row=>({
     description:row.querySelector('.item-name').value.trim(),
     price:Number(row.querySelector('.item-price').value)||0,
-    files:[...row.querySelector('.item-files').files]
-  })).filter(x=>x.description||x.price>0||x.files.length);
+    files:[...row.querySelector('.item-files').files],
+    images:Array.isArray(row._existingImages)?row._existingImages:[]
+  })).filter(x=>x.description||x.price>0||x.files.length||x.images.length);
 }
 function validateItems(items){
   if(!items.length)return 'Tambahkan minimal 1 item dan isi keterangan serta harga.';
@@ -112,14 +115,19 @@ function showDetail(id){
   openModal('detailModal');
 }
 function adminActions(r){
-  if(r.status==='pending')return `<div class="detail-section"><h4>Aksi Keuangan</h4><textarea id="financeNote" class="search" rows="3" placeholder="Catatan approval / penolakan"></textarea><div class="finance-actions"><button class="btn btn-success" onclick="changeStatus('${escapeAttr(r.id)}','approved')">✓ Setujui</button><button class="btn btn-danger" onclick="changeStatus('${escapeAttr(r.id)}','rejected')">✕ Tolak</button></div></div>`;
-  if(r.status==='approved')return `<div class="detail-section"><h4>Aksi Keuangan</h4><button class="btn btn-blue" onclick="changeStatus('${escapeAttr(r.id)}','paid')">Rp Tandai Sudah Dibayar</button></div>`;
-  return '';
+  const manage=`<div class="finance-actions"><button class="btn btn-light" onclick="editRequest('${escapeAttr(r.id)}')">✎ Edit</button><button class="btn btn-danger" onclick="deleteRequest('${escapeAttr(r.id)}')">🗑 Hapus</button></div>`;
+  let statusActions='';
+  if(r.status==='pending')statusActions=`<textarea id="financeNote" class="search" rows="3" placeholder="Catatan approval / penolakan">${escapeHtml(r.finance_note||'')}</textarea><div class="finance-actions"><button class="btn btn-success" onclick="changeStatus('${escapeAttr(r.id)}','approved')">✓ Setujui</button><button class="btn btn-danger" onclick="changeStatus('${escapeAttr(r.id)}','rejected')">✕ Tolak</button></div>`;
+  else if(r.status==='approved')statusActions=`<textarea id="financeNote" class="search" rows="3" placeholder="Catatan pembayaran (opsional)">${escapeHtml(r.finance_note||'')}</textarea><div class="finance-actions"><button class="btn btn-blue" onclick="changeStatus('${escapeAttr(r.id)}','paid')">Rp Tandai Sudah Dibayar</button><button class="btn btn-light" onclick="changeStatus('${escapeAttr(r.id)}','pending')">↶ Kembalikan Menunggu</button></div>`;
+  else statusActions=`<div class="finance-actions"><button class="btn btn-light" onclick="changeStatus('${escapeAttr(r.id)}','pending')">↶ Kembalikan Menunggu</button></div>`;
+  return `<div class="detail-section"><h4>Aksi Pengelola</h4>${statusActions}${manage}</div>`;
 }
 async function changeStatus(id,status){
-  const note=$('#financeNote')?.value||'';if(status==='rejected'&&!note.trim()){toast('Isi catatan saat menolak permohonan.',false);return}
-  try{await api('updateStatus',{id,status,finance_note:note,pin:state.pin});toast('Status berhasil diperbarui.');closeModal('detailModal');await load();}catch(e){toast(e.message,false)}
+  const note=$('#financeNote')?.value||'';
+  if(status==='rejected'&&!note.trim()){toast('Isi catatan saat menolak permohonan.',false);return}
+  try{await api('updateStatus',{id,status,finance_note:note,pin:state.pin});toast('Status berhasil diperbarui.');closeModal('detailModal');await load();openFinancePanel();}catch(e){toast(e.message,false)}
 }
+
 async function deleteSavedImage(requestId,itemIndex,imageId){
   if(!state.admin)return;
   if(!confirm('Hapus gambar bukti ini dari Drive?'))return;
@@ -133,10 +141,12 @@ async function submitRequest(e){
   const total=items.reduce((sum,x)=>sum+x.price,0);if(!(total>0)){showItemError('Total dana harus lebih dari Rp0.');return}
   btn.disabled=true;
   try{
-    const cleanItems=items.map(x=>({description:x.description,price:x.price}));
-    const fd=new FormData(form);const data=Object.fromEntries(fd.entries());delete data.receipt;data.amount=total;data.items=cleanItems;
-    btn.textContent='Menyimpan permohonan...';
-    const created=await api('createRequest',data);
+    const cleanItems=items.map(x=>({description:x.description,price:x.price,images:x.images||[]}));
+    const fd=new FormData(form);const data=Object.fromEntries(fd.entries());delete data.receipt;data.amount=total;data.items=cleanItems;data.pin=state.pin;
+    const isEdit=!!state.editingId;
+    if(isEdit)data.id=state.editingId;
+    btn.textContent=isEdit?'Menyimpan perubahan...':'Menyimpan permohonan...';
+    const saved=await api(isEdit?'updateRequest':'createRequest',data);
     const uploadJobs=[];
     items.forEach((item,itemIndex)=>item.files.forEach(file=>uploadJobs.push({itemIndex,file})));
     let done=0,failed=[];
@@ -144,28 +154,55 @@ async function submitRequest(e){
       btn.textContent=`Mengunggah bukti ${done+1}/${uploadJobs.length}...`;
       try{
         if(fileTooLarge(job.file))throw new Error('Ukuran lebih dari 10 MB');
-        await api('uploadItemImage',{id:created.id,item_index:job.itemIndex,file:{name:job.file.name,type:job.file.type,data:await fileToBase64(job.file)}});
+        await api('uploadItemImage',{id:saved.id||state.editingId,item_index:job.itemIndex,file:{name:job.file.name,type:job.file.type,data:await fileToBase64(job.file)}});
       }catch(ex){failed.push(job.file.name+': '+ex.message)}
       done++;
     }
-    form.reset();renderItems([]);closeModal('requestModal');await load();
-    if(failed.length)toast(`Permohonan tersimpan, tetapi ${failed.length} gambar gagal diunggah.`,false);
-    else toast(`Permohonan berhasil dikirim. ${uploadJobs.length} gambar tersimpan.`);
+    const edited=isEdit;state.editingId='';form.reset();renderItems([]);closeModal('requestModal');await load();
+    if(failed.length)toast(`${edited?'Perubahan tersimpan':'Permohonan tersimpan'}, tetapi ${failed.length} gambar gagal diunggah.`,false);
+    else toast(edited?'Permohonan berhasil diedit.':`Permohonan berhasil dikirim. ${uploadJobs.length} gambar tersimpan.`);
   }catch(e){err.textContent=e.message;err.classList.remove('hidden')}
   finally{btn.disabled=false;btn.textContent='Kirim Permohonan'}
 }
 function fileTooLarge(file){return file.size>10*1024*1024}
 function fileToBase64(file){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result).split(',')[1]);r.onerror=reject;r.readAsDataURL(file)})}
 
+function currentMonth(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')}
+async function renderFinancePanel(month=currentMonth()){
+  $('#financeContent').innerHTML='<div class="finance-list"><div class="alert">Memuat rekap keuangan...</div></div>';
+  try{
+    const recap=await api('monthlyRecap',{month});
+    const s=recap.data.summary, rows=recap.data.rows||[];
+    $('#financeContent').innerHTML=`<div class="finance-list"><div class="finance-toolbar"><div><strong>Rekap 1 Bulan</strong><div class="meta">Pilih bulan untuk melihat ringkasan dan daftar permohonan.</div></div><input id="financeMonth" class="month-input" type="month" value="${escapeAttr(month)}"></div><div class="finance-summary"><div class="finance-stat"><span>Total</span><strong>${s.total}</strong><small>${rupiah(s.total_amount)}</small></div><div class="finance-stat"><span>Menunggu</span><strong>${s.pending}</strong><small>-</small></div><div class="finance-stat approved"><span>Disetujui</span><strong>${s.approved}</strong><small>${rupiah(s.approved_amount)}</small></div><div class="finance-stat paid"><span>Dibayar</span><strong>${s.paid}</strong><small>${rupiah(s.paid_amount)}</small></div><div class="finance-stat rejected"><span>Ditolak</span><strong>${s.rejected}</strong><small>${rupiah(s.rejected_amount)}</small></div></div><div class="finance-list-head"><div><strong>Semua Permohonan</strong><span class="meta">${rows.length} data pada ${escapeHtml(month)}</span></div></div>${rows.length?rows.map(x=>financeItem(x)).join(''):'<div class="empty">Tidak ada permohonan pada bulan ini.</div>'}</div>`;
+    $('#financeMonth').onchange=e=>renderFinancePanel(e.target.value||currentMonth());
+  }catch(e){$('#financeContent').innerHTML=`<div class="finance-list"><div class="alert error">${escapeHtml(e.message)}</div></div>`}
+}
+function financeItem(x){return `<div class="finance-item"><div class="finance-main"><div><strong>${escapeHtml(x.request_number)}</strong> <span class="status ${escapeAttr(x.status)}">${statusLabel[x.status]||x.status}</span></div><span class="meta">${escapeHtml(x.name||'-')} · ${escapeHtml(x.title||'-')} · ${dateFmt(x.created_at)}</span><strong class="finance-amount">${rupiah(x.amount)}</strong></div><div class="finance-item-actions"><button class="btn btn-light" onclick="closeModal('financeModal');showDetail('${escapeAttr(x.id)}')">Buka</button><button class="btn btn-light" onclick="editRequest('${escapeAttr(x.id)}')">✎ Edit</button><button class="btn btn-danger" onclick="deleteRequest('${escapeAttr(x.id)}')">Hapus</button></div></div>`}
+async function openFinancePanel(){if(!state.admin)return;openModal('financeModal');await renderFinancePanel($('#financeMonth')?.value||currentMonth())}
 async function openFinance(){
   const pin=prompt('Masukkan PIN Panel Keuangan:');if(!pin)return;
-  try{const r=await api('adminCheck',{pin});if(!r.authorized)throw new Error('PIN salah.');state.admin=true;state.pin=pin;$('#financeContent').innerHTML=`<div class="finance-list"><div class="alert">Panel aktif. Klik salah satu permohonan untuk meninjau, melihat semua bukti gambar, dan mengubah status.</div>${state.requests.length?state.requests.map(x=>`<div class="finance-item"><div><strong>${escapeHtml(x.request_number)}</strong><br><span class="meta">${escapeHtml(x.name||'-')} · ${escapeHtml(x.title)}</span></div><button class="btn btn-light" onclick="closeModal('financeModal');showDetail('${escapeAttr(x.id)}')">Buka</button></div>`).join(''):'<div class="empty">Belum ada data.</div>'}</div>`;openModal('financeModal')}
+  try{const r=await api('adminCheck',{pin});if(!r.authorized)throw new Error('PIN salah.');state.admin=true;state.pin=pin;openModal('financeModal');await renderFinancePanel(currentMonth())}
   catch(e){toast(e.message,false)}
+}
+function editRequest(id){
+  if(!state.admin)return;
+  const r=state.requests.find(x=>String(x.id)===String(id));if(!r)return;
+  state.editingId=r.id;
+  $('#formTitle').textContent='Edit Permohonan Dana';
+  $('#submitBtn').textContent='Simpan Perubahan';
+  const form=$('#requestForm');form.name.value=r.name||'';form.department.value=r.department||'';form.title.value=r.title||'';form.category.value=r.category||'operasional';form.description.value=r.description||'';
+  renderItems(r.items||[]);showItemError('');$('#formError').classList.add('hidden');closeModal('financeModal');closeModal('detailModal');openModal('requestModal');
+}
+async function deleteRequest(id){
+  if(!state.admin)return;
+  const r=state.requests.find(x=>String(x.id)===String(id));if(!r)return;
+  if(!confirm(`Hapus ${r.request_number}? Data permohonan dan bukti yang tersimpan akan dihapus.`))return;
+  try{await api('deleteRequest',{id:r.id,pin:state.pin});toast('Permohonan berhasil dihapus.');closeModal('detailModal');await load();await openFinancePanel();}catch(e){toast(e.message,false)}
 }
 function escapeHtml(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
 function escapeAttr(s){return escapeHtml(s)}
 
-$('#newRequestBtn').onclick=()=>{renderItems([]);showItemError('');$('#formError').classList.add('hidden');openModal('requestModal')};
+$('#newRequestBtn').onclick=()=>{state.editingId='';$('#formTitle').textContent='Permohonan Dana Baru';$('#submitBtn').textContent='Kirim Permohonan';$('#requestForm').reset();renderItems([]);showItemError('');$('#formError').classList.add('hidden');openModal('requestModal')};
 $('#refreshBtn').onclick=load;
 $('#financeBtn').onclick=openFinance;
 $('#addItemBtn').onclick=addItem;

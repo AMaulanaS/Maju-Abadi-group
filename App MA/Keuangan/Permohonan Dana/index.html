@@ -24,7 +24,7 @@
 
     <div class="modal hidden" id="requestModal">
       <div class="modal-card request-form-card">
-        <div class="modal-head"><div><span class="eyebrow">FORM PENGAJUAN</span><h2>Permohonan Dana Baru</h2></div><button class="icon-btn" data-close="requestModal">×</button></div>
+        <div class="modal-head"><div><span class="eyebrow">FORM PENGAJUAN</span><h2 id="formTitle">Permohonan Dana Baru</h2></div><button class="icon-btn" data-close="requestModal">×</button></div>
         <form id="requestForm" class="form">
           <div class="form-grid"><label>Nama Pemohon<input name="name" required placeholder="Nama lengkap"></label><label>Departemen / Bagian<input name="department" placeholder="Contoh: Operasional"></label></div>
           <label>Judul Permohonan<input name="title" required placeholder="Contoh: Pembelian ATK bulanan"></label>
@@ -52,7 +52,7 @@
     </div>
 
     <div class="modal hidden" id="detailModal"><div class="modal-card detail-card"><div id="detailContent"></div></div></div>
-    <div class="modal hidden" id="financeModal"><div class="modal-card"><div class="modal-head"><div><span class="eyebrow">PENGELOLA</span><h2>Panel Keuangan</h2><p>PIN digunakan hanya untuk aksi persetujuan.</p></div><button class="icon-btn" data-close="financeModal">×</button></div><div id="financeContent"></div></div></div>
+    <div class="modal hidden" id="financeModal"><div class="modal-card finance-card"><div class="modal-head"><div><span class="eyebrow">PENGELOLA</span><h2>Panel Keuangan</h2><p>Kelola status, edit/hapus data, dan lihat rekap bulanan.</p></div><button class="icon-btn" data-close="financeModal">×</button></div><div id="financeContent"></div></div></div>
     <div class="toast hidden" id="toast"></div>
   </div>
   <script src="script.js"></script>

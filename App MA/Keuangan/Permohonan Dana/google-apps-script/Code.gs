@@ -30,6 +30,9 @@ function doPost(e){
       case 'getRequest': return json_(getRequest_(p.id));
       case 'adminCheck': return json_({ok:true,authorized:String(p.pin||'')===String(CONFIG.ADMIN_PIN)});
       case 'updateStatus': return json_(updateStatus_(p));
+      case 'updateRequest': return json_(updateRequest_(p));
+      case 'deleteRequest': return json_(deleteRequest_(p));
+      case 'monthlyRecap': return json_({ok:true,data:getMonthlyRecap_(p.month)});
       default: return json_({ok:false,message:'Action tidak dikenal.'});
     }
   }catch(err){return json_({ok:false,message:err.message||String(err)});}
@@ -153,16 +156,62 @@ function nextNumber_(sh){const year=Utilities.formatDate(new Date(),Session.getS
 function getRequest_(id){const r=listRequests_().find(x=>x.id===String(id));if(!r)throw new Error('Permohonan tidak ditemukan.');return {ok:true,data:r};}
 function updateStatus_(p){
   if(String(p.pin||'')!==String(CONFIG.ADMIN_PIN))throw new Error('Akses keuangan ditolak.');
-  const allowed=['approved','rejected','paid'];if(allowed.indexOf(p.status)<0)throw new Error('Status tidak valid.');
-  const sh=sheet_(),last=sh.getLastRow(),vals=sh.getRange(2,1,Math.max(last-1,0),HEADERS.length).getValues();
-  for(let i=0;i<vals.length;i++){
-    if(String(vals[i][0])===String(p.id)){
-      const row=i+2,now=new Date();sh.getRange(row,9).setValue(p.status);
-      if(p.finance_note!==undefined)sh.getRange(row,12).setValue(String(p.finance_note||''));
-      if(p.status==='approved'||p.status==='rejected'){sh.getRange(row,13).setValue('Panel Keuangan');sh.getRange(row,14).setValue(now);}
-      sh.getRange(row,16).setValue(now);return {ok:true};
-    }
+  const allowed=['pending','approved','rejected','paid'];
+  if(allowed.indexOf(String(p.status))<0)throw new Error('Status tidak valid.');
+  const found=findRequestRow_(p.id), now=new Date();
+  found.sh.getRange(found.row,9).setValue(String(p.status));
+  if(p.finance_note!==undefined)found.sh.getRange(found.row,12).setValue(String(p.finance_note||''));
+  if(p.status==='approved'||p.status==='rejected'){
+    found.sh.getRange(found.row,13).setValue('Panel Keuangan');
+    found.sh.getRange(found.row,14).setValue(now);
   }
-  throw new Error('Data tidak ditemukan.');
+  if(p.status==='pending'){
+    found.sh.getRange(found.row,13).setValue('');
+    found.sh.getRange(found.row,14).setValue('');
+  }
+  found.sh.getRange(found.row,16).setValue(now);
+  return {ok:true,status:String(p.status)};
+}
+function validateRequestPayload_(p){
+  const name=String(p.name||'').trim(), title=String(p.title||'').trim();
+  if(!name)throw new Error('Nama pemohon wajib diisi.');
+  if(!title)throw new Error('Judul wajib diisi.');
+  const items=parseItems_(p.items);
+  if(!items.length)throw new Error('Minimal 1 item harus ditambahkan.');
+  if(items.some(x=>!x.description))throw new Error('Keterangan semua item wajib diisi.');
+  if(items.some(x=>!(x.price>0)))throw new Error('Harga setiap item harus lebih dari Rp0.');
+  const amount=items.reduce((sum,x)=>sum+x.price,0);
+  if(!(amount>0))throw new Error('Total jumlah dana tidak valid.');
+  return {name,title,items,amount};
+}
+function updateRequest_(p){
+  if(String(p.pin||'')!==String(CONFIG.ADMIN_PIN))throw new Error('Akses keuangan ditolak.');
+  const found=findRequestRow_(p.id), data=validateRequestPayload_(p), oldItems=parseItems_(found.values[16]);
+  const items=data.items.map((x,i)=>({description:x.description,price:x.price,images:Array.isArray(x.images)?x.images:((oldItems[i]&&oldItems[i].images)||[])}));
+  const kept={}; items.forEach(item=>(item.images||[]).forEach(img=>kept[String(img.id)]=true));
+  oldItems.forEach(item=>(item.images||[]).forEach(img=>{if(img.id&&!kept[String(img.id)])trashDriveFile_(img.id);}));
+  found.sh.getRange(found.row,3,1,6).setValues([[data.name,String(p.department||''),data.title,String(p.category||'operasional'),data.amount,String(p.description||'')]]);
+  found.sh.getRange(found.row,17).setValue(JSON.stringify(items));
+  found.sh.getRange(found.row,16).setValue(new Date());
+  return {ok:true,id:String(p.id),amount:data.amount,items:items};
+}
+function trashDriveFile_(fileId){try{DriveApp.getFileById(String(fileId)).setTrashed(true);}catch(e){}}
+function extractDriveId_(url){const m=String(url||'').match(/[?&]id=([^&]+)/);return m?m[1]:'';}
+function deleteRequest_(p){
+  if(String(p.pin||'')!==String(CONFIG.ADMIN_PIN))throw new Error('Akses keuangan ditolak.');
+  const found=findRequestRow_(p.id), values=found.values;
+  trashDriveFile_(extractDriveId_(values[9]));
+  parseItems_(values[16]).forEach(item=>(item.images||[]).forEach(img=>trashDriveFile_(img.id)));
+  found.sh.deleteRow(found.row);
+  return {ok:true,id:String(p.id)};
+}
+function getMonthlyRecap_(month){
+  const tz=Session.getScriptTimeZone()||'Asia/Jakarta';
+  const target=String(month||Utilities.formatDate(new Date(),tz,'yyyy-MM'));
+  if(!/^\d{4}-\d{2}$/.test(target))throw new Error('Format bulan tidak valid.');
+  const rows=listRequests_().filter(r=>r.created_at && Utilities.formatDate(new Date(r.created_at),tz,'yyyy-MM')===target);
+  const summary={month:target,total:rows.length,pending:0,approved:0,rejected:0,paid:0,total_amount:0,approved_amount:0,paid_amount:0,rejected_amount:0};
+  rows.forEach(r=>{const a=Number(r.amount||0);summary[r.status]=(summary[r.status]||0)+1;summary.total_amount+=a;if(r.status==='approved')summary.approved_amount+=a;if(r.status==='paid')summary.paid_amount+=a;if(r.status==='rejected')summary.rejected_amount+=a;});
+  return {summary,rows};
 }
 function getFolder_(){if(CONFIG.DRIVE_FOLDER_ID)return DriveApp.getFolderById(CONFIG.DRIVE_FOLDER_ID);const props=PropertiesService.getScriptProperties(),saved=props.getProperty('RECEIPT_FOLDER_ID');if(saved)return DriveApp.getFolderById(saved);const folder=DriveApp.createFolder('Permohonan Dana - Bukti');props.setProperty('RECEIPT_FOLDER_ID',folder.getId());return folder;}
