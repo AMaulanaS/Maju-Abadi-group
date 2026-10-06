@@ -325,10 +325,27 @@ function doGet(e) {
   }
 }
 
+function findRowById_(sheet, id) {
+  const targetId = String(id || '').trim();
+  if (!targetId) return -1;
+
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return -1;
+
+  const ids = sheet.getRange(2, 2, lastRow - 1, 1).getValues();
+  for (let i = 0; i < ids.length; i++) {
+    if (String(ids[i][0] || '').trim() === targetId) {
+      return i + 2;
+    }
+  }
+  return -1;
+}
+
 function doPost(e) {
   try {
-    const action = String(e && e.parameter && e.parameter.action || '').toLowerCase();
+    const action = String(e && e.parameter && e.parameter.action || 'create').toLowerCase();
 
+    // Upload PDF berdiri sendiri.
     if (action === 'upload') {
       return jsonOutput_(uploadPdf_(e));
     }
@@ -340,11 +357,81 @@ function doPost(e) {
       return jsonOutput_({ success: false, error: 'Kategori tidak dikenal: ' + kategori });
     }
 
+    const sheet = getOrCreateSheet_(cfg);
+
+    // ------------------------------------------------------------
+    // HAPUS DATA BERDASARKAN ID
+    // ------------------------------------------------------------
+    if (action === 'delete') {
+      const id = String(e.parameter.id || '').trim();
+      if (!id) {
+        return jsonOutput_({ success: false, error: 'ID data wajib diisi.' });
+      }
+
+      const rowNumber = findRowById_(sheet, id);
+      if (rowNumber < 0) {
+        return jsonOutput_({ success: false, error: 'Data dengan ID tersebut tidak ditemukan.' });
+      }
+
+      sheet.deleteRow(rowNumber);
+      return jsonOutput_({
+        success: true,
+        message: 'Data berhasil dihapus.',
+        id: id
+      });
+    }
+
+    // ------------------------------------------------------------
+    // EDIT DATA BERDASARKAN ID
+    // ------------------------------------------------------------
+    if (action === 'edit') {
+      const id = String(e.parameter.id || '').trim();
+      if (!id) {
+        return jsonOutput_({ success: false, error: 'ID data wajib diisi untuk edit.' });
+      }
+
+      const rowNumber = findRowById_(sheet, id);
+      if (rowNumber < 0) {
+        return jsonOutput_({ success: false, error: 'Data dengan ID tersebut tidak ditemukan.' });
+      }
+
+      const currentRow = sheet.getRange(rowNumber, 1, 1, cfg.headers.length).getValues()[0];
+
+      // Jika PDF baru tidak dikirim, pertahankan file lama.
+      const updatedRow = currentRow.slice();
+      updatedRow[0] = currentRow[0]; // Timestamp tetap
+      updatedRow[1] = id;             // ID tetap
+
+      if (e.parameter.fileName !== undefined && String(e.parameter.fileName).trim() !== '') {
+        updatedRow[2] = String(e.parameter.fileName).trim();
+      }
+      if (e.parameter.fileUrl !== undefined && String(e.parameter.fileUrl).trim() !== '') {
+        updatedRow[3] = String(e.parameter.fileUrl).trim();
+      }
+
+      cfg.headers.slice(4).forEach((h, offset) => {
+        const paramKey = h.charAt(0).toLowerCase() + h.slice(1);
+        if (e.parameter[paramKey] !== undefined) {
+          updatedRow[offset + 4] = String(e.parameter[paramKey] || '').trim();
+        }
+      });
+
+      sheet.getRange(rowNumber, 1, 1, cfg.headers.length).setValues([updatedRow]);
+
+      return jsonOutput_({
+        success: true,
+        message: 'Data berhasil diperbarui.',
+        id: id
+      });
+    }
+
+    // ------------------------------------------------------------
+    // TAMBAH DATA BARU
+    // ------------------------------------------------------------
     if (!e.parameter.fileId || !e.parameter.fileUrl) {
       return jsonOutput_({ success: false, error: 'PDF wajib diupload terlebih dahulu.' });
     }
 
-    const sheet = getOrCreateSheet_(cfg);
     const timestamp = new Date();
     const id = 'ID-' + Date.now().toString().slice(-8);
     const row = [timestamp, id,
@@ -357,7 +444,7 @@ function doPost(e) {
     });
 
     sheet.appendRow(row);
-    return jsonOutput_({ success: true, message: 'Success', id: id });
+    return jsonOutput_({ success: true, message: 'Data berhasil disimpan.', id: id });
 
   } catch (error) {
     console.error(error);

@@ -47,6 +47,7 @@ const CATEGORY_ORDER = ['serkom', 'legal_rma', 'legal_fma', 'legal_zma'];
 
 let activeCategory = CATEGORY_ORDER[0];
 const dataCache = {};
+let editingRecord = null;
 
 // ---------------------------------------------------------------
 // UTILITAS
@@ -103,7 +104,7 @@ function setLoading(show, title = 'Sedang memproses...', message = 'Mohon tunggu
 function showForm() {
     const form = document.getElementById('dataForm');
     const btnAdd = document.getElementById('btnTambahData');
-    buildForm(activeCategory);
+    if (!editingRecord) buildForm(activeCategory);
     form.classList.remove('hidden');
     if (btnAdd) btnAdd.classList.add('hidden');
     form.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -115,6 +116,7 @@ function hideForm() {
     form.classList.add('hidden');
     if (btnAdd) btnAdd.classList.remove('hidden');
     window.uploadedFile = null;
+    editingRecord = null;
 }
 
 // ---------------------------------------------------------------
@@ -164,15 +166,20 @@ function switchTab(key) {
 function buildForm(key) {
     const cfg = CATEGORY_CONFIG[key];
     const container = document.getElementById('formFields');
-    window.uploadedFile = null;
+    const isEditing = !!editingRecord && editingRecord.category === key;
+    window.uploadedFile = isEditing ? (editingRecord.uploadedFile || null) : null;
     const submitButton = document.getElementById('btnSubmit');
-    if (submitButton) submitButton.disabled = true;
+    if (submitButton) submitButton.disabled = !isEditing;
 
     container.innerHTML = `
         <div class="upload-card field-group">
-            <label for="f_upload">${escapeHtml(cfg.uploadLabel || 'Upload PDF Dokumen')} <span class="required">*</span></label>
-            <input type="file" id="f_upload" accept="application/pdf,.pdf" required>
-            <small id="uploadStatus" class="upload-status">Upload PDF terlebih dahulu. Field lainnya akan aktif setelah upload berhasil.</small>
+            <label for="f_upload">${escapeHtml(cfg.uploadLabel || 'Upload PDF Dokumen')} ${isEditing ? '<span class="optional">• opsional saat edit</span>' : '<span class="required">*</span>'}</label>
+            <input type="file" id="f_upload" accept="application/pdf,.pdf" ${isEditing ? '' : 'required'}>
+            <small id="uploadStatus" class="upload-status ${isEditing ? 'success' : ''}">
+                ${isEditing
+                    ? 'Mode Edit aktif. PDF lama tetap digunakan jika tidak memilih PDF baru.'
+                    : 'Upload PDF terlebih dahulu. Field lainnya akan aktif setelah upload berhasil.'}
+            </small>
         </div>
         ${cfg.fields.map(f => `
             <div class="field-group">
@@ -186,17 +193,19 @@ function buildForm(key) {
                     id="f_${f.id}"
                     placeholder="${escapeHtml(f.placeholder || '')}"
                     ${f.required ? 'required' : ''}
-                    disabled
+                    ${isEditing ? '' : 'disabled'}
                 >
             </div>
         `).join('')}
     `;
 
     document.getElementById('formTitle').innerHTML =
-        `<span class="form-title-icon">${cfg.icon}</span> Tambah Data ${escapeHtml(cfg.label)}`;
+        `<span class="form-title-icon">${cfg.icon}</span> ${isEditing ? 'Edit Data' : 'Tambah Data'} ${escapeHtml(cfg.label)}`;
 
     document.getElementById('formSubtitle').textContent =
-        `Upload dokumen terlebih dahulu, kemudian isi data ${cfg.label.toLowerCase()} lalu tekan Simpan Data.`;
+        isEditing
+            ? 'Periksa dan ubah data yang diperlukan, lalu tekan Simpan Perubahan.'
+            : `Upload dokumen terlebih dahulu, kemudian isi data ${cfg.label.toLowerCase()} lalu tekan Simpan Data.`;
 
     const uploadInput = document.getElementById('f_upload');
     uploadInput.addEventListener('change', () => handleUpload(key));
@@ -472,6 +481,7 @@ function buildTableHead(key) {
                 `<th>${escapeHtml(f.label.split('(')[0].trim())}</th>`
             ).join('')}
             <th>Status</th>
+            <th>Aksi</th>
         </tr>
     `;
 }
@@ -541,6 +551,109 @@ function formatVal(val, type) {
     }
 
     return escapeHtml(val);
+}
+
+
+// ---------------------------------------------------------------
+// AKSI EDIT & HAPUS DATA MONITORING
+// ---------------------------------------------------------------
+function getRecordId(item) {
+    return String(item.id || item.ID || '').trim();
+}
+
+function editRecord(key, index) {
+    const data = dataCache[key];
+    if (!Array.isArray(data) || !data[index]) return;
+
+    const item = data[index];
+    const id = getRecordId(item);
+    if (!id) {
+        showToast('ID data tidak ditemukan. Data ini tidak bisa diedit.', 'error');
+        return;
+    }
+
+    const fileUrl = String(item.uploadfileurl || item.fileurl || item.linkfile || item.uploadurl || '').trim();
+    const fileName = String(item.uploadfilename || item.filename || '').trim();
+
+    editingRecord = {
+        category: key,
+        id,
+        uploadedFile: fileUrl ? {
+            id: '',
+            name: fileName,
+            url: fileUrl
+        } : null
+    };
+
+    buildForm(key);
+    const cfg = CATEGORY_CONFIG[key];
+
+    cfg.fields.forEach(f => {
+        const el = document.getElementById(`f_${f.id}`);
+        if (el) el.value = item[f.id.toLowerCase()] ?? '';
+    });
+
+    const uploadStatus = document.getElementById('uploadStatus');
+    if (uploadStatus) {
+        uploadStatus.textContent = fileUrl
+            ? 'PDF lama tetap digunakan. Pilih PDF baru hanya jika ingin menggantinya.'
+            : 'Data ini belum memiliki PDF. Pilih PDF baru jika diperlukan.';
+    }
+
+    document.getElementById('dataForm').classList.remove('hidden');
+    document.getElementById('btnTambahData').classList.add('hidden');
+    document.getElementById('dataForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+async function deleteRecord(key, index) {
+    const data = dataCache[key];
+    if (!Array.isArray(data) || !data[index]) return;
+
+    const item = data[index];
+    const id = getRecordId(item);
+    if (!id) {
+        showToast('ID data tidak ditemukan. Data ini tidak bisa dihapus.', 'error');
+        return;
+    }
+
+    const cfg = CATEGORY_CONFIG[key];
+    const ident = cfg.fields
+        .map(f => item[f.id.toLowerCase()])
+        .filter(v => v !== undefined && v !== null && String(v).trim() !== '')
+        .slice(0, 2)
+        .join(' - ') || `Data nomor ${index + 1}`;
+
+    if (!confirm(`Yakin ingin menghapus data berikut?\n\n${ident}\n\nData akan dihapus dari Google Spreadsheet dan tidak bisa dibatalkan.`)) {
+        return;
+    }
+
+    setLoading(true, 'Menghapus data...', 'Data sedang dihapus dari Google Spreadsheet.');
+
+    try {
+        const payload = new URLSearchParams();
+        payload.append('action', 'delete');
+        payload.append('kategori', key);
+        payload.append('id', id);
+
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: payload
+        });
+        const result = await readJsonResponse(response);
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.error || 'Gagal menghapus data.');
+        }
+
+        showToast('Data berhasil dihapus.', 'success');
+        dataCache[key] = null;
+        await loadData(key);
+    } catch (error) {
+        console.error(error);
+        showToast(error.message || 'Gagal menghapus data.', 'error');
+    } finally {
+        setLoading(false);
+    }
 }
 
 // ---------------------------------------------------------------
@@ -665,6 +778,12 @@ function renderTable(key) {
                         ${driveButton}
                     </div>
                 </td>
+                <td class="action-cell">
+                    <div class="monitor-actions">
+                        <button type="button" class="action-btn edit-btn" onclick="editRecord('${escapeHtml(key)}', ${index})" title="Edit data">✏️ Edit</button>
+                        <button type="button" class="action-btn delete-btn" onclick="deleteRecord('${escapeHtml(key)}', ${index})" title="Hapus data">🗑️ Hapus</button>
+                    </div>
+                </td>
             </tr>
         `;
     }).join('');
@@ -691,20 +810,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const cfg = CATEGORY_CONFIG[activeCategory];
 
-        if (!window.uploadedFile || window.uploadedFile.category !== activeCategory) {
+        const isEditing = !!editingRecord && editingRecord.category === activeCategory;
+
+        if (!isEditing && (!window.uploadedFile || window.uploadedFile.category !== activeCategory)) {
             showToast('Upload PDF terlebih dahulu sebelum mengisi dan menyimpan data.', 'error');
             return;
         }
 
         btnSubmit.disabled = true;
-        setLoading(true, 'Menyimpan data...', 'Sedang mengirim data ke Google Spreadsheet.');
-        btnSubmit.innerHTML = '<span class="btn-spinner"></span> Menyimpan...';
+        setLoading(true, isEditing ? 'Menyimpan perubahan...' : 'Menyimpan data...', 'Sedang mengirim data ke Google Spreadsheet.');
+        btnSubmit.innerHTML = `<span class="btn-spinner"></span> ${isEditing ? 'Menyimpan Perubahan...' : 'Menyimpan...'}`;
 
         const formData = new URLSearchParams();
+        formData.append('action', isEditing ? 'edit' : 'create');
         formData.append('kategori', activeCategory);
-        formData.append('fileId', window.uploadedFile.id || '');
-        formData.append('fileName', window.uploadedFile.name || '');
-        formData.append('fileUrl', window.uploadedFile.url || '');
+
+        if (window.uploadedFile) {
+            formData.append('fileId', window.uploadedFile.id || '');
+            formData.append('fileName', window.uploadedFile.name || '');
+            formData.append('fileUrl', window.uploadedFile.url || '');
+        }
+
+        if (isEditing) {
+            formData.append('id', editingRecord.id);
+        }
 
         cfg.fields.forEach(f => {
             formData.append(
@@ -725,10 +854,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(result.error || 'Gagal menyimpan data.');
             }
 
-            showToast('Data berhasil disimpan ke Google Spreadsheet!', 'success');
+            showToast(isEditing ? 'Perubahan data berhasil disimpan!' : 'Data berhasil disimpan ke Google Spreadsheet!', 'success');
 
             form.reset();
             window.uploadedFile = null;
+            editingRecord = null;
             buildForm(activeCategory);
             hideForm();
             dataCache[activeCategory] = null;
@@ -743,7 +873,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } finally {
             setLoading(false);
             btnSubmit.disabled = false;
-            btnSubmit.innerHTML = '💾 Simpan Data';
+            btnSubmit.innerHTML = isEditing ? '💾 Simpan Perubahan' : '💾 Simpan Data';
         }
     });
 
@@ -755,7 +885,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btnCancel').addEventListener('click', () => {
         if (document.body.classList.contains('is-loading')) return;
         form.reset();
+        editingRecord = null;
         hideForm();
+        buildForm(activeCategory);
     });
 
     document.getElementById('btnRefresh').addEventListener('click', () => {
