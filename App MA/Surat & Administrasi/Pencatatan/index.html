@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Arsip Administrasi</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="bar"></div>
+
+<section id="login">
+  <div class="lbox">
+    <h1>Arsip Administrasi</h1>
+    <p>Masukkan PIN untuk membuka data akun dan proyek.</p>
+    <form id="lf">
+      <input id="pin" type="password" placeholder="PIN" autocomplete="current-password" required>
+      <div id="err" role="alert"></div>
+      <button class="p">Masuk</button>
+    </form>
+  </div>
+</section>
+
+<div id="app" class="hide">
+  <header>
+    <h1>Arsip Administrasi</h1>
+    <nav class="tabs"><button data-t="akun" class="on">Akun login</button><button data-t="proyek">Pencatatan proyek</button></nav>
+    <button id="out" class="ghost">Keluar</button>
+  </header>
+  <main>
+    <div class="tools">
+      <input id="q" type="search" placeholder="Cari..." aria-label="Cari">
+      <button id="rf" class="ghost" title="Muat ulang dari Google Sheet">Muat ulang</button>
+      <button class="p" id="add">+ Tambah</button>
+    </div>
+    <div id="list" class="grid"></div>
+  </main>
+</div>
+
+<dialog id="dlg"><form id="df"><h2 id="dt"></h2><div id="fields"></div>
+  <div class="fa"><button type="button" id="cx">Batal</button><button class="p">Simpan</button></div></form></dialog>
+
+<script src="app.js"></script>
+</body>
+</html>

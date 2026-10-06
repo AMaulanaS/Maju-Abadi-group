@@ -1,0 +1,66 @@
+:root{--red:#c8102e;--blue:#1e40af;--grad:linear-gradient(135deg,#c8102e,#1e40af);--ink:#1c2230;--mut:#667085;--line:#e3e7ee}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--ink);font:15px/1.5 "Segoe UI",system-ui,sans-serif;
+  background:linear-gradient(135deg,#8f0d22 0%,#c8102e 32%,#1e3a8a 100%) fixed}
+h1,h2{font-family:Georgia,"Times New Roman",serif;margin:0}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:1px solid var(--line);background:#fff;padding:7px 14px;border-radius:6px;position:relative}
+button.p{background:var(--grad);color:#fff;border:0}
+button.ghost{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.35)}
+button.d{color:var(--red)}
+button:disabled{opacity:.7;cursor:wait}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid #93b4ff;outline-offset:1px}
+input,textarea{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:#fff}
+label{display:block;font-size:13px;color:var(--mut);margin:12px 0 4px}
+.hide{display:none!important}
+
+/* loading */
+#bar{position:fixed;left:0;top:0;height:3px;width:100%;z-index:99;opacity:0;transition:opacity .2s;
+  background:linear-gradient(90deg,transparent,#fff,transparent);background-size:40% 100%;background-repeat:no-repeat;animation:bar 1s linear infinite}
+#bar.on{opacity:1}
+@keyframes bar{from{background-position:-40% 0}to{background-position:140% 0}}
+.busy{color:transparent!important}
+.busy::after,.ring{content:"";display:block;width:18px;height:18px;border-radius:50%;border:3px solid rgba(128,128,128,.3);border-top-color:#fff;animation:spin .7s linear infinite}
+.busy::after{position:absolute;left:calc(50% - 9px);top:calc(50% - 9px)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sk{min-height:150px;background:linear-gradient(100deg,#fff 30%,#eef1f6 50%,#fff 70%) 0 0/300% 100%;animation:sh 1.2s linear infinite}
+@keyframes sh{to{background-position:-300% 0}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:3s!important}}
+
+/* login */
+#login{display:grid;place-items:center;min-height:100vh;padding:20px}
+.lbox{background:#fff;width:min(360px,100%);padding:30px 26px;border-radius:12px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.lbox h1{font-size:28px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lbox p{color:var(--mut);margin:6px 0 18px}
+#err{color:var(--red);min-height:24px;margin:8px 0}
+.lbox button{width:100%;padding:10px}
+
+/* app */
+header{display:flex;align-items:center;gap:16px;padding:14px 24px;flex-wrap:wrap;color:#fff;
+  background:rgba(0,0,0,.22);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.2)}
+header h1{font-size:20px;margin-right:auto}
+.tabs button{background:none;border:0;border-bottom:3px solid transparent;border-radius:0;color:#fff;padding:8px 12px;opacity:.8}
+.tabs button.on{border-color:#fff;font-weight:700;opacity:1}
+main{max-width:1150px;margin:0 auto;padding:20px}
+.tools{display:flex;gap:10px;margin-bottom:16px}
+.tools input{flex:1}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px;align-items:start}
+.item{background:#fff;border-radius:10px;padding:16px;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.item h2{font-size:18px;margin-bottom:6px;padding-bottom:8px;border-bottom:3px solid;border-image:var(--grad) 1}
+.sv{margin-top:12px;font-weight:700;font-size:14px;color:var(--blue)}
+.row{display:flex;align-items:center;gap:8px;padding:5px 0;border-top:1px solid var(--line)}
+.row b{flex:0 0 105px;font-weight:400;color:var(--mut);font-size:13px}
+.row span{flex:1;word-break:break-word;white-space:pre-line}
+.row button{padding:1px 8px;font-size:12px}
+.act{display:flex;gap:8px;margin-top:14px}
+.empty{grid-column:1/-1;color:#fff;padding:50px 0;text-align:center}
+
+/* form */
+dialog{border:0;border-radius:12px;background:#fff;width:min(560px,94vw);padding:22px;max-height:92vh}
+dialog::backdrop{background:rgba(10,15,40,.6)}
+dialog h2{font-size:22px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;display:inline-block}
+fieldset{border:1px solid var(--line);border-radius:8px;margin:14px 0 0;padding:0 12px 12px}
+legend{font-weight:700;color:var(--blue);padding:0 6px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.fa{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+@media(max-width:520px){.two{grid-template-columns:1fr}.tools{flex-wrap:wrap}}
