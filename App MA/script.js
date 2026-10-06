@@ -33,6 +33,7 @@ const MA_DIVISIONS = {
     cards: [
       { icon: "bi-journal-text", title: "Buku Nomor Surat", desc: "Pencatatan dan pengelolaan nomor surat.", href: "Surat & Administrasi/Buku Nomor Surat/index.html", active: true },
       { icon: "bi-people",       title: "Buku Tamu",        desc: "Pencatatan kunjungan tamu dan kebutuhan administrasi.", href: "Surat & Administrasi/Buku Tamu/index.html", active: true }
+      { icon: "bi-journal-bookmark",       title: "Pencatatan",        desc: "Pencatatan akun kebutuhan administrasi.", href: "Surat & Administrasi/Pencatatan/index.html", active: true }
     ]
   },
   keuangan: {
