@@ -5,7 +5,11 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycbwt87pA-3UE_rbHXxTX1KaBckKKkwHIvXDZM1lCdJSAvZIGrvU_h8zHQcC9F7pjbs9f/exec';
 const ADMIN_PIN = '123456';
 
-const state = { requests: [], filter: 'all', search: '', sort: 'newest', admin: false, pin: '', editingId: '' };
+const now=new Date();
+const currentMonthKey=()=>{const y=now.getFullYear(),m=String(now.getMonth()+1).padStart(2,'0');return `${y}-${m}`};
+const monthKey=v=>{if(!v)return '';const d=new Date(v);if(isNaN(d))return '';return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`};
+const monthLabel=v=>{if(!v)return '-';const [y,m]=v.split('-');return new Date(Number(y),Number(m)-1,1).toLocaleDateString('id-ID',{month:'long',year:'numeric'})};
+const state = { requests: [], filter: 'all', search: '', sort: 'newest', admin: false, pin: '', editingId: '', statsMonth: currentMonthKey() };
 const $ = (s) => document.querySelector(s);
 const rupiah = (n) => new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',minimumFractionDigits:0}).format(Number(n||0));
 const dateFmt = (v) => { if(!v) return '-'; const d=new Date(v); return isNaN(d) ? String(v) : d.toLocaleString('id-ID',{dateStyle:'medium',timeStyle:'short'}); };
@@ -31,8 +35,10 @@ async function load(){
   catch(e){$('#requestList').innerHTML='<div class="empty"><strong>Belum terhubung ke database.</strong><br><span>'+escapeHtml(e.message)+'</span></div>';renderStats([])}
 }
 function renderStats(rows){
-  const pending=rows.filter(x=>x.status==='pending'), approved=rows.filter(x=>x.status==='approved'), paid=rows.filter(x=>x.status==='paid');
-  $('#stats').innerHTML=`<div class="stat"><div class="label">Total Permohonan</div><div class="value">${rows.length}</div></div><div class="stat"><div class="label">Menunggu</div><div class="value">${pending.length}</div></div><div class="stat"><div class="label">Disetujui</div><div class="value">${approved.length}</div></div><div class="stat"><div class="label">Total Dibayar</div><div class="value">${rupiah(paid.reduce((a,x)=>a+Number(x.amount||0),0))}</div></div>`;
+  const monthRows=rows.filter(x=>monthKey(x.created_at)===state.statsMonth);
+  const pending=monthRows.filter(x=>x.status==='pending'), approved=monthRows.filter(x=>x.status==='approved'), paid=monthRows.filter(x=>x.status==='paid');
+  $('#stats').innerHTML=`<div class="stats-head"><div><span class="eyebrow">REKAP PER BULAN</span><strong>Ringkasan ${monthLabel(state.statsMonth)}</strong><small>Total di bawah hanya untuk permohonan yang dibuat pada bulan terpilih.</small></div><label class="month-filter">Bulan<input id="statsMonth" type="month" value="${escapeAttr(state.statsMonth)}"></label></div><div class="stats-cards"><div class="stat"><div class="label">Total Permohonan</div><div class="value">${monthRows.length}</div></div><div class="stat"><div class="label">Menunggu</div><div class="value">${pending.length}</div></div><div class="stat"><div class="label">Disetujui</div><div class="value">${approved.length}</div></div><div class="stat"><div class="label">Total Dibayar</div><div class="value">${rupiah(paid.reduce((a,x)=>a+Number(x.amount||0),0))}</div></div></div>`;
+  const picker=$('#statsMonth'); if(picker) picker.addEventListener('change',e=>{state.statsMonth=e.target.value||currentMonthKey();renderStats(state.requests)});
 }
 function getFiltered(){
   let a=[...state.requests];
