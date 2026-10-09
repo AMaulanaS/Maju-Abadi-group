@@ -1,0 +1,20 @@
+ARSIP ADMINISTRASI — CATATAN PEMBARUAN
+
+Perubahan pada versi ini:
+- Memperbaiki elemen tombol Kelola kategori yang dipanggil JavaScript tetapi sebelumnya tidak tersedia di HTML. Kondisi ini dapat membuat tampilan aplikasi berhenti saat masuk.
+- Menambahkan tombol tampil/sembunyikan PIN pada halaman login.
+- Menambahkan pesan error koneksi yang lebih jelas dan batas waktu permintaan 20 detik.
+- Menambahkan notifikasi toast dan indikator loading.
+- Memperbarui tampilan agar lebih modern, responsif, dan mudah dipakai di ponsel.
+- Kolom password akun ditampilkan sebagai input password saat formulir tambah/ubah.
+
+CARA MEMASANG
+1. Ekstrak ZIP ini.
+2. Unggah file index.html, style.css, dan app.js ke hosting/tempat website yang sekarang digunakan, menggantikan file lama.
+3. File Code.gs tetap merupakan backend Google Apps Script yang digunakan website.
+4. Pastikan URL API di baris awal app.js mengarah ke URL Web App Apps Script yang benar.
+5. Di Google Apps Script, buka Deploy > Manage deployments. Pastikan deployment Web App aktif dan aksesnya sesuai kebutuhan. Jika Code.gs pernah diubah, pilih Deploy > Manage deployments > Edit (ikon pensil) > Version: New version > Deploy. Pastikan izin akses cocok dengan cara website digunakan.
+6. Uji login. Jika muncul pesan PIN salah, periksa nilai PIN di variabel PIN dalam Code.gs. Jangan membagikan PIN atau menyimpan PIN produksi di repositori publik.
+
+CATATAN KEAMANAN
+Code.gs dari ZIP asal menggunakan PIN contoh di dalam kode. Ganti dengan PIN rahasia sebelum digunakan sungguhan, lalu deploy versi baru. Akses Web App sebaiknya dibatasi sesuai kebutuhan organisasi. Jangan mengirim ZIP ini ke tempat publik karena berisi URL backend aplikasi.

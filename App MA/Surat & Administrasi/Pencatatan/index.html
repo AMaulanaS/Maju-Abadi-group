@@ -9,16 +9,46 @@
 </head>
 <body>
 <div id="bar"></div>
+<div id="toast" role="status" aria-live="polite"></div>
 
 <section id="login">
-  <div class="lbox">
-    <h1>Arsip Administrasi</h1>
-    <p>Masukkan PIN untuk membuka data akun dan proyek.</p>
-    <form id="lf">
-      <input id="pin" type="password" placeholder="PIN" autocomplete="current-password" required>
-      <div id="err" role="alert"></div>
-      <button class="p">Masuk</button>
-    </form>
+  <div class="login-shell">
+    <aside class="login-showcase" aria-label="Informasi aplikasi">
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none"><path d="M13 5.5h15l9 9V39a3.5 3.5 0 0 1-3.5 3.5h-20A3.5 3.5 0 0 1 10 39V9a3.5 3.5 0 0 1 3-3.5Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><path d="M28 6v10h9M17 25h13M17 32h13" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+        </div>
+        <span>ARSIP<span class="brand-dot">.</span></span>
+      </div>
+      <div class="showcase-copy">
+        <div class="eyebrow"><span></span> RUANG KERJA DIGITAL</div>
+        <h2>Semua catatan.<br><em>Satu tempat.</em></h2>
+        <p>Kelola akun dan pencatatan proyek dengan lebih rapi, mudah, dan terpusat.</p>
+        <div class="feature-list">
+          <div class="feature"><span class="feature-icon">✓</span><span><b>Data lebih tertata</b><small>Informasi tersimpan dalam satu dashboard</small></span></div>
+          <div class="feature"><span class="feature-icon">↻</span><span><b>Tersinkron dengan mudah</b><small>Terhubung dengan Google Sheets</small></span></div>
+        </div>
+      </div>
+      <div class="showcase-footer"><span class="status-dot"></span> WORKSPACE ADMINISTRASI <span class="footer-sep">•</span> AKSES TERBATAS</div>
+      <div class="decor decor-one"></div><div class="decor decor-two"></div>
+    </aside>
+    <div class="login-side">
+      <div class="lbox">
+        <div class="mobile-brand"><div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 48 48" fill="none"><path d="M13 5.5h15l9 9V39a3.5 3.5 0 0 1-3.5 3.5h-20A3.5 3.5 0 0 1 10 39V9a3.5 3.5 0 0 1 3-3.5Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><path d="M28 6v10h9M17 25h13M17 32h13" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></div><span>ARSIP<span class="brand-dot">.</span></span></div>
+        <div class="login-heading-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="10" width="16" height="11" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M8 10V7a4 4 0 1 1 8 0v3M12 14v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <div class="login-kicker">SELAMAT DATANG KEMBALI</div>
+        <h1>Masuk ke akunmu</h1>
+        <p class="login-description">Masukkan PIN akses untuk melanjutkan ke dashboard administrasi.</p>
+        <form id="lf">
+          <label for="pin">PIN akses</label>
+          <div class="pin-wrap"><input id="pin" type="password" placeholder="Masukkan PIN kamu" autocomplete="current-password" required><button type="button" id="togglePin" class="pin-toggle" aria-label="Tampilkan PIN">Lihat</button></div>
+          <div id="err" role="alert" aria-live="polite"></div>
+          <button class="p login-submit">Masuk ke dashboard <span aria-hidden="true">→</span></button>
+        </form>
+        <div class="secure-note"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 2.5 16 5v4.2c0 3.7-2.5 6.4-6 8.3-3.5-1.9-6-4.6-6-8.3V5l6-2.5Z" stroke="currentColor" stroke-width="1.5"/><path d="m7.5 9.8 1.7 1.7 3.4-3.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Akses aman untuk pengguna berwenang</div>
+      </div>
+      <div class="login-side-footer">© Arsip Administrasi <span>•</span> Sistem pencatatan internal</div>
+    </div>
   </div>
 </section>
 
@@ -31,8 +61,9 @@
   <main>
     <div class="tools">
       <input id="q" type="search" placeholder="Cari..." aria-label="Cari">
-      <button id="rf" class="ghost" title="Muat ulang dari Google Sheet">Muat ulang</button>
-      <button class="p" id="add">+ Tambah</button>
+      <button id="catManage" class="ghost" type="button">Kelola kategori</button>
+      <button id="rf" class="ghost" title="Muat ulang dari Google Sheet">↻ Muat ulang</button>
+      <button class="p" id="add">＋ Tambah</button>
     </div>
     <div id="list" class="grid"></div>
   </main>
@@ -40,6 +71,8 @@
 
 <dialog id="dlg"><form id="df"><h2 id="dt"></h2><div id="fields"></div>
   <div class="fa"><button type="button" id="cx">Batal</button><button class="p">Simpan</button></div></form></dialog>
+
+<dialog id="catDlg"><h2>Kelola kategori akun</h2><p class="hint">Tambah kategori baru atau ubah nama/hapus kategori yang sudah ada.</p><div id="categoryList"></div><div class="new-category"><input id="newCategory" placeholder="Nama kategori baru" aria-label="Nama kategori baru"><button type="button" class="p" id="addCategory">+ Tambah</button></div><div class="fa"><button type="button" id="catClose">Selesai</button></div></dialog>
 
 <script src="app.js"></script>
 </body>
