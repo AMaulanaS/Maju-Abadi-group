@@ -11,16 +11,17 @@ Struktur sudah dipisahkan dari file HTML tunggal menjadi:
 
 ## Modul
 1. Progress Proyek / Ringkasan
-2. Daftar Proyek
+2. Daftar Proyek & Pengalaman (ekspor Excel/PDF)
 3. Jadwal Pekerjaan
 4. Pekerjaan Lapangan
 5. Dokumentasi Proyek
 6. Tim Lapangan
+7. (digabung ke Daftar Proyek)
 
 ## Database Google Sheets
 
-Backend mengikuti struktur API yang sudah dipakai website. Lima tab akan digunakan:
-`Proyek`, `Jadwal`, `Pekerjaan`, `Dokumentasi`, `Tim`.
+Backend mengikuti struktur API yang sudah dipakai website. Enam tab akan digunakan:
+`Proyek`, `Jadwal`, `Pekerjaan`, `Dokumentasi`, `Tim`, `Pengalaman Kerja`.
 
 ### Cara pemasangan
 1. Buat Google Spreadsheet baru.

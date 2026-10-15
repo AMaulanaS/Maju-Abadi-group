@@ -31,8 +31,12 @@ const ICP={
  pin:'<path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>',
  ref:'<path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/>',
  arr:'<path d="M5 12h14M13 6l6 6-6 6"/>',
- plus:'<path d="M12 5v14M5 12h14"/>'
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ dl:'<path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 21h16"/>',
+ bag:'<path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M12 12h.01"/>'
 };
+const num=v=>Number(String(v||"").replace(/[^\d.-]/g,""))||0;
+const rp=v=>{const n=Number(String(v||"").replace(/[^\d.-]/g,""))||0;return "Rp "+n.toLocaleString("id-ID")};
 const IC=(n,s=18)=>`<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICP[n]}</svg>`;
 
 /* ===== Definisi modul ===== */
@@ -42,10 +46,10 @@ const MODS={
 ringkasan:{n:"Progress Proyek",i:IC("chart"),d:"Pantau perkembangan semua proyek beserta jadwal, pekerjaan, tim, dan dokumentasinya.",src:"proyek",s:ST.p,
   st:d=>[["Total proyek",d.length],["Berjalan",cs(d,"Berjalan")],["Selesai",cs(d,"Selesai")],["Rata-rata progress",avg(d)+"%"]],
   g:x=>`<article class="card pad"><div class="mt"><div><b style="font-size:16px; color:var(--ink);">${esc(x.nama)}</b><small>${esc(x.kode)}</small></div>${badge(x.status)}</div>${pg(x.progress)}<div class="mt"><small>PIC: ${esc(x.pemilik||"-")}</small><small>Deadline: ${fd(x.deadline)}</small></div><div class="ch">${[["jadwal","jadwal"],["pekerjaan","pekerjaan"],["tim","personel"],["dokumentasi","dokumentasi"]].map(([m,l])=>`<span>${cn(m,x.kode)}${l}</span>`).join("")}</div></article>`},
-proyek:{n:"Daftar Proyek",i:IC("list"),d:"Data dan informasi seluruh proyek.",add:"Tambah Proyek",s:ST.p,
-  f:[["kode","Kode proyek","text",1],["nama","Nama proyek","text",1],["pemilik","PIC","text"],["kategori","Kategori","text"],["status","Status","sel",0,ST.p],["progress","Progress (%)","number"],["mulai","Tanggal mulai","date"],["deadline","Deadline","date"],["anggaran","Anggaran (Rp)","number"],["deskripsi","Deskripsi","area"]],
-  c:[["Kode",x=>`<b>${esc(x.kode)}</b>`],["Proyek",x=>`<b style="color:var(--ink); font-size:14px;">${esc(x.nama)}</b><small>${esc(x.deskripsi)}</small>`],["PIC",x=>esc(x.pemilik||"-")],["Kategori",x=>esc(x.kategori||"-")],["Status",x=>badge(x.status)],["Progress",x=>pg(x.progress)],["Deadline",x=>fd(x.deadline)]],
-  st:d=>[["Total proyek",d.length],["Berjalan",cs(d,"Berjalan")],["Selesai",cs(d,"Selesai")],["Tertunda",cs(d,"Tertunda")]]},
+proyek:{n:"Daftar Proyek & Pengalaman",i:IC("list"),d:"Data proyek sekaligus pengalaman kerja (kontrak, pemberi tugas, BA serah terima). Bisa diunduh sebagai Excel atau PDF untuk upload di INAPROC.",add:"Tambah Proyek",ex:1,s:ST.p,
+  f:[["kode","Kode proyek","text",1],["nama","Nama proyek / Nama paket pekerjaan","text",1],["pemilik","PIC","text"],["kategori","Kategori","text"],["status","Status","sel",0,ST.p],["progress","Progress (%)","number"],["mulai","Tanggal mulai","date"],["deadline","Deadline","date"],["anggaran","Anggaran internal (Rp)","number"],["lokasi","Lokasi pekerjaan","text"],["pemberiNama","Pemberi tugas / PPK (nama)","text"],["pemberiAlamat","Alamat / telepon pemberi tugas","text"],["kontrakNo","No. kontrak","text"],["kontrakTanggal","Tanggal kontrak","date"],["nilai","Nilai kontrak (Rp)","number"],["tglSelesaiKontrak","Tanggal selesai (kontrak)","date"],["tglBA","Tanggal BA serah terima","date"],["deskripsi","Deskripsi / ringkasan lingkup pekerjaan","area"]],
+  c:[["Kode",x=>`<b>${esc(x.kode)}</b>`],["Proyek / Lingkup",x=>`<b style="color:var(--ink); font-size:14px;">${esc(x.nama)}</b><small>${esc(x.deskripsi)}</small>`],["Lokasi",x=>esc(x.lokasi||"-")],["Pemberi Tugas",x=>`<b>${esc(x.pemberiNama||"-")}</b><small>${esc(x.pemberiAlamat||"")}</small>`],["No / Tanggal Kontrak",x=>`<b>${esc(x.kontrakNo||"-")}</b><small>${fd(x.kontrakTanggal)}</small>`],["Nilai Kontrak",x=>`<b>${rp(x.nilai)}</b>`],["Status",x=>badge(x.status)],["Progress",x=>pg(x.progress)],["Selesai / BA",x=>`${fd(x.tglSelesaiKontrak)}<small>BA: ${fd(x.tglBA)}</small>`]],
+  st:d=>[["Total proyek",d.length],["Berjalan",cs(d,"Berjalan")],["Selesai",cs(d,"Selesai")],["Total nilai kontrak",rp(d.reduce((a,x)=>a+num(x.nilai),0))]]},
 jadwal:{n:"Jadwal Pekerjaan",i:IC("cal"),d:"Atur jadwal dan agenda pekerjaan.",add:"Tambah Jadwal",s:ST.j,ip:"JD-",sk:"tanggal",
   f:[["tanggal","Tanggal","date",1],["mulai","Jam mulai","time",1],["selesai","Jam selesai","time"],["pekerjaan","Nama pekerjaan","text",1],["lokasi","Lokasi","text",1],["petugas","Petugas / tim","text"],["prioritas","Prioritas","sel",0,PR],["status","Status","sel",0,ST.j],PJ,["keterangan","Keterangan","area"]],
   c:[["Tanggal",x=>fd(x.tanggal)],["Jam",x=>esc(x.mulai)+(x.selesai?" – "+esc(x.selesai):"")],["Pekerjaan",x=>`<b style="color:var(--ink); font-size:14px;">${esc(x.pekerjaan)}</b><small>${esc(x.keterangan)}</small>`],["Lokasi",x=>esc(x.lokasi)],["Petugas",x=>esc(x.petugas||"-")],["Proyek",x=>esc(x.kodeProyek||"-")],["Prioritas",x=>pr(x.prioritas)],["Status",x=>badge(x.status)]],
@@ -88,18 +92,18 @@ function listView(){const M=MODS[cur],d=S[M.src||cur];
   return `<div class="stats">${M.st(d).map(([l,v])=>`<div class="stat"><span>${l}</span><b>${v}</b></div>`).join("")}</div>
   <section class="panel"><div class="tools"><input id="q" type="search" placeholder="Cari data..." aria-label="Cari"><select id="sf" aria-label="Filter status"><option value="">Semua status</option>${M.s.map(o=>`<option>${o}</option>`).join("")}</select></div>
   ${M.g?'<div class="gal" id="tb"></div>':`<div class="tw"><table><thead><tr>${M.c.map(c=>`<th>${c[0]}</th>`).join("")}<th></th></tr></thead><tbody id="tb"></tbody></table></div>`}</section>${M.x?'<div id="xt"></div>':""}`}
-function rows(){const M=MODS[cur],q=$("#q").value.toLowerCase(),s=$("#sf").value,
-  r=S[M.src||cur].filter(x=>(!q||Object.values(x).join(" ").toLowerCase().includes(q))&&(!s||x.status===s));
+function shown(){const M=MODS[cur],q=($("#q")?.value||"").toLowerCase(),s=$("#sf")?.value||"";return S[M.src||cur].filter(x=>(!q||Object.values(x).join(" ").toLowerCase().includes(q))&&(!s||x.status===s))}
+function rows(){const M=MODS[cur],r=shown();
   $("#tb").innerHTML=r.length?r.map(x=>M.g?M.g(x):`<tr>${M.c.map(c=>`<td>${c[1](x)}</td>`).join("")}<td class="ac"><button class="bt s" data-e="${esc(x.id)}">Edit</button><button class="bt s" data-d="${esc(x.id)}" style="color:var(--redB); border-color:#fca5a5; background:#fef2f2;">Hapus</button></td></tr>`).join(""):M.g?'<div class="em">Belum ada data.</div>':'<tr><td colspan="9" class="em">Belum ada data.</td></tr>';
   if(M.x)$("#xt").innerHTML=M.x(S[cur])}
 function render(){cur=MODS[location.hash.slice(1)]?location.hash.slice(1):"ringkasan";const M=MODS[cur],s=M.src||cur;
   document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.n===cur));
-  $("#view").innerHTML=`<div class="hd"><div><h1>${M.i} ${M.n}</h1><p>${M.d}</p></div><div><button class="bt" data-r="1">${IC("ref",16)} Muat Ulang</button>${M.f?`<button class="bt pri" data-a="1">${IC("plus",16)} ${M.add}</button>`:""}</div></div>`+(!L[s]?'<div class="em">Memuat data dari Google Sheets...</div>':E[s]?`<div class="em" style="color:var(--redB);">Gagal memuat: ${esc(E[s])}</div>`:listView());
+  $("#view").innerHTML=`<div class="hd"><div><h1>${M.i} ${M.n}</h1><p>${M.d}</p></div><div><button class="bt" data-r="1">${IC("ref",16)} Muat Ulang</button>${M.ex?`<button class="bt" data-ex="xlsx">${IC("dl",16)} Excel</button><button class="bt" data-ex="pdf">${IC("dl",16)} PDF</button>`:""}${M.f?`<button class="bt pri" data-a="1">${IC("plus",16)} ${M.add}</button>`:""}</div></div>`+(!L[s]?'<div class="em">Memuat data dari Google Sheets...</div>':E[s]?`<div class="em" style="color:var(--redB);">Gagal memuat: ${esc(E[s])}</div>`:listView());
   if(L[s]&&!E[s])rows()}
 
 /* ===== Form tambah / ubah ===== */
 const fld=([k,l,t,r,o],x)=>{
-  const v=x?(x[k]??""):t==="date"&&k!=="deadline"?today():t==="time"&&k==="mulai"?"08:00":t==="number"?"0":"";
+  const v=x?(x[k]??""):t==="date"&&!["deadline","kontrakTanggal","tglSelesaiKontrak","tglBA"].includes(k)?today():t==="time"&&k==="mulai"?"08:00":t==="number"?"0":"";
   const a=`name="${k}"${r?" required":""}`;let h;
   if(t==="sel")h=`<select ${a}>${o.map(s=>`<option${s===v?" selected":""}>${s}</option>`).join("")}</select>`;
   else if(t==="proj")h=`<select ${a}>${r?"":'<option value="">Tanpa proyek</option>'}${v&&!S.proyek.some(p=>p.kode===v)?`<option selected>${esc(v)}</option>`:""}${S.proyek.map(p=>`<option value="${esc(p.kode)}"${p.kode===v?" selected":""}>${esc(p.kode)}:${esc(p.nama)}</option>`).join("")}</select>`;
@@ -112,19 +116,50 @@ function form(x){const M=MODS[cur];ed=x?.id||"";
 function detail(x){if(!x)return;
   $("#md").innerHTML=`<h2 style="font-weight:700; font-size:24px; margin-bottom:4px;">${esc(x.title)}</h2><p class="mu" style="margin-bottom:20px;">${esc(pn(x.project))}, ${fd(x.date)}, PIC ${esc(x.pic||"-")}</p>${x.photos?.length?`<div class="ph">${x.photos.map(u=>`<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(ph(u))}" alt="Foto dokumentasi" loading="lazy"></a>`).join("")}</div>`:""}<div class="mt" style="margin-top:24px; padding-top:16px; border-top:1px solid var(--line);">${badge(x.status)}${pg(x.progress)}</div><div style="margin-top:16px;"><p><b>Kegiatan:</b> ${esc(x.activity)}</p><p style="color:var(--mu);">${esc(x.notes||"").replace(/\n/g,"<br>")}</p></div><div class="fa"><button class="bt" data-d="${esc(x.id)}" style="color:var(--redB); border-color:#fca5a5;">Hapus</button><button class="bt" data-e="${esc(x.id)}">Edit</button><button class="bt pri" data-x="1">Tutup</button></div>`;modal(1)}
 
+
+/* ===== Ekspor pengalaman kerja (format INAPROC) ===== */
+const EXH=["No","Nama Paket Pekerjaan","Ringkasan Lingkup Pekerjaan","Lokasi","Pemberi Tugas / PPK","Alamat / Telepon Pemberi Tugas","No. Kontrak","Tanggal Kontrak","Nilai Kontrak (Rp)","Tanggal Selesai (Kontrak)","Tanggal BA Serah Terima"];
+const fdx=v=>{const s=D(v);if(!s)return"-";const d=new Date(s+"T00:00");return isNaN(d)?s:d.toLocaleDateString("id-ID",{day:"2-digit",month:"long",year:"numeric"})};
+function exportRows(){return shown().slice().sort((a,b)=>String(b.kontrakTanggal||"").localeCompare(String(a.kontrakTanggal||""))).map((x,i)=>[i+1,x.nama||"-",x.deskripsi||"-",x.lokasi||"-",x.pemberiNama||"-",x.pemberiAlamat||"-",x.kontrakNo||"-",fdx(x.kontrakTanggal),num(x.nilai),fdx(x.tglSelesaiKontrak),fdx(x.tglBA)])}
+function exportData(t){
+  const r=exportRows();if(!r.length)return toast("Tidak ada data untuk diunduh.",1);
+  const kurang=shown().filter(x=>!x.kontrakNo||!num(x.nilai)||!x.pemberiNama).length;
+  const tgl=today();
+  try{
+    if(t==="xlsx"){
+      if(!window.XLSX)throw Error("Library Excel belum termuat. Cek koneksi internet.");
+      const ws=XLSX.utils.aoa_to_sheet([["DAFTAR PENGALAMAN PEKERJAAN — Maju Abadi Group"],["Dicetak: "+fdx(tgl)],[],EXH,...r]);
+      ws["!cols"]=[6,40,45,25,30,32,24,18,20,20,20].map(w=>({wch:w}));
+      ws["!merges"]=[{s:{r:0,c:0},e:{r:0,c:10}}];
+      r.forEach((_,i)=>{const c=ws["I"+(i+5)];if(c)c.z="#,##0"});
+      const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Pengalaman Kerja");
+      XLSX.writeFile(wb,"Pengalaman_Kerja_"+tgl+".xlsx");
+    }else{
+      if(!window.jspdf)throw Error("Library PDF belum termuat. Cek koneksi internet.");
+      const doc=new window.jspdf.jsPDF({orientation:"landscape",unit:"mm",format:"a4"});
+      doc.setFontSize(14);doc.text("DAFTAR PENGALAMAN PEKERJAAN",14,14);
+      doc.setFontSize(10);doc.text("Maju Abadi Group  |  Dicetak: "+fdx(tgl),14,20);
+      doc.autoTable({head:[EXH],body:r.map(x=>{const y=x.slice();y[8]=rp(y[8]);return y}),startY:25,styles:{fontSize:7.5,cellPadding:1.6,valign:"top"},headStyles:{fillColor:[37,99,235],halign:"center"},columnStyles:{0:{cellWidth:8,halign:"center"},8:{halign:"right"}},margin:{left:10,right:10}});
+      doc.save("Pengalaman_Kerja_"+tgl+".pdf");
+    }
+    toast(kurang?`Terunduh. ${kurang} proyek belum lengkap (No. kontrak / nilai / pemberi tugas).`:"File berhasil diunduh.");
+  }catch(e){toast(e.message,1)}
+}
+
 /* ===== Interaksi ===== */
 const modal=on=>{$("#ov").hidden=!on};
 const toast=(s,er)=>{const t=$("#ts");t.textContent=s;t.className="ts"+(er?" er":"");t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>t.hidden=true,3200)};
 const byId=id=>S[cur].find(y=>String(y.id)===id);
 document.addEventListener("click",async e=>{
   if(e.target.id==="ov")return modal(0);
-  const t=e.target.closest("[data-n],[data-a],[data-e],[data-d],[data-v],[data-x],[data-r]");if(!t)return;const q=t.dataset;
+  const t=e.target.closest("[data-n],[data-a],[data-e],[data-d],[data-v],[data-x],[data-r],[data-ex]");if(!t)return;const q=t.dataset;
   if(q.n)location.hash=q.n;
   else if(q.a)form();
   else if(q.e)form(byId(q.e));
   else if(q.v)detail(byId(q.v));
   else if(q.x)modal(0);
   else if(q.r)loadAll();
+  else if(q.ex)exportData(q.ex);
   else if(q.d){if(!byId(q.d)||!confirm("Hapus data ini? Tindakan ini tidak bisa dibatalkan."))return;
     try{await api(cur,"delete",{id:q.d});modal(0);toast("Data dihapus");await load(cur);render()}catch(err){toast(err.message,1)}}});
 document.addEventListener("input",e=>{if(e.target.id==="q")rows()});
