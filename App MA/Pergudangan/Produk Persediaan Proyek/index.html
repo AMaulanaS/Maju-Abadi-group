@@ -29,6 +29,7 @@
     font-size: 13px;
   }
 </style>
+<link rel="stylesheet" href="gudang-3d.css">
 </head>
 <body class="app-shell-lock">
 
@@ -46,7 +47,7 @@
     <button class="nav" data-page="proyek" data-keep="1">Proyek</button>
   </nav>
   
-  <div class="top-right">
+  <div class="top-right"><a class="gd3" href="gudang3d.html">Gudang 3D</a>
     <span id="status" style="font-weight: 600; color: var(--primary);">● Menghubungkan...</span>
     <button title="Refresh database" onclick="loadData()" style="color: var(--primary);">⟲</button>
   </div>
@@ -114,7 +115,7 @@
             </label>
             <label>Kategori <input id="kategori" placeholder="Kabel / Lampu PJU / Pipa"></label>
             <label>Satuan <input id="satuan" value="PCS" placeholder="Satuan dasar"></label>
-            <label>Lokasi Gudang <input id="lokasi" placeholder="Rak A1 / Zona B"></label>
+            <label>Lokasi Gudang <input id="lokasi" list="lokasiList" placeholder="Pilih zona, mis. Rak Abu 1 - Tingkat 2"><datalist id="lokasiList"><option value="Rak Kantilever"><option value="Area Kabel"><option value="Rak Merah Alat Proyek"><option value="Mezanin"><option value="Rak Abu 1"><option value="Rak Abu 2"><option value="Lemari Kaca"><option value="Rak Merah Kelistrikan"></datalist></label>
             <label class="wide">Spesifikasi <textarea id="spesifikasi" placeholder="Detail teknis produk..."></textarea></label>
           </div>
         </div>
@@ -250,5 +251,6 @@
 <div id="toast" class="toast"></div>
 
 <script src="gudang.js"></script>
+<script src="gudang-3d.js"></script>
 </body>
 </html>

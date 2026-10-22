@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gudang 3D | Maju Abadi Group</title>
+<style>
+:root{--p:#0078d4;--ink:#1a1a1a;--mu:#666;--bd:#e0e0e0;--ok:#107c10;--wa:#d98f00;--no:#e81123}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:"Segoe UI",system-ui,sans-serif;color:var(--ink);background:#eef3f8}
+header{display:flex;align-items:center;gap:16px;padding:10px 18px;background:#fff;border-bottom:1px solid var(--bd);height:53px}
+header b{font-size:15px}
+header b span{color:var(--p)}
+header a{color:var(--p);text-decoration:none;font-size:13px}
+.pt{margin-left:auto;display:flex;gap:6px}
+.pt button{border:1px solid var(--bd);background:#fff;padding:6px 12px;border-radius:6px;cursor:pointer;font:inherit;font-size:13px}
+.pt button.on{background:var(--p);color:#fff;border-color:var(--p)}
+main{display:grid;grid-template-columns:1fr 350px;height:calc(100% - 53px)}
+#stage{position:relative;overflow:hidden;touch-action:none;cursor:grab}
+#stage canvas{display:block}
+#hint{position:absolute;left:14px;bottom:12px;font-size:12px;color:var(--mu);background:#ffffffd9;padding:6px 10px;border-radius:6px;pointer-events:none}
+#legend{position:absolute;left:14px;top:12px;display:flex;gap:12px;font-size:12px;background:#ffffffd9;padding:6px 10px;border-radius:6px}
+#legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}
+#banner{position:absolute;right:14px;top:12px;font-size:12px;background:#fff4ce;color:#7a5b00;padding:6px 10px;border-radius:6px;display:none;max-width:280px}
+aside{background:#fff;border-left:1px solid var(--bd);display:flex;flex-direction:column;min-height:0}
+aside h2{margin:0;padding:16px 16px 4px;font-size:18px}
+aside p{margin:0;padding:0 16px 10px;font-size:13px;color:var(--mu)}
+#q{margin:0 16px 10px;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;font:inherit;font-size:13px}
+#list{overflow:auto;flex:1;padding:0 8px 12px}
+.row{display:grid;grid-template-columns:1fr auto;gap:2px 8px;padding:9px 8px;border-bottom:1px solid #f0f0f0;font-size:13px}
+.row small{color:var(--mu)}
+.row em{font-style:normal;font-weight:600;text-align:right}
+.tag{grid-column:2;justify-self:end;font-size:11px;padding:2px 8px;border-radius:10px}
+.aman{background:#e7f5ed;color:var(--ok)}.menipis{background:#fff8e1;color:#856404}.habis{background:#fde7e9;color:var(--no)}
+.zbtn{display:flex;justify-content:space-between;width:100%;border:0;background:none;padding:9px 8px;border-bottom:1px solid #f0f0f0;font:inherit;font-size:13px;cursor:pointer;text-align:left}
+.zbtn:hover{background:#f3f8fd}
+.back{margin:0 16px 8px;border:0;background:none;color:var(--p);cursor:pointer;font:inherit;font-size:13px;padding:0;text-align:left}
+@media(max-width:800px){main{grid-template-columns:1fr;grid-template-rows:55% 45%}aside{border-left:0;border-top:1px solid var(--bd)}header a{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <b>MAJU ABADI <span>GROUP</span></b>
+  <a href="index.html">← Persediaan Proyek</a>
+  <div class="pt" id="pt"></div>
+</header>
+<main>
+  <div id="stage">
+    <div id="legend"><span><i style="background:#107c10"></i>Stok aman</span><span><i style="background:#f0a500"></i>Menipis</span><span><i style="background:#e81123"></i>Habis</span><span><i style="background:#8aa4bd"></i>Kosong</span></div>
+    <div id="banner"></div>
+    <div id="hint">Geser untuk memutar · scroll atau cubit untuk zoom · klik rak untuk melihat isinya</div>
+  </div>
+  <aside>
+    <h2 id="ttl">Semua Zona</h2>
+    <p id="sub"></p>
+    <input id="q" placeholder="Cari kode atau nama produk..." oninput="renderPanel()">
+    <div id="list"></div>
+  </aside>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// Gunakan URL Apps Script yang sama dengan modul Produk (gudang.js)
+const API_URL='https://script.google.com/macros/s/AKfycbwhzQLPfSPwQouiM_9x0DJT5FFzQOPEn84rKKNDo-7UD-I3nk8hhVokIiY6_FNCG4SQww/exec';
+
+// Nama zona = awalan yang harus ditulis di kolom "Lokasi Gudang" produk. Contoh: "Rak Abu 1 - Tingkat 2"
+const Z=[
+ {id:'kantilever',n:'Rak Kantilever',x:-6,z:-6.1,w:9,d:1.6,h:4.2,lv:2,col:0x2b2f33,kind:'pipa'},
+ {id:'kabel',n:'Area Kabel',x:-6,z:-3.6,w:5,d:2,h:1.2,kind:'kabel'},
+ {id:'alat',n:'Rak Merah Alat Proyek',x:-9.2,z:-1.2,w:3,d:1,h:2.6,lv:4,col:0xc0392b},
+ {id:'mezanin',n:'Mezanin',x:-8.5,z:3.6,w:5,d:4,h:1.4,kind:'mezanin'},
+ {id:'abu1',n:'Rak Abu 1',x:3.4,z:-6.2,w:2.6,d:1,h:3.4,lv:4,col:0x8a9199},
+ {id:'abu2',n:'Rak Abu 2',x:6.2,z:-6.2,w:2.6,d:1,h:3.4,lv:4,col:0x8a9199},
+ {id:'lemari',n:'Lemari Kaca',x:9.2,z:-6.2,w:1.6,d:0.8,h:3,lv:4,col:0x6b7580,glass:1},
+ {id:'listrik',n:'Rak Merah Kelistrikan',x:8,z:-2.4,w:3,d:1,h:2.4,lv:3,col:0xc0392b}
+];
+const COL={aman:0x107c10,menipis:0xf0a500,habis:0xe81123,kosong:0x8aa4bd};
+const norm=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const num=v=>Number(v)||0;
+
+let produk=[],stokPT=[],pt='ALL',sel=null;
+
+/* ---------- DATA ---------- */
+function total(kode){return stokPT.filter(s=>(pt==='ALL'||s.ptId===pt)&&String(s.kode).toLowerCase()===String(kode).toLowerCase()).reduce((a,b)=>a+num(b.qty),0)}
+function status(p){const t=total(p.kode);return t<=0?'habis':(num(p.stokMin)>0&&t<=num(p.stokMin)?'menipis':'aman')}
+function zoneOf(p){const l=norm(p.lokasi);return l?Z.find(z=>l.startsWith(norm(z.n))):null}
+function inZone(id){return produk.filter(p=>{const z=zoneOf(p);return id==='none'?!z:z&&z.id===id})}
+function zoneStatus(id){const l=inZone(id);if(!l.length)return'kosong';const s=l.map(status);return s.includes('habis')?'habis':s.includes('menipis')?'menipis':'aman'}
+
+async function load(){
+  const b=document.getElementById('banner');
+  try{
+    const u=new URL(API_URL);u.searchParams.set('action','all');
+    const r=await (await fetch(u,{cache:'no-store'})).json();
+    if(!r.ok)throw Error(r.error||'Database gagal');
+    produk=r.data.produk||[];stokPT=r.data.stokPT||[];
+  }catch(e){
+    b.style.display='block';b.textContent='Belum terhubung ke Google Sheet ('+e.message+'). Menampilkan data contoh.';
+    produk=[{kode:'KBL-001',nama:'Kabel NYY 4x10',lokasi:'Area Kabel',satuan:'Roll',stokMin:5},{kode:'PJU-010',nama:'Lampu PJU 100W',lokasi:'Rak Abu 1 - Tingkat 2',satuan:'Pcs',stokMin:10},{kode:'MCB-016',nama:'MCB 16A',lokasi:'Rak Merah Kelistrikan',satuan:'Pcs',stokMin:20},{kode:'HLM-001',nama:'Helm Proyek',lokasi:'Rak Merah Alat Proyek',satuan:'Pcs',stokMin:5},{kode:'PIP-020',nama:'Pipa Galvanis 2"',lokasi:'Rak Kantilever',satuan:'Batang',stokMin:10},{kode:'SPL-550',nama:'Panel Surya 550W',lokasi:'Mezanin',satuan:'Unit',stokMin:2},{kode:'XXX-999',nama:'Produk tanpa lokasi',lokasi:'',satuan:'Pcs',stokMin:1}];
+    stokPT=[{ptId:'FMA',kode:'KBL-001',qty:12},{ptId:'FMA',kode:'PJU-010',qty:6},{ptId:'ZMA',kode:'MCB-016',qty:0},{ptId:'FMA',kode:'HLM-001',qty:30},{ptId:'RMA',kode:'PIP-020',qty:40},{ptId:'FMA',kode:'SPL-550',qty:2}];
+  }
+  refresh();
+}
+function refresh(){paint();renderPanel()}
+
+/* ---------- PANEL ---------- */
+function renderPanel(){
+  const q=document.getElementById('q').value.toLowerCase(),L=document.getElementById('list'),T=document.getElementById('ttl'),S=document.getElementById('sub');
+  if(!sel){
+    T.textContent='Semua Zona';
+    const none=inZone('none').length;
+    S.textContent=produk.length+' produk · klik rak di denah atau pilih zona';
+    L.innerHTML=Z.map(z=>`<button class="zbtn" onclick="pick('${z.id}')"><span>${esc(z.n)}</span><span class="tag ${zoneStatus(z.id)}">${inZone(z.id).length} produk</span></button>`).join('')+
+      `<button class="zbtn" onclick="pick('none')"><span>Belum ada lokasi</span><span class="tag ${none?'menipis':'aman'}">${none} produk</span></button>`;
+    return;
+  }
+  const z=Z.find(a=>a.id===sel);
+  T.textContent=z?z.n:'Belum ada lokasi';
+  const l=inZone(sel).filter(p=>(p.kode+' '+p.nama).toLowerCase().includes(q));
+  S.textContent=l.length+' produk'+(pt==='ALL'?' · semua PT':' · '+pt);
+  L.innerHTML='<button class="back" onclick="pick(null)">← Semua zona</button>'+(l.length?l.map(p=>{const s=status(p);return `<div class="row"><div><b>${esc(p.nama)}</b><br><small>${esc(p.kode)} · ${esc(p.lokasi||'—')}</small></div><em>${total(p.kode)} ${esc(p.satuan||'')}</em><span class="tag ${s}">${s}</span></div>`}).join(''):'<p style="padding:16px 8px">Belum ada produk di zona ini. Isi kolom Lokasi Gudang di form Produk dengan awalan "'+esc(z?z.n:'')+'".</p>');
+}
+function pick(id){sel=id;paint();renderPanel();cam()}
+
+/* ---------- 3D ---------- */
+const stage=document.getElementById('stage');
+const scene=new THREE.Scene();scene.background=new THREE.Color(0xeef3f8);
+const camera=new THREE.PerspectiveCamera(45,1,.1,200);
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));stage.prepend(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xffffff,0xb8c4d0,.85));
+const sun=new THREE.DirectionalLight(0xffffff,.55);sun.position.set(-8,16,10);scene.add(sun);
+
+const mat=(c,o={})=>new THREE.MeshLambertMaterial({color:c,...o});
+function box(w,h,d,c,x,y,z,p){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(c));m.position.set(x,y,z);(p||scene).add(m);return m}
+let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+
+// Lantai & dinding
+box(22,.2,14,0xcfd6dc,0,-.1,0);
+box(10,.22,8.4,0xe6eaee,6,-.09,-2.8);
+box(22,5,.2,0xdfe7ee,0,2.5,-7.1);
+box(.2,5,14,0xdfe7ee,-11,2.5,0);
+
+// Kendaraan (hiasan, depan menghadap ke arah penonton)
+function wheel(g,x,z){const w=new THREE.Mesh(new THREE.CylinderGeometry(.32,.32,.25,14),mat(0x111111));w.rotation.z=Math.PI/2;w.position.set(x,.32,z);g.add(w)}
+function vehicle(x,z,name,pickup){
+  const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);
+  if(pickup){
+    box(1.7,.7,4.2,0x25282c,0,.7,0,g);box(1.6,.8,1.4,0x2f343a,0,1.4,1.2,g);box(1.64,.4,1.0,0x9fc3d6,0,1.45,1.2,g);box(1.7,.3,2.2,0x30353b,0,1.2,-1,g);
+  }else{
+    box(1.8,.6,4,0x30353b,0,.6,0,g);box(1.6,.6,2,0x3a4048,0,1.2,-.1,g);box(1.64,.32,1.6,0x9fc3d6,0,1.25,-.1,g);
+  }
+  [-.85,.85].forEach(a=>[-1.3,1.3].forEach(b=>wheel(g,a,b)));
+  const s=label(name);s.scale.set(1.9,.36,1);s.position.set(x,2.5,z);scene.add(s);
+}
+vehicle(-2.2,2.6,'Pickup',true);vehicle(1.2,3.4,'Mobil',false);
+
+// Dua kamar di bawah Mezanin: istirahat dan masak untuk tim lapangan
+const wm=mat(0xf4f7fa,{transparent:true,opacity:.5});
+function wall(w,h,d,x,z){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),wm);m.position.set(x,h/2,z);scene.add(m)}
+wall(5,3.1,.1,-8.5,1.6);wall(5,3.1,.1,-8.5,5.6);wall(.1,3.1,4,-8.5,3.6);wall(.1,3.1,4,-6,3.6);
+box(.9,2,.06,0x8b5a2b,-9.7,1,5.64);box(.9,2,.06,0x8b5a2b,-7.3,1,5.64);
+box(1.6,.4,.9,0x6c8ebf,-10,.3,2.3);box(1.8,.9,.6,0x9aa5ae,-7.3,.45,2.1);
+[['Kamar Istirahat',-9.75],['Kamar Masak',-7.25]].forEach(([t,x])=>{const s=label(t);s.scale.set(2.1,.4,1);s.position.set(x,2.3,3.6);scene.add(s)});
+
+function shelf(z){
+  const g=new THREE.Group();g.position.set(z.x,0,z.z);scene.add(g);
+  if(z.kind==='kabel'){
+    box(z.w,.15,z.d,0x6f8fa6,0,.1,0,g);
+    [-1.4,0,1.4].forEach((x,i)=>{const t=new THREE.Mesh(new THREE.TorusGeometry(.5,.28,10,24),mat(i==1?0x1d1d1d:0x333333));t.rotation.x=Math.PI/2;t.position.set(x,.45,0);g.add(t)});
+    return g;
+  }
+  if(z.kind==='mezanin'){
+    const sl=box(z.w,.12,z.d,0xb9c3cc,0,3.2,0,g);sl.material.transparent=true;sl.material.opacity=.7;
+    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([a,b])=>box(.12,3.2,.12,0x8a9199,a*z.w/2.1,1.6,b*z.d/2.1,g));
+    for(let i=0;i<9;i++)box(.5+rnd()*.5,.4+rnd()*.4,.5+rnd()*.4,0xb98a5a,(rnd()-.5)*(z.w-1),3.5,(rnd()-.5)*(z.d-1),g);
+    box(1.6,.04,.9,0x2a4a8a,.6,3.28,.6,g);
+    return g;
+  }
+  const lv=z.lv;
+  [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([a,b])=>box(.07,z.h,.07,z.col,a*z.w/2,z.h/2,b*z.d/2,g));
+  for(let i=0;i<=lv;i++){
+    const y=.1+(z.h-.1)*i/lv;
+    box(z.w,.05,z.d,z.col,0,y,0,g);
+    if(i<lv){
+      if(z.kind==='pipa'){for(let k=0;k<5;k++){const c=new THREE.Mesh(new THREE.CylinderGeometry(.07,.07,z.w-.4,8),mat(k%2?0xc9ced3:0xb98a5a));c.rotation.z=Math.PI/2;c.position.set(0,y+.1+k*.02,(k-2)*.28);g.add(c)}}
+      else for(let k=0;k<3;k++){const bw=.4+rnd()*.5,bh=.3+rnd()*.3;box(bw,bh,z.d*.7,rnd()>.35?0xb98a5a:0xe8e2d6,(k-1)*(z.w/3.2),y+bh/2+.03,0,g)}
+    }
+  }
+  if(z.glass){const gl=new THREE.Mesh(new THREE.BoxGeometry(z.w,z.h,.03),new THREE.MeshLambertMaterial({color:0xaed6f1,transparent:true,opacity:.22}));gl.position.set(0,z.h/2,z.d/2);g.add(gl)}
+  return g;
+}
+
+// Volume status (berwarna sesuai stok) + label
+const vols={};
+function label(t){
+  const c=document.createElement('canvas');c.width=512;c.height=96;const x=c.getContext('2d');
+  x.font='600 38px "Segoe UI",sans-serif';x.fillStyle='#ffffffee';const w=Math.min(x.measureText(t).width+40,500);x.fillRect(256-w/2,12,w,72);
+  x.fillStyle='#1a1a1a';x.textAlign='center';x.fillText(t,256,62);
+  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:false}));s.scale.set(3.4,.64,1);return s;
+}
+Z.forEach(z=>{
+  shelf(z);
+  const baseY=z.kind==='mezanin'?3.2:0;
+  const v=new THREE.Mesh(new THREE.BoxGeometry(z.w+.25,z.h+.1,z.d+.25),new THREE.MeshBasicMaterial({color:COL.kosong,transparent:true,opacity:.2,depthWrite:false}));
+  v.position.set(z.x,baseY+(z.h+.1)/2,z.z);v.userData.id=z.id;scene.add(v);vols[z.id]=v;
+  const s=label(z.n);s.position.set(z.x,baseY+z.h+.9,z.z);scene.add(s);
+});
+function paint(){Z.forEach(z=>{const m=vols[z.id].material;m.color.setHex(COL[zoneStatus(z.id)]);m.opacity=sel===z.id?.5:(hov===z.id?.38:.2)})}
+
+/* ---------- KAMERA & INTERAKSI ---------- */
+let th=.55,ph=1.0,rad=27,hov=null;const tgt=new THREE.Vector3(0,1.2,0);
+function cam(){camera.position.set(tgt.x+rad*Math.sin(ph)*Math.sin(th),tgt.y+rad*Math.cos(ph),tgt.z+rad*Math.sin(ph)*Math.cos(th));camera.lookAt(tgt);renderer.render(scene,camera)}
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();cam()}
+new ResizeObserver(resize).observe(stage);
+
+const ray=new THREE.Raycaster(),ptr=new Map();let moved=0,pinch=0;
+function hit(e){const r=renderer.domElement.getBoundingClientRect();ray.setFromCamera(new THREE.Vector2(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1),camera);const h=ray.intersectObjects(Object.values(vols))[0];return h?h.object.userData.id:null}
+stage.addEventListener('pointerdown',e=>{stage.setPointerCapture(e.pointerId);ptr.set(e.pointerId,{x:e.clientX,y:e.clientY});moved=0;if(ptr.size==2){const [a,b]=[...ptr.values()];pinch=Math.hypot(a.x-b.x,a.y-b.y)}});
+stage.addEventListener('pointermove',e=>{
+  const p=ptr.get(e.pointerId);
+  if(!p){const id=hit(e);if(id!==hov){hov=id;stage.style.cursor=id?'pointer':'grab';paint();cam()}return}
+  if(ptr.size==2){ptr.set(e.pointerId,{x:e.clientX,y:e.clientY});const [a,b]=[...ptr.values()],d=Math.hypot(a.x-b.x,a.y-b.y);rad=Math.min(45,Math.max(8,rad*pinch/d));pinch=d;moved=99;cam();return}
+  const dx=e.clientX-p.x,dy=e.clientY-p.y;moved+=Math.abs(dx)+Math.abs(dy);
+  th-=dx*.006;ph=Math.min(1.45,Math.max(.25,ph-dy*.006));ptr.set(e.pointerId,{x:e.clientX,y:e.clientY});cam();
+});
+stage.addEventListener('pointerup',e=>{ptr.delete(e.pointerId);if(moved<6&&!ptr.size){const id=hit(e);pick(id)}});
+stage.addEventListener('pointercancel',e=>ptr.delete(e.pointerId));
+stage.addEventListener('wheel',e=>{e.preventDefault();rad=Math.min(45,Math.max(8,rad*(1+e.deltaY*.001)));cam()},{passive:false});
+
+/* ---------- FILTER PT ---------- */
+document.getElementById('pt').innerHTML=['ALL','FMA','ZMA','RMA'].map(k=>`<button class="${k==='ALL'?'on':''}" data-k="${k}">${k==='ALL'?'Semua PT':k}</button>`).join('');
+document.getElementById('pt').addEventListener('click',e=>{const k=e.target.dataset.k;if(!k)return;pt=k;[...e.currentTarget.children].forEach(b=>b.classList.toggle('on',b.dataset.k===k));refresh();cam()});
+
+resize();load().then(cam);
+</script>
+</body>
+</html>
