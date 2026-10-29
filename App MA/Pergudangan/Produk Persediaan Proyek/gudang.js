@@ -138,7 +138,7 @@ function selectProduct(id){currentId=id;let x=state.produk.find(a=>String(a.id)=
 function openModal(t,b){$('modalTitle').textContent=t;$('modalBody').innerHTML=b;$('modal').classList.remove('hidden')}function closeModal(){$('modal').classList.add('hidden')}
 function productOptions(selected=''){return state.produk.map(p=>`<option value="${esc(p.kode)}" ${String(p.kode)===String(selected)?'selected':''}>${esc(p.kode)} — ${esc(p.nama)}</option>`).join('')}
 function projectOptions(selected='',ptId=activePT){return state.proyek.filter(p=>String(p.ptId)===String(ptId)).map(p=>`<option value="${esc(p.id)}" ${String(p.id)===String(selected)?'selected':''}>${esc(p.kode)} — ${esc(p.nama)}</option>`).join('')}
-function ptOptions(selected=activePT,includeActive=true){return companies.filter(c=>includeActive||c.id!==activePT).map(c=>`<option value="${c.id}" ${c.id===selected?'selected':''}>${esc(c.nama)}</option>`).join('')}
+function ptOptions(selected=activePT,includeActive=true){return companies.filter(c=>includeActive||c.id!==activePT).map(c=>`<option value="${esc(c.id)}" ${c.id===selected?'selected':''}>${esc(c.nama)}</option>`).join('')}
 
 function normalizeItems(v){
   if(Array.isArray(v)) return v;
