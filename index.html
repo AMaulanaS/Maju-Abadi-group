@@ -6,12 +6,13 @@
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>Maju Abadi Group | Construction & Tour Travel</title>
   <meta name="description" content="Maju Abadi Group - solusi profesional Mechanical, Electrical, Konstruksi, Pengadaan, Maintenance, serta divisi Tour & Travel." />
-  <meta name="keywords" content="Maju Abadi Group, kontraktor, mechanical electrical, konstruksi, pengadaan, PJU, tour travel, paket wisata" />
+  <meta name="keywords" content="Maju Abadi Group, kontraktor, mechanical electrical, konstruksi, pengadaan, PJU, tour travel, paket wisata, PLTS, panel surya, PLTS residensial" />
   <link rel="icon" type="image/png" href="img/LOGO MA GROUP PERSEGI.png">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="PLTS Residensial/plts.css" />
 </head>
 <body>
 
@@ -31,6 +32,7 @@
       <a href="#about" class="nav-link">Tentang Kami</a>
       <a href="#organization" class="nav-link">Group</a>
       <a href="#services" class="nav-link">Layanan</a>
+      <a href="#plts" class="nav-link">PLTS</a>
       <a href="#tour-travel" class="nav-link nav-tour">Tour & Travel</a>
       <a href="#projects" class="nav-link">Proyek</a>
       <a href="#stats" class="nav-link">Pencapaian</a>
@@ -234,6 +236,52 @@
       <article class="service-card reveal"><div class="service-icon-wrap">🛠️</div><h3 class="service-title">Maintenance Service</h3><p class="service-desc">Pemeliharaan dan dukungan teknis agar sistem tetap optimal dan berkelanjutan.</p><ul class="service-list"><li>Preventive maintenance</li><li>Perbaikan</li><li>Inspeksi teknis</li></ul><a href="#contact" class="service-link">Konsultasikan →</a></article>
     </div>
   </div>
+</section>
+
+<!-- ===== PLTS RESIDENSIAL ===== -->
+<section class="plts-section section" id="plts">
+  <div class="container">
+    <div class="plts-intro reveal">
+      <div>
+        <div class="section-tag">PLTS Residensial</div>
+        <h2 class="section-title">Paket PLTS Hybrid untuk <span class="text-accent">Rumah Anda</span></h2>
+      </div>
+      <p class="section-desc">Maju Abadi Energi menyediakan paket PLTS hybrid siap pasang: panel surya, inverter, dan baterai LiFePO4 dalam satu paket. Pilih wilayah Anda untuk melihat harga dan spesifikasi.</p>
+    </div>
+
+    <ol class="plts-flow reveal" aria-label="Skema sistem PLTS residensial hybrid">
+      <li><strong>Panel surya</strong><span>Lesso monocrystalline</span></li>
+      <li><strong>Inverter hybrid</strong><span>Deye smart inverter</span></li>
+      <li><strong>Penyimpanan baterai</strong><span>LiFePO4, cadangan daya</span></li>
+      <li><strong>Rumah &amp; PLN</strong><span>Listrik siap pakai 24 jam</span></li>
+    </ol>
+
+    <div class="plts-tabs" role="tablist" aria-label="Pilih wilayah">
+      <button type="button" class="plts-tab" role="tab" id="pltsTab-semarang" data-region="semarang" aria-selected="true" aria-controls="pltsPanel">Semarang &amp; sekitarnya</button>
+      <button type="button" class="plts-tab" role="tab" id="pltsTab-kalimantan" data-region="kalimantan" aria-selected="false" aria-controls="pltsPanel" tabindex="-1">Kalimantan</button>
+      <button type="button" class="plts-tab" role="tab" id="pltsTab-papua" data-region="papua" aria-selected="false" aria-controls="pltsPanel" tabindex="-1">Papua</button>
+    </div>
+
+    <div id="pltsPanel" role="tabpanel" aria-live="polite">
+      <noscript>
+        <p>Aktifkan JavaScript untuk melihat daftar harga, atau lihat brosur:
+          <a href="PLTS Residensial/Brosur/brosur-plts-semarang.jpg">Semarang</a>,
+          <a href="PLTS Residensial/Brosur/brosur-plts-kalimantan.jpg">Kalimantan</a>,
+          <a href="PLTS Residensial/Brosur/brosur-plts-papua.jpg">Papua</a>.</p>
+      </noscript>
+    </div>
+  </div>
+
+  <dialog class="plts-dialog" id="pltsDialog" aria-labelledby="pltsDialogTitle">
+    <div class="plts-dialog-bar">
+      <span id="pltsDialogTitle">Brosur PLTS</span>
+      <div>
+        <a class="plts-link" id="pltsDialogDownload" href="#" download>Unduh</a>
+        <button type="button" class="plts-dialog-close" aria-label="Tutup brosur">&times;</button>
+      </div>
+    </div>
+    <div class="plts-dialog-body"><img id="pltsDialogImg" src="" alt=""></div>
+  </dialog>
 </section>
 
 <!-- ===== DIVISI TOUR & TRAVEL BARU ===== -->
@@ -542,7 +590,7 @@
             <div class="form-group"><label for="phone">No. WhatsApp</label><input id="phone" required placeholder="08xxxxxxxxxx"></div>
           </div>
           <div class="form-group"><label for="service">Kebutuhan</label>
-            <select id="service"><option value="Proyek / Konstruksi">Proyek / Konstruksi</option><option value="Pengadaan">Pengadaan</option><option value="Maintenance">Maintenance</option><option value="Tour & Travel">Tour & Travel</option></select>
+            <select id="service"><option value="Proyek / Konstruksi">Proyek / Konstruksi</option><option value="Pengadaan">Pengadaan</option><option value="Maintenance">Maintenance</option><option value="Tour & Travel">Tour & Travel</option><option value="PLTS Residensial">PLTS Residensial</option></select>
           </div>
           <div class="form-group"><label for="message">Pesan</label><textarea id="message" required placeholder="Ceritakan kebutuhan Anda..."></textarea></div>
           <button class="btn-primary" type="submit">Kirim via WhatsApp →</button>
@@ -566,7 +614,7 @@
         </div>
       </div>
 
-      <div class="footer-col"><h4>Layanan</h4><a href="#services">Mechanical & Electrical</a><a href="#services">Pengadaan</a><a href="#services">Konstruksi</a><a href="#services">Maintenance</a><a href="#tour-travel">Tour & Travel</a></div>
+      <div class="footer-col"><h4>Layanan</h4><a href="#services">Mechanical & Electrical</a><a href="#services">Pengadaan</a><a href="#services">Konstruksi</a><a href="#services">Maintenance</a><a href="#plts">PLTS Residensial</a><a href="#tour-travel">Tour & Travel</a></div>
       <div class="footer-col"><h4>Tour & Travel</h4><a href="#tour-travel">Paket Wisata</a><a href="#tour-travel">Corporate Trip</a><a href="#tour-travel">Study Tour</a><a href="#tour-travel">Wisata Religi</a><a href="#tour-travel">Gathering</a></div>
       <div class="footer-col footer-contact-col">
         <h4>Kontak</h4>
@@ -591,7 +639,8 @@
 
 <a href="https://wa.me/6285100511753" class="floating-wa" target="_blank" aria-label="WhatsApp">WA</a>
 <button class="back-to-top" id="backToTop" aria-label="Back to Top">↑</button>
-<script src="/kunjungan.js"></script>
+<script src="Kunjungan Website/kunjungan.js"></script>
 <script src="script.js"></script>
+<script src="PLTS Residensial/plts.js"></script>
 </body>
 </html>

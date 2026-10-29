@@ -1,0 +1,23 @@
+FINAL SISTEM TESTIMONI MAJU ABADI GROUP
+
+Isi ZIP:
+- index.html
+- style.css
+- script.js
+- Code.gs
+
+script.js sudah menggunakan Web App URL baru dan GET untuk submit.
+Code.gs sudah:
+- menyimpan testimoni ke Google Sheet
+- status otomatis APPROVED
+- menyediakan action=submit melalui GET
+- menyediakan action=list untuk membaca testimoni
+
+SETELAH mengganti Code.gs:
+Save -> Deploy -> Manage deployments -> pilih deployment final -> Versi baru -> Terapkan.
+Ini hanya perlu dilakukan sekali untuk perubahan kode.
+
+Setelah itu, setiap testimoni baru tidak perlu approval dan tidak perlu deployment lagi.
+
+
+CATATAN FIX: Code.gs versi ini mendukung action=submit melalui GET. script.js mengirim submission dengan GET no-cors agar kompatibel dengan GitHub Pages dan redirect ContentService.
