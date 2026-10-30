@@ -1,4 +1,187 @@
-document.addEventListener('DOMContentLoaded', () => {
+function cmsEscapeHtml(value) {
+  return String(value == null ? '' : value).replace(/[&<>"']/g, char => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[char]));
+}
+
+function cmsSetHighlightedTitle(element, value) {
+  if (!element || !value) return;
+  const parts = String(value).split('|');
+  if (parts.length > 1) {
+    element.innerHTML = cmsEscapeHtml(parts[0].trim()) + ' <span class="text-accent">' + cmsEscapeHtml(parts.slice(1).join('|').trim()) + '</span>';
+  } else {
+    element.textContent = value;
+  }
+}
+
+function cmsRenderServices(items) {
+  const grid = document.querySelector('.services-grid');
+  if (!grid || !Array.isArray(items)) return;
+  grid.innerHTML = items.map((item, index) => {
+    const bullets = Array.isArray(item.bullets) ? item.bullets : [];
+    return `<article class="service-card ${index === 0 ? 'service-card-featured' : ''} reveal">
+      <div class="service-icon-wrap">${cmsEscapeHtml(item.icon || '✦')}</div>
+      <h3 class="service-title">${cmsEscapeHtml(item.title || '')}</h3>
+      <p class="service-desc">${cmsEscapeHtml(item.description || '')}</p>
+      <ul class="service-list">${bullets.map(text => `<li>${cmsEscapeHtml(text)}</li>`).join('')}</ul>
+      <a href="#contact" class="service-link">Konsultasikan →</a>
+    </article>`;
+  }).join('');
+}
+
+function cmsRenderProjects(items) {
+  const grid = document.getElementById('projectsGrid');
+  const filterWrap = document.querySelector('.project-filter');
+  if (!grid || !Array.isArray(items)) return;
+  const categories = [];
+  items.forEach(item => {
+    const key = String(item.category || 'lainnya');
+    if (!categories.some(category => category.key === key)) categories.push({ key, label: item.label || key });
+  });
+  if (filterWrap) {
+    filterWrap.innerHTML = `<button class="filter-btn active" data-filter="all">Semua</button>` +
+      categories.map(category => `<button class="filter-btn" data-filter="${cmsEscapeHtml(category.key)}">${cmsEscapeHtml(category.label)}</button>`).join('');
+  }
+  grid.innerHTML = items.map(item => `<div class="project-card reveal ${item.featured ? 'project-card-large' : ''}" data-category="${cmsEscapeHtml(item.category || 'lainnya')}">
+    <div class="project-img"><img src="${cmsEscapeHtml(item.image || '')}" alt="${cmsEscapeHtml(item.title || 'Proyek Maju Abadi Group')}" loading="lazy"><div class="project-overlay"></div></div>
+    <div class="project-info"><span class="project-cat">${cmsEscapeHtml(item.label || '')}</span><h3>${cmsEscapeHtml(item.title || '')}</h3></div>
+  </div>`).join('');
+}
+
+function cmsRenderTour(items) {
+  const grid = document.querySelector('.tour-grid');
+  if (!grid || !Array.isArray(items)) return;
+  grid.innerHTML = items.map((item, index) => `<article class="tour-card reveal">
+    <div class="tour-card-number">${String(index + 1).padStart(2, '0')}</div>
+    <div class="tour-icon">${cmsEscapeHtml(item.icon || '✦')}</div>
+    <h3>${cmsEscapeHtml(item.title || '')}</h3>
+    <p>${cmsEscapeHtml(item.description || '')}</p>
+    <a href="#contact" class="tour-link" data-tour="${cmsEscapeHtml(item.title || '')}">Konsultasi ${cmsEscapeHtml(item.title || 'Layanan')} →</a>
+  </article>`).join('');
+}
+
+function applyMajuAbadiCms(data) {
+  if (!data || !data.ok) return;
+  const settings = data.settings || {};
+  const setText = (selector, value) => {
+    const element = document.querySelector(selector);
+    if (element && value != null && value !== '') element.textContent = value;
+  };
+
+  const badge = document.querySelector('.hero-badge');
+  if (badge && settings.heroBadge) badge.innerHTML = `<span class="badge-dot"></span>${cmsEscapeHtml(settings.heroBadge)}`;
+
+  const heroTitle = document.querySelector('.hero-title');
+  if (heroTitle) {
+    const lines = [settings.heroLine1, settings.heroLine2, settings.heroLine3].filter(Boolean);
+    if (lines.length) heroTitle.innerHTML = lines.map((line, index) => `<span class="title-line ${index === 1 ? 'title-accent' : ''}">${cmsEscapeHtml(line)}</span>`).join('');
+  }
+  setText('.hero-subtitle', settings.heroSubtitle);
+
+  cmsSetHighlightedTitle(document.querySelector('#about .about-content .section-title'), settings.aboutTitle);
+  ['aboutParagraph1', 'aboutParagraph2', 'aboutParagraph3'].forEach((key, index) => {
+    const paragraph = document.querySelectorAll('#about .about-desc')[index];
+    if (paragraph && settings[key]) paragraph.textContent = settings[key];
+  });
+
+  const stats = [
+    ['statProjects', 'statLabelProjects'], ['statYears', 'statLabelYears'],
+    ['statSatisfaction', 'statLabelSatisfaction'], ['statTeam', 'statLabelTeam']
+  ];
+  document.querySelectorAll('.hero-stats-bar .stat-item').forEach((item, index) => {
+    const pair = stats[index];
+    if (!pair) return;
+    const number = item.querySelector('[data-count]');
+    const label = item.querySelector('.stat-label');
+    if (number && settings[pair[0]] !== undefined) {
+      number.dataset.count = String(Math.max(0, Number(settings[pair[0]]) || 0));
+      number.textContent = '0';
+    }
+    if (label && settings[pair[1]]) label.textContent = settings[pair[1]];
+  });
+
+  cmsSetHighlightedTitle(document.querySelector('#plts .plts-intro .section-title'), settings.pltsTitle);
+  setText('#plts .plts-intro .section-desc', settings.pltsDescription);
+
+  setText('#tour-travel .tour-badge', settings.tourBadge);
+  cmsSetHighlightedTitle(document.querySelector('#tour-travel .section-header .section-title'), settings.tourTitle);
+  setText('#tour-travel .section-header .section-desc', settings.tourDescription);
+  setText('#tour-travel .tour-intro h3', settings.tourIntroTitle);
+  setText('#tour-travel .tour-intro p', settings.tourIntroDescription);
+  setText('#projects .section-header .section-desc', settings.projectsDescription);
+
+  cmsSetHighlightedTitle(document.querySelector('#contact .contact-info .section-title'), settings.contactTitle);
+  setText('#contact .contact-desc', settings.contactDescription);
+  setText('#contact .contact-item:first-child p', settings.contactAddress);
+  const phoneLink = document.querySelector('#contact .contact-item:nth-child(2) a');
+  const footerPhone = document.querySelector('.footer-contact-col > a[href^="https://wa.me/"]');
+  const whatsapp = String(settings.contactWhatsapp || '').replace(/[^0-9]/g, '');
+  if (whatsapp && phoneLink) {
+    phoneLink.href = `https://wa.me/${whatsapp}`;
+    phoneLink.textContent = settings.contactWhatsappLabel || ('+' + whatsapp);
+  }
+  if (whatsapp && footerPhone) {
+    footerPhone.href = `https://wa.me/${whatsapp}`;
+    footerPhone.textContent = '💬 ' + (settings.contactWhatsappLabel || ('+' + whatsapp));
+  }
+  const emailLink = document.querySelector('#contact .contact-item:last-child a');
+  const footerEmail = document.querySelector('.footer-contact-col a[href^="mailto:"]');
+  if (settings.contactEmail && emailLink) {
+    emailLink.href = 'mailto:' + settings.contactEmail;
+    emailLink.textContent = settings.contactEmail;
+  }
+  if (settings.contactEmail && footerEmail) {
+    footerEmail.href = 'mailto:' + settings.contactEmail;
+    footerEmail.textContent = '✉ ' + settings.contactEmail;
+  }
+
+  cmsRenderServices(data.services || []);
+  cmsRenderProjects(data.projects || []);
+  cmsRenderTour(data.tour || []);
+}
+
+async function loadMajuAbadiCms() {
+  const endpoint = window.MA_CMS_CONFIG && window.MA_CMS_CONFIG.webAppUrl;
+  if (!endpoint || !/^https:\/\//i.test(endpoint)) return;
+  return new Promise(resolve => {
+    const callbackName = '__maCmsCallback_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+    const script = document.createElement('script');
+    let finished = false;
+    const cleanup = () => {
+      if (finished) return;
+      finished = true;
+      delete window[callbackName];
+      script.remove();
+    };
+    const timer = window.setTimeout(() => {
+      cleanup();
+      console.warn('CMS tidak merespons. Website menggunakan konten bawaan.');
+      resolve();
+    }, 10000);
+    window[callbackName] = data => {
+      window.clearTimeout(timer);
+      try {
+        if (data && data.ok) applyMajuAbadiCms(data);
+      } catch (error) {
+        console.warn('Konten CMS tidak dapat diterapkan:', error);
+      }
+      cleanup();
+      resolve();
+    };
+    script.onerror = () => {
+      window.clearTimeout(timer);
+      cleanup();
+      console.warn('CMS belum dapat dimuat. Website menggunakan konten bawaan.');
+      resolve();
+    };
+    const separator = endpoint.includes('?') ? '&' : '?';
+    script.src = endpoint + separator + 'action=content&callback=' + encodeURIComponent(callbackName) + '&t=' + Date.now();
+    document.head.appendChild(script);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadMajuAbadiCms();
   const particleContainer = document.getElementById('particles');
   if (particleContainer) {
     for (let i = 0; i < 30; i++) {
