@@ -20,5 +20,5 @@
  * dan password tidak pernah disimpan di file ini.
  */
 window.MA_CMS_CONFIG = {
-  webAppUrl: ''
+  webAppUrl: 'https://script.google.com/macros/s/AKfycbwZ9Sl0K0UBm5iufnzOCTT3zAeyluA9dx1i1YNbpRobJMrGnHgOwyPYC0JggZZKZqUOlg/exec'
 };
