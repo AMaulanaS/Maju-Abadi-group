@@ -15,18 +15,23 @@
     <div class="eyebrow">Administrator Area</div>
     <h1>Kelola Landing Page</h1>
     <p>Masuk ke panel admin untuk memperbarui informasi perusahaan, layanan, portofolio proyek, serta konten Tour & Travel.</p>
-    <a class="button" id="openAdmin" href="Admin_website/admin.html" hidden>Buka Panel Admin →</a>
-    <div class="setup" id="setupMessage">Panel admin belum dihubungkan. Admin perlu menempelkan URL Web App Google Apps Script ke bagian <code>webAppUrl</code> pada file <code>cms-config.js</code>, lalu memperbarui website.</div>
+    <a class="button" id="openAdmin" href="Admin%20Website/Admin.html">Buka Panel Admin →</a>
+    <p style="margin:14px 0 0;font-size:12px"><a id="openAdminAlt" href="#" hidden style="color:#1d5f9e">Alternatif: buka lewat Google Apps Script</a></p>
+    <div class="setup" id="setupMessage">Panel admin belum dihubungkan. Admin perlu menempelkan URL Web App Google Apps Script ke bagian <code>webAppUrl</code> pada file <code>cms-config.js</code>, lalu memperbarui website. Halaman login tetap dapat dibuka dan akan menampilkan status koneksinya.</div>
   </main>
   <script src="cms-config.js"></script>
   <script>
     const endpoint = window.MA_CMS_CONFIG && window.MA_CMS_CONFIG.webAppUrl;
-    if (endpoint && /^https:\/\//i.test(endpoint)) {
-      const url = new URL(endpoint);
+    // Hanya URL Web App Google Apps Script berakhiran /exec yang dianggap valid.
+    const validEndpoint = typeof endpoint === 'string' && /^https:\/\/script\.google\.com\/.+\/exec(?:\?.*)?$/i.test(endpoint.trim());
+    if (validEndpoint) {
+      const url = new URL(endpoint.trim());
       url.searchParams.set('page', 'admin');
-      document.getElementById('openAdmin').href = url.toString();
-      document.getElementById('openAdmin').hidden = false;
-      document.getElementById('setupMessage').textContent = 'Login menggunakan password admin yang telah dibuat melalui Google Apps Script.';
+      document.getElementById('openAdminAlt').href = url.toString();
+      document.getElementById('openAdminAlt').hidden = false;
+      document.getElementById('setupMessage').textContent = 'Perubahan yang disimpan di panel admin langsung tersinkron ke Google Sheet CMS. Login menggunakan password admin yang dibuat melalui Google Apps Script.';
+    } else if (endpoint) {
+      document.getElementById('setupMessage').textContent = 'URL pada cms-config.js tidak valid. Gunakan URL Web App dari Apps Script yang diawali https://script.google.com/ dan berakhiran /exec (bukan /dev).';
     }
   </script>
 </body>

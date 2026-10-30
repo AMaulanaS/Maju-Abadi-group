@@ -1,50 +1,61 @@
 # Admin Landing Page — Maju Abadi Group
 
-Fitur ini menambahkan panel untuk mengelola konten landing page tanpa mengedit HTML setiap kali. Data tersimpan di Google Sheets melalui Google Apps Script.
+Panel untuk mengelola konten landing page tanpa mengedit HTML. Semua data disimpan di **Google Sheets** melalui **Google Apps Script**.
 
-## Yang bisa dikelola
+## Cara kerja
 
-- Teks beranda dan Tentang Kami.
-- Statistik beranda.
-- Deskripsi PLTS Residensial.
-- Konten pengantar Tour & Travel.
-- Daftar layanan: tambah, ubah, sembunyikan, atau hapus.
-- Portofolio proyek: tambah, ubah, sembunyikan, hapus, kategori, dan foto.
-- Kartu Tour & Travel: tambah, ubah, sembunyikan, atau hapus.
-- Informasi alamat, WhatsApp, dan email.
+```
+Admin.html  ──(POST /exec)──►  Code.gs (Apps Script Web App)  ◄──►  Google Sheet "Maju Abadi Group - Website CMS"
+                                          ▲
+index.html + script.js ──(GET ?action=content)──┘   (website publik membaca dari sini)
+```
 
-Foto portofolio dapat diunggah dari perangkat melalui panel admin (maksimal 6 MB per foto). Foto akan disimpan di Google Drive pemilik Apps Script dan dibagikan dengan tautan publik agar dapat tampil di website.
+Panel admin kini bisa dibuka dengan **dua cara**, keduanya menyimpan ke Sheet yang sama:
 
-## Setup pertama kali
+1. **Dari website** (disarankan): `https://majuabadigroup.com/admin.html` → *Buka Panel Admin* (membuka `Admin Website/Admin.html` dan terhubung langsung ke Web App).
+2. **Dari Google Apps Script** (cara lama): `URL_WEB_APP/exec?page=admin`. Memerlukan file `Admin` ditempel juga di project Apps Script.
 
-> Admin CMS membutuhkan Google Apps Script dan Google Sheets. Bagian ini perlu dilakukan satu kali oleh pemilik/admin website sebelum panel dapat digunakan.
+Di halaman login ada baris status koneksi. Jika tertulis **“✓ Terhubung ke Google Sheet CMS”**, sinkronisasi siap dipakai.
 
-1. Buka **https://script.google.com/** menggunakan akun Google perusahaan/pengelola website.
-2. Buat project baru, misalnya **Maju Abadi Website CMS**.
-3. Ganti isi file `Code.gs` dengan isi file `Admin Website/Code.gs` dari folder project ini.
-4. Tambahkan file HTML baru bernama **Admin**, lalu salin seluruh isi `Admin Website/Admin.html` ke file tersebut.
-5. Di fungsi `initializeAdminPassword()` pada `Code.gs`, ganti teks `GANTI_DENGAN_PASSWORD_KUAT_MINIMAL_16_KARAKTER` dengan password kuat minimal 16 karakter. Jalankan fungsi **initializeAdminPassword** dari editor Apps Script dan setujui izin yang diminta. Setelah sukses, kembalikan string di kode ke placeholder semula lalu simpan. Hash dan salt password tetap tersimpan di Script Properties; password asli tidak diperlukan lagi.
-6. Jalankan fungsi **initializeCms** satu kali. Fungsi ini membuat spreadsheet **Maju Abadi Group - Website CMS** dan mengisi konten awal. Simpan URL spreadsheet yang tercetak di log untuk pengelolaan cadangan bila dibutuhkan.
-7. Klik **Deploy → New deployment → Web app**. Pilih **Execute as: Me** dan **Who has access: Anyone**. Deploy, lalu salin URL Web App yang berakhiran `/exec`.
-8. Buka file `cms-config.js` di folder utama website. Isi `webAppUrl` dengan URL Web App tadi, tanpa menambahkan `?page=admin` atau `?action=content`.
-9. Simpan perubahan ke repository GitHub dan tunggu GitHub Pages selesai memperbarui website.
-10. Buka `https://majuabadigroup.com/admin.html`, tekan **Buka Panel Admin**, lalu login menggunakan password yang disiapkan pada langkah 5.
+## Setup / update (satu kali, atau setiap `Code.gs` berubah)
+
+1. Buka **https://script.google.com/** dengan akun Google pengelola website, lalu buka project **Maju Abadi Website CMS** (atau buat baru).
+2. Ganti seluruh isi `Code.gs` dengan isi file `Admin Website/Code.gs`.
+3. *(Opsional, hanya untuk cara 2)* tambahkan file HTML bernama **Admin** berisi `Admin Website/Admin.html`.
+4. **Password admin** — hanya bila belum pernah dibuat atau ingin diganti:
+   - Di fungsi `initializeAdminPassword()`, ganti teks `GANTI_DENGAN_PASSWORD_KUAT_MINIMAL_16_KARAKTER` dengan password baru (minimal 16 karakter).
+   - Jalankan fungsi **initializeAdminPassword**, setujui izin.
+   - **Kembalikan** teks ke placeholder semula dan simpan. Jangan pernah menyimpan password asli di `Code.gs` yang masuk ke repository.
+5. Jalankan fungsi **diagnoseCms** dan lihat *Execution log*. Semua baris harus berstatus SIAP. (Spreadsheet CMS juga dibuat otomatis saat login admin pertama bila belum ada.)
+6. **Deploy → Manage deployments → ikon pensil → Version: New version → Deploy.** Pengaturan: *Execute as: Me*, *Who has access: Anyone*. Langkah ini wajib setiap kali kode berubah; tanpa itu URL `/exec` masih menjalankan kode lama.
+7. Pastikan file **`cms-config.js` ada di folder utama** (sejajar dengan `index.html` dan `admin.html`) dan `webAppUrl` di dalamnya berisi URL Web App yang diawali `https://script.google.com/` dan berakhiran `/exec` (bukan `/dev`). Tanpa file ini panel admin tidak tahu ke mana harus terhubung, dan login tidak akan berfungsi.
+8. Commit ke GitHub dan tunggu GitHub Pages selesai diperbarui. File lama `Code.gs_20-_20perbaikan.gs` boleh dihapus; gantinya `Code.gs`.
 
 ## Penggunaan
 
-- Buka menu **Konten Utama**, **Layanan**, **Portofolio Proyek**, atau **Tour & Travel**.
-- Isi atau ubah konten yang diperlukan.
-- Untuk foto proyek, pilih file gambar lalu tekan **Upload Foto**. URL gambar akan terisi otomatis.
-- Klik **Simpan Semua Perubahan**. Website akan memuat konten terbaru saat pengunjung membuka atau memuat ulang halaman.
-- Jika hanya ingin menyembunyikan sebuah kartu, hilangkan centang **Tampilkan di website**. Kartu tidak dihapus dari daftar admin.
+- Pilih menu **Konten Utama**, **Layanan**, **Portofolio Proyek**, atau **Tour & Travel**, ubah isinya, lalu klik **Simpan Semua Perubahan**.
+- Tombol **Buka Google Sheet** di pojok kanan atas membuka spreadsheet-nya untuk memeriksa data tersimpan.
+- Website membaca konten terbaru saat halaman dimuat ulang (cache maksimal 60 detik).
+- Menyembunyikan kartu: hilangkan centang **Tampilkan di website**.
+- Foto proyek: pilih file → **Upload Foto** (maks. 6 MB). File tersimpan di folder Drive **Maju Abadi Website Media**; jangan dihapus.
+- Batas: 60 layanan, 100 proyek, 60 konten Tour & Travel.
 
-## Catatan keamanan dan operasional
+## Jika belum sinkron — cek pesan di halaman login
 
-- Password hanya disimpan sebagai hash + salt di Script Properties, bukan di HTML/JavaScript publik.
-- Endpoint publik hanya menyediakan konten yang aktif. Fungsi simpan dan upload memerlukan token sesi admin yang dibuat setelah login.
-- Setelah beberapa percobaan login yang salah, login akan dikunci sementara.
-- Jangan membagikan password admin. Gunakan akun Google yang dikelola perusahaan sebagai pemilik Apps Script dan Google Drive media.
-- Setelah upload gambar, jangan menghapus file di folder Drive **Maju Abadi Website Media**, karena website menggunakan file tersebut.
-- Jika ingin mengubah password, edit fungsi `initializeAdminPassword()` dengan password baru, jalankan ulang, lalu kembalikan placeholder seperti langkah setup.
-- Perubahan teks, layanan, proyek, dan Tour & Travel tidak memerlukan edit kode atau deployment ulang. Perubahan pada kode Apps Script sendiri memerlukan deployment versi baru.
-- Jika CMS belum dihubungkan atau sedang tidak tersedia, landing page tetap menggunakan konten bawaan yang tersimpan di `index.html`.
+| Pesan | Penyebab | Solusi |
+|---|---|---|
+| URL Web App belum diisi | File `cms-config.js` tidak ada di folder utama, atau `webAppUrl` kosong | Buat/isi file tersebut dengan URL `/exec`, commit, lalu klik **Periksa ulang koneksi** |
+| URL Web App pada cms-config.js tidak valid | URL bukan dari `script.google.com`, berakhiran `/dev`, atau URL editor | Salin ulang "Web app URL" dari Manage deployments (berakhiran `/exec`) |
+| Web App masih memakai kode lama | `Code.gs` baru belum di-deploy | Langkah 2 dan 6 di atas |
+| Password admin belum disiapkan | `initializeAdminPassword()` belum dijalankan | Langkah 4 |
+| Tidak dapat menghubungi Web App | Akses bukan *Anyone*, atau URL salah | Deploy ulang dengan *Who has access: Anyone* |
+| Sesi admin tidak valid | Sesi berakhir (6 jam) | Login kembali |
+| Terlalu banyak percobaan | 8 kali salah password | Tunggu ±15 menit |
+
+## Keamanan
+
+- Password hanya disimpan sebagai hash + salt di Script Properties, tidak ada di HTML/JavaScript publik.
+- Workflow GitHub Pages mengunggah **seluruh repository**, termasuk `Code.gs`. Karena itu `Code.gs` tidak boleh berisi password asli.
+- Jika password pernah tertulis di `Code.gs` yang sudah di-commit, anggap password itu sudah bocor: buat password baru (langkah 4) dan, bila repository publik, pertimbangkan membersihkan riwayat Git.
+- Endpoint publik hanya mengirim konten aktif. Simpan dan upload memerlukan token sesi yang dibuat setelah login.
+- Jika CMS tidak tersedia, landing page tetap memakai konten bawaan di `index.html`.
