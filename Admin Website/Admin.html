@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Admin Website | Maju Abadi Group</title>
+  <style>
+    :root{--navy:#10233f;--blue:#1d5f9e;--gold:#d8a63b;--ink:#172638;--muted:#6b7888;--line:#e3e9f0;--bg:#f3f6fa;--white:#fff;--green:#16845b;--red:#bd3b46;--shadow:0 12px 34px rgba(16,35,63,.08)}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 Inter,Arial,sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer}.shell{max-width:1240px;margin:auto;padding:28px 22px 56px}.top{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:24px}.brand{display:flex;align-items:center;gap:13px}.brand-mark{width:46px;height:46px;border-radius:13px;background:var(--navy);display:grid;place-items:center;color:#fff;font-weight:900;letter-spacing:-1px}.brand h1{font-size:19px;line-height:1.2;margin:0;color:var(--navy)}.brand p{margin:3px 0 0;color:var(--muted);font-size:12px}.top-actions{display:flex;gap:10px;align-items:center}.pill{border:1px solid var(--line);padding:7px 11px;border-radius:30px;color:var(--muted);font-size:12px;background:#fff}.btn{border:0;border-radius:9px;padding:10px 15px;font-weight:700;background:var(--blue);color:white}.btn:hover{filter:brightness(1.06)}.btn.secondary{background:#eaf0f6;color:var(--navy)}.btn.danger{background:#fff0f0;color:var(--red)}.btn.small{padding:7px 10px;font-size:12px}.panel{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}.login-wrap{max-width:440px;margin:8vh auto}.login-card{padding:30px}.login-card h2{margin:0 0 6px;color:var(--navy);font-size:23px}.muted{color:var(--muted)}.field{display:flex;flex-direction:column;gap:6px;margin:0 0 14px}.field label{font-size:12px;font-weight:750;color:#435267}.field input,.field textarea,.field select,.item-editor input,.item-editor textarea,.item-editor select{width:100%;border:1px solid #dbe3eb;border-radius:8px;background:#fff;padding:10px 11px;color:var(--ink);outline:none}.field textarea,.item-editor textarea{min-height:78px;resize:vertical}.field input:focus,.field textarea:focus,.field select:focus,.item-editor input:focus,.item-editor textarea:focus,.item-editor select:focus{border-color:#6b9cc9;box-shadow:0 0 0 3px rgba(29,95,158,.1)}.help{font-size:11px;color:var(--muted)}.status{min-height:22px;font-size:12px;margin-top:10px;color:var(--muted)}.status.error{color:var(--red)}.status.success{color:var(--green)}.dashboard[hidden],.login-wrap[hidden]{display:none!important}.tabs{display:flex;gap:8px;overflow:auto;padding:8px;margin-bottom:16px;background:#e9eef4;border-radius:12px}.tab{white-space:nowrap;border:0;background:transparent;color:#5b6b7c;font-weight:700;padding:10px 14px;border-radius:8px}.tab.active{background:#fff;color:var(--navy);box-shadow:0 2px 8px rgba(16,35,63,.08)}.view[hidden]{display:none!important}.view-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:18px}.view-head h2{margin:0;color:var(--navy);font-size:21px}.view-head p{margin:5px 0 0;color:var(--muted)}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 18px;padding:22px}.form-grid .full{grid-column:1/-1}.section-label{font-size:13px;font-weight:800;color:var(--navy);padding:16px 22px 0}.savebar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 22px;border-top:1px solid var(--line)}.items-list{display:grid;gap:13px}.item-editor{padding:17px;border:1px solid var(--line);border-radius:13px;background:#fff}.item-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.item-top strong{color:var(--navy)}.item-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.item-fields .full{grid-column:1/-1}.item-field{display:flex;flex-direction:column;gap:5px}.item-field label{font-size:11px;color:#58697c;font-weight:750}.checks{display:flex;align-items:center;gap:17px;flex-wrap:wrap;margin-top:10px}.check{display:flex;align-items:center;gap:7px;color:#536274;font-size:12px}.check input{width:auto}.upload-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.upload-row input[type=file]{font-size:11px;padding:6px;max-width:100%}.empty{border:1px dashed #cbd5e0;border-radius:12px;padding:24px;text-align:center;color:var(--muted)}.sticky-save{position:sticky;bottom:12px;display:flex;justify-content:flex-end;margin-top:18px;pointer-events:none}.sticky-save .btn{pointer-events:auto;box-shadow:0 8px 22px rgba(16,35,63,.22);padding:12px 20px}.note{margin-top:16px;padding:12px 14px;border-radius:10px;background:#f7f9fc;border:1px solid var(--line);font-size:12px;color:#5c6a79}.login-foot{margin-top:20px;font-size:11px;text-align:center;color:#8290a0}
+    @media(max-width:760px){.shell{padding:18px 13px 42px}.top{align-items:flex-start}.top-actions{flex-direction:column;align-items:flex-end}.brand h1{font-size:16px}.form-grid,.item-fields{grid-template-columns:1fr}.form-grid .full,.item-fields .full{grid-column:auto}.view-head{flex-direction:column}.pill{display:none}.login-wrap{margin:5vh auto}.login-card{padding:22px}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="top">
+      <div class="brand"><div class="brand-mark">MA</div><div><h1>Website Admin</h1><p>Maju Abadi Group · Content Management</p></div></div>
+      <div class="top-actions"><span class="pill">Panel pengelola konten</span><a class="btn secondary small" id="sheetLink" href="#" target="_blank" rel="noopener" hidden style="text-decoration:none">Buka Google Sheet</a><button class="btn secondary small" id="logoutBtn" hidden>Keluar</button></div>
+    </header>
+
+    <section class="login-wrap" id="loginWrap">
+      <div class="panel login-card">
+        <h2>Masuk Admin</h2>
+        <p class="muted" style="margin:0 0 22px">Kelola informasi, layanan, portofolio proyek, dan konten Tour & Travel Maju Abadi Group.</p>
+        <form id="loginForm">
+          <div class="field"><label for="adminPassword">Password admin</label><input id="adminPassword" type="password" autocomplete="current-password" required placeholder="Masukkan password admin"></div>
+          <button class="btn" type="submit" style="width:100%">Masuk ke Dashboard</button>
+        </form>
+        <div class="status" id="connStatus" role="status" aria-live="polite"></div>
+        <button class="btn secondary small" type="button" id="retryConn" hidden style="margin-top:8px">Periksa ulang koneksi</button>
+        <div class="status" id="loginStatus" role="status"></div>
+        <div class="login-foot">Akses dilindungi autentikasi server-side. Jangan bagikan password kepada pihak lain.</div>
+      </div>
+    </section>
+
+    <section class="dashboard" id="dashboard" hidden>
+      <nav class="tabs" aria-label="Menu admin">
+        <button class="tab active" data-view="site">Konten Utama</button>
+        <button class="tab" data-view="services">Layanan</button>
+        <button class="tab" data-view="projects">Portofolio Proyek</button>
+        <button class="tab" data-view="tour">Tour & Travel</button>
+      </nav>
+
+      <section class="view" id="view-site">
+        <div class="view-head"><div><h2>Konten Utama Website</h2><p>Ubah teks pada beranda, tentang kami, statistik, PLTS, dan kontak.</p></div></div>
+        <form class="panel" id="settingsForm">
+          <div class="section-label">Beranda</div>
+          <div class="form-grid">
+            <div class="field"><label>Badge beranda</label><input name="heroBadge" data-setting value=""></div>
+            <div class="field"><label>Judul baris 1</label><input name="heroLine1" data-setting value=""></div>
+            <div class="field"><label>Judul baris 2</label><input name="heroLine2" data-setting value=""></div>
+            <div class="field"><label>Judul baris 3</label><input name="heroLine3" data-setting value=""></div>
+            <div class="field full"><label>Subjudul beranda</label><textarea name="heroSubtitle" data-setting></textarea></div>
+          </div>
+          <div class="section-label">Tentang Kami</div>
+          <div class="form-grid">
+            <div class="field full"><label>Judul (pisahkan bagian berwarna dengan tanda |)</label><input name="aboutTitle" data-setting></div>
+            <div class="field full"><label>Paragraf 1</label><textarea name="aboutParagraph1" data-setting></textarea></div>
+            <div class="field full"><label>Paragraf 2</label><textarea name="aboutParagraph2" data-setting></textarea></div>
+            <div class="field full"><label>Paragraf 3</label><textarea name="aboutParagraph3" data-setting></textarea></div>
+          </div>
+          <div class="section-label">Statistik Beranda</div>
+          <div class="form-grid">
+            <div class="field"><label>Jumlah proyek</label><input name="statProjects" data-setting type="number" min="0"></div>
+            <div class="field"><label>Tahun pengalaman</label><input name="statYears" data-setting type="number" min="0"></div>
+            <div class="field"><label>Persentase klien puas</label><input name="statSatisfaction" data-setting type="number" min="0" max="100"></div>
+            <div class="field"><label>Jumlah tim profesional</label><input name="statTeam" data-setting type="number" min="0"></div>
+            <div class="field"><label>Label proyek</label><input name="statLabelProjects" data-setting></div>
+            <div class="field"><label>Label pengalaman</label><input name="statLabelYears" data-setting></div>
+            <div class="field"><label>Label kepuasan</label><input name="statLabelSatisfaction" data-setting></div>
+            <div class="field"><label>Label tim</label><input name="statLabelTeam" data-setting></div>
+          </div>
+          <div class="section-label">PLTS Residensial</div>
+          <div class="form-grid">
+            <div class="field full"><label>Judul PLTS (pisahkan bagian berwarna dengan |)</label><input name="pltsTitle" data-setting></div>
+            <div class="field full"><label>Deskripsi PLTS</label><textarea name="pltsDescription" data-setting></textarea></div>
+          </div>
+          <div class="section-label">Tour & Travel</div>
+          <div class="form-grid">
+            <div class="field"><label>Badge Tour & Travel</label><input name="tourBadge" data-setting></div>
+            <div class="field"><label>Judul Tour & Travel (gunakan | untuk bagian berwarna)</label><input name="tourTitle" data-setting></div>
+            <div class="field full"><label>Deskripsi bagian Tour & Travel</label><textarea name="tourDescription" data-setting></textarea></div>
+            <div class="field full"><label>Judul pengantar</label><input name="tourIntroTitle" data-setting></div>
+            <div class="field full"><label>Deskripsi pengantar</label><textarea name="tourIntroDescription" data-setting></textarea></div>
+          </div>
+          <div class="section-label">Portofolio dan Kontak</div>
+          <div class="form-grid">
+            <div class="field full"><label>Deskripsi pengantar portofolio</label><textarea name="projectsDescription" data-setting></textarea></div>
+            <div class="field"><label>Judul kontak (gunakan | untuk bagian berwarna)</label><input name="contactTitle" data-setting></div>
+            <div class="field"><label>Nomor WhatsApp (format internasional tanpa +)</label><input name="contactWhatsapp" data-setting placeholder="6285100511753"></div>
+            <div class="field full"><label>Deskripsi kontak</label><textarea name="contactDescription" data-setting></textarea></div>
+            <div class="field full"><label>Alamat kantor</label><input name="contactAddress" data-setting></div>
+            <div class="field"><label>Tampilan nomor WhatsApp</label><input name="contactWhatsappLabel" data-setting></div>
+            <div class="field"><label>Email</label><input name="contactEmail" data-setting type="email"></div>
+          </div>
+          <div class="savebar"><span class="help">Perubahan teks akan muncul setelah website memuat ulang konten.</span><button class="btn" type="submit">Simpan Konten Utama</button></div>
+        </form>
+      </section>
+
+      <section class="view" id="view-services" hidden>
+        <div class="view-head"><div><h2>Daftar Layanan</h2><p>Tambah, ubah, sembunyikan, atau hapus kartu layanan.</p></div><button class="btn" id="addService">+ Tambah Layanan</button></div>
+        <div class="items-list" id="servicesList"></div>
+      </section>
+
+      <section class="view" id="view-projects" hidden>
+        <div class="view-head"><div><h2>Portofolio Proyek</h2><p>Masukkan nama proyek, kategori, dan foto dokumentasi untuk ditampilkan di landing page.</p></div><button class="btn" id="addProject">+ Tambah Proyek</button></div>
+        <div class="items-list" id="projectsList"></div>
+        <div class="note">Foto dapat diunggah langsung dari perangkat (maksimal 6 MB; JPG, PNG, WEBP, atau GIF). File tersimpan di Google Drive pemilik Apps Script dan otomatis dibagikan dengan tautan publik agar dapat tampil di website.</div>
+      </section>
+
+      <section class="view" id="view-tour" hidden>
+        <div class="view-head"><div><h2>Konten Tour & Travel</h2><p>Kelola kartu paket wisata, transportasi, dan layanan perjalanan.</p></div><button class="btn" id="addTour">+ Tambah Konten</button></div>
+        <div class="items-list" id="tourList"></div>
+      </section>
+
+      <div class="sticky-save"><button class="btn" id="saveAllBtn">Simpan Semua Perubahan</button></div>
+      <div class="status" id="saveStatus" role="status" aria-live="polite"></div>
+      <div class="note">Tips: centang “Tampilkan di website” agar konten terlihat. Untuk menyembunyikan tanpa menghapus, hilangkan centang tersebut. Maksimal 60 layanan, 100 proyek, dan 60 konten Tour & Travel.</div>
+    </section>
+  </main>
+
+  <script>
+    let sessionToken = '';
+    let currentData = { settings: {}, services: [], projects: [], tour: [] };
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+
+    function escapeHtml(value) {
+      return String(value == null ? '' : value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+    }
+    function showStatus(element, message, type) {
+      element.textContent = message || '';
+      element.className = 'status' + (type ? ' ' + type : '');
+    }
+    // Dua cara terhubung ke Google Sheet:
+    //  1) Dibuka dari Google Apps Script (/exec?page=admin)  -> google.script.run
+    //  2) Dibuka dari GitHub Pages / domain sendiri          -> POST langsung ke Web App
+    const appsScriptBridgeAvailable = !!(
+      window.google && window.google.script && window.google.script.run
+    );
+    const REQUIRED_API_VERSION = 2;
+    let webAppUrl = '';
+
+    const ACTION_MAP = {
+      loginAdmin: args => ({ action: 'login', password: args[0] }),
+      logoutAdmin: args => ({ action: 'logout', token: args[0] }),
+      getAdminContent: args => ({ action: 'getAdminContent', token: args[0] }),
+      saveAdminContent: args => ({ action: 'saveAdminContent', token: args[0], payload: args[1] }),
+      uploadImage: args => ({ action: 'uploadImage', token: args[0], fileName: args[1], mimeType: args[2], dataUrl: args[3] })
+    };
+
+    function loadScript(src) {
+      return new Promise(resolve => {
+        const el = document.createElement('script');
+        el.src = src;
+        el.onload = () => resolve(true);
+        el.onerror = () => { el.remove(); resolve(false); };
+        document.head.appendChild(el);
+      });
+    }
+
+    // Hanya URL Web App Google Apps Script yang berakhiran /exec yang diterima. Ini mencegah password
+    // terkirim ke alamat lain dan mendeteksi kesalahan umum (memakai URL editor atau URL /dev).
+    function isValidWebAppUrl(url) {
+      return typeof url === 'string' && /^https:\/\/script\.google\.com\/.+\/exec(?:\?.*)?$/i.test(url.trim());
+    }
+
+    async function resolveWebAppUrl() {
+      // cms-config.js ada di folder utama website (satu tingkat di atas "Admin Website/").
+      let rejected = '';
+      for (const path of ['../cms-config.js', 'cms-config.js']) {
+        window.MA_CMS_CONFIG = undefined;
+        await loadScript(path + '?t=' + Date.now());
+        const url = window.MA_CMS_CONFIG && window.MA_CMS_CONFIG.webAppUrl;
+        if (isValidWebAppUrl(url)) return { url: url.trim(), rejected: '' };
+        if (url) rejected = String(url);
+      }
+      return { url: '', rejected };
+    }
+
+    function postToWebApp(body) {
+      return fetch(webAppUrl, {
+        method: 'POST',
+        // text/plain = "simple request": tidak memicu preflight CORS yang tidak didukung Apps Script.
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(body),
+        cache: 'no-store',
+        redirect: 'follow'
+      }).catch(() => {
+        throw new Error('Tidak dapat menghubungi Google Apps Script. Periksa koneksi internet, lalu pastikan Web App di-deploy dengan akses "Anyone" dan versi terbaru.');
+      }).then(async response => {
+        let data;
+        try { data = await response.json(); } catch (error) {
+          throw new Error('Server tidak mengembalikan data yang benar. Pastikan URL pada cms-config.js adalah URL Web App berakhiran /exec dan sudah di-deploy ulang dengan versi terbaru.');
+        }
+        if (data && data.ok === false) throw new Error(data.message || 'Permintaan gagal.');
+        return data;
+      });
+    }
+
+    function serverCall(method, ...args) {
+      if (appsScriptBridgeAvailable) {
+        return new Promise((resolve, reject) => {
+          google.script.run
+            .withSuccessHandler(resolve)
+            .withFailureHandler(error => reject(new Error(error && error.message ? error.message : String(error))))[method](...args);
+        });
+      }
+      if (!webAppUrl) {
+        return Promise.reject(new Error('URL Web App belum diisi. Isi webAppUrl pada file cms-config.js dengan URL Web App Google Apps Script (berakhiran /exec), lalu simpan dan muat ulang halaman ini.'));
+      }
+      if (!ACTION_MAP[method]) return Promise.reject(new Error('Aksi tidak dikenal: ' + method));
+      return postToWebApp(ACTION_MAP[method](args));
+    }
+
+    // Cek koneksi sejak awal agar penyebab "belum sinkron" langsung terlihat.
+    // Mengembalikan true bila Web App siap dipakai login. Tombol login TIDAK dikunci permanen:
+    // bila ada masalah, pesan tampil dan pengguna bisa memperbaikinya lalu mencoba lagi.
+    let connectionReady = false;
+
+    async function checkConnection() {
+      const statusBox = $('#connStatus');
+      const retryButton = $('#retryConn');
+      const fail = message => {
+        connectionReady = false;
+        showStatus(statusBox, message, 'error');
+        retryButton.hidden = false;
+        return false;
+      };
+      retryButton.hidden = true;
+      connectionReady = false;
+
+      if (appsScriptBridgeAvailable) {
+        connectionReady = true;
+        showStatus(statusBox, 'Terhubung melalui Google Apps Script.', 'success');
+        return true;
+      }
+
+      showStatus(statusBox, 'Memeriksa koneksi ke Google Sheet...', '');
+      const resolved = await resolveWebAppUrl();
+      webAppUrl = resolved.url;
+      if (!webAppUrl) {
+        return fail(resolved.rejected
+          ? 'URL Web App pada cms-config.js tidak valid. Gunakan URL "Web app" dari Deploy → Manage deployments: harus diawali https://script.google.com/ dan berakhiran /exec (bukan /dev).'
+          : 'URL Web App belum diisi. Isi webAppUrl pada cms-config.js (folder utama website), simpan, commit, tunggu GitHub Pages selesai, lalu klik "Periksa ulang koneksi".');
+      }
+
+      try {
+        const separator = webAppUrl.includes('?') ? '&' : '?';
+        const response = await fetch(webAppUrl + separator + 'action=status&t=' + Date.now(), { method: 'GET', cache: 'no-store' });
+        const status = await response.json();
+        // Kode lama tidak mengenal action=status sehingga apiVersion kosong (NaN).
+        // NaN < 2 bernilai false, jadi bandingkan dengan >= agar kode lama pasti terdeteksi.
+        if (!status || status.ok !== true || !(Number(status.apiVersion) >= REQUIRED_API_VERSION)) {
+          return fail('Web App masih memakai kode lama. Di Apps Script: tempel Code.gs terbaru, lalu Deploy → Manage deployments → ikon pensil → Version: New version → Deploy.');
+        }
+        if (!status.passwordReady) {
+          return fail('Password admin belum disiapkan. Di Apps Script, jalankan fungsi initializeAdminPassword() satu kali.');
+        }
+        connectionReady = true;
+        showStatus(statusBox, status.spreadsheetReady
+          ? '✓ Terhubung ke Google Sheet CMS. Silakan login.'
+          : '✓ Terhubung. Spreadsheet CMS akan dibuat otomatis saat login pertama.', 'success');
+        return true;
+      } catch (error) {
+        return fail('Tidak dapat menghubungi Web App. Pastikan Web App di-deploy dengan "Who has access: Anyone" dan URL di cms-config.js benar.');
+      }
+    }
+    $('#retryConn').addEventListener('click', checkConnection);
+    checkConnection();
+
+    $('#loginForm').addEventListener('submit', async event => {
+      event.preventDefault();
+      const button = $('#loginForm button[type="submit"]');
+      button.disabled = true;
+      try {
+        // Bila koneksi belum siap (mis. URL baru saja diperbaiki), periksa ulang dulu sebelum
+        // mengirim password.
+        if (!connectionReady && !(await checkConnection())) {
+          showStatus($('#loginStatus'), 'Login belum bisa dilakukan. Perbaiki masalah koneksi di atas, lalu coba lagi.', 'error');
+          return;
+        }
+        showStatus($('#loginStatus'), 'Memeriksa password...', '');
+        const result = await serverCall('loginAdmin', $('#adminPassword').value);
+        if (!result || !result.ok) throw new Error(result && result.message ? result.message : 'Login gagal.');
+        sessionToken = result.token;
+        $('#adminPassword').value = '';
+        showStatus($('#loginStatus'), '', '');
+        $('#loginWrap').hidden = true;
+        $('#dashboard').hidden = false;
+        $('#logoutBtn').hidden = false;
+        await loadDashboard();
+      } catch (error) {
+        showStatus($('#loginStatus'), error.message, 'error');
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    $('#logoutBtn').addEventListener('click', async () => {
+      try { await serverCall('logoutAdmin', sessionToken); } catch (error) {}
+      sessionToken = '';
+      $('#dashboard').hidden = true;
+      $('#logoutBtn').hidden = true;
+      $('#sheetLink').hidden = true;
+      $('#loginWrap').hidden = false;
+      $('#adminPassword').value = '';
+      showStatus($('#loginStatus'), 'Anda sudah keluar dari panel admin.', 'success');
+    });
+
+    async function loadDashboard() {
+      try {
+        const data = await serverCall('getAdminContent', sessionToken);
+        currentData = data;
+        const sheetLink = $('#sheetLink');
+        if (data.spreadsheetUrl) { sheetLink.href = data.spreadsheetUrl; sheetLink.hidden = false; }
+        $$('[data-setting]').forEach(input => { input.value = data.settings[input.name] == null ? '' : data.settings[input.name]; });
+        renderServices(data.services || []);
+        renderProjects(data.projects || []);
+        renderTour(data.tour || []);
+      } catch (error) {
+        showStatus($('#saveStatus'), error.message, 'error');
+        if (error.message.toLowerCase().includes('sesi')) $('#logoutBtn').click();
+      }
+    }
+
+    $$('.tab').forEach(tab => tab.addEventListener('click', () => {
+      $$('.tab').forEach(item => item.classList.toggle('active', item === tab));
+      $$('.view').forEach(view => view.hidden = view.id !== 'view-' + tab.dataset.view);
+    }));
+
+    function itemMarkup(type, item = {}) {
+      const isService = type === 'service';
+      const isProject = type === 'project';
+      const fields = isService ? `
+        <div class="item-field"><label>Ikon / Emoji</label><input data-field="icon" value="${escapeHtml(item.icon || '')}" placeholder="⚡"></div>
+        <div class="item-field"><label>Nama layanan</label><input data-field="title" value="${escapeHtml(item.title || '')}" placeholder="Nama layanan" required></div>
+        <div class="item-field full"><label>Deskripsi</label><textarea data-field="description" placeholder="Jelaskan layanan">${escapeHtml(item.description || '')}</textarea></div>
+        <div class="item-field full"><label>Daftar poin (satu poin per baris)</label><textarea data-field="bullets" placeholder="Instalasi\nPerawatan\nKonsultasi">${escapeHtml((item.bullets || []).join('\n'))}</textarea></div>` : isProject ? `
+        <div class="item-field"><label>Kategori (kode singkat)</label><select data-field="category"><option value="electrical">electrical</option><option value="pju">pju</option><option value="supplier">supplier</option><option value="maintenance">maintenance</option><option value="construction">construction</option><option value="lainnya">lainnya</option></select></div>
+        <div class="item-field"><label>Label kategori yang tampil</label><input data-field="label" value="${escapeHtml(item.label || '')}" placeholder="Mechanical & Electrical"></div>
+        <div class="item-field full"><label>Nama / judul proyek</label><input data-field="title" value="${escapeHtml(item.title || '')}" placeholder="Nama proyek" required></div>
+        <div class="item-field full"><label>URL foto (diisi otomatis setelah upload juga bisa)</label><input data-field="image" value="${escapeHtml(item.image || '')}" placeholder="https://... atau img/foto.jpg"></div>
+        <div class="item-field full"><label>Upload foto dari perangkat</label><div class="upload-row"><input type="file" data-upload accept="image/png,image/jpeg,image/webp,image/gif"><button type="button" class="btn secondary small" data-upload-button>Upload Foto</button><span class="help" data-upload-status></span></div></div>` : `
+        <div class="item-field"><label>Ikon / Emoji</label><input data-field="icon" value="${escapeHtml(item.icon || '')}" placeholder="🌴"></div>
+        <div class="item-field"><label>Nama layanan perjalanan</label><input data-field="title" value="${escapeHtml(item.title || '')}" placeholder="Paket Wisata" required></div>
+        <div class="item-field full"><label>Deskripsi</label><textarea data-field="description" placeholder="Deskripsi singkat">${escapeHtml(item.description || '')}</textarea></div>`;
+      const active = item.active !== false;
+      return `<article class="item-editor" data-type="${type}" data-id="${escapeHtml(item.id || '')}">
+        <div class="item-top"><strong>${isService ? 'Kartu Layanan' : isProject ? 'Kartu Portofolio' : 'Kartu Tour & Travel'}</strong><button type="button" class="btn danger small" data-remove>Hapus</button></div>
+        <div class="item-fields">${fields}</div>
+        <div class="checks"><label class="check"><input type="checkbox" data-field="active" ${active ? 'checked' : ''}> Tampilkan di website</label>${isProject ? `<label class="check"><input type="checkbox" data-field="featured" ${item.featured ? 'checked' : ''}> Jadikan kartu unggulan</label>` : ''}</div>
+      </article>`;
+    }
+
+    function renderServices(items) {
+      $('#servicesList').innerHTML = items.length ? items.map(item => itemMarkup('service', item)).join('') : '<div class="empty">Belum ada layanan. Klik “Tambah Layanan” untuk membuat konten baru.</div>';
+    }
+    function renderProjects(items) {
+      $('#projectsList').innerHTML = items.length ? items.map(item => itemMarkup('project', item)).join('') : '<div class="empty">Belum ada proyek. Klik “Tambah Proyek” untuk menambahkan portofolio.</div>';
+      $$('#projectsList [data-field="category"]').forEach((select, index) => { select.value = items[index] && items[index].category ? items[index].category : 'lainnya'; });
+    }
+    function renderTour(items) {
+      $('#tourList').innerHTML = items.length ? items.map(item => itemMarkup('tour', item)).join('') : '<div class="empty">Belum ada konten. Klik “Tambah Konten” untuk menambahkan layanan perjalanan.</div>';
+    }
+
+    function addItem(type) {
+      const target = type === 'service' ? $('#servicesList') : type === 'project' ? $('#projectsList') : $('#tourList');
+      const empty = $('.empty', target);
+      if (empty) empty.remove();
+      target.insertAdjacentHTML('beforeend', itemMarkup(type, { id: type + '-' + Date.now(), active: true }));
+    }
+    $('#addService').addEventListener('click', () => addItem('service'));
+    $('#addProject').addEventListener('click', () => addItem('project'));
+    $('#addTour').addEventListener('click', () => addItem('tour'));
+
+    document.addEventListener('click', async event => {
+      const removeButton = event.target.closest('[data-remove]');
+      if (removeButton) {
+        removeButton.closest('.item-editor').remove();
+        return;
+      }
+      const uploadButton = event.target.closest('[data-upload-button]');
+      if (uploadButton) {
+        const card = uploadButton.closest('.item-editor');
+        const fileInput = $('[data-upload]', card);
+        const file = fileInput.files && fileInput.files[0];
+        const status = $('[data-upload-status]', card);
+        if (!file) { status.textContent = 'Pilih foto terlebih dahulu.'; return; }
+        if (file.size > 6 * 1024 * 1024) { status.textContent = 'Maksimal 6 MB.'; return; }
+        uploadButton.disabled = true;
+        status.textContent = 'Mengunggah...';
+        try {
+          const dataUrl = await fileToDataUrl(file);
+          const result = await serverCall('uploadImage', sessionToken, file.name, file.type, dataUrl);
+          $('[data-field="image"]', card).value = result.url;
+          status.textContent = 'Foto berhasil diunggah.';
+        } catch (error) {
+          status.textContent = error.message;
+        } finally {
+          uploadButton.disabled = false;
+        }
+      }
+    });
+
+    function fileToDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error('Gagal membaca file gambar.'));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function collectItems(container, type) {
+      return $$('.item-editor', container).map((card, index) => {
+        const value = key => { const input = $(`[data-field="${key}"]`, card); return input ? (input.type === 'checkbox' ? input.checked : input.value.trim()) : ''; };
+        const item = { id: card.dataset.id || type + '-' + (index + 1), active: value('active') };
+        if (type === 'service') Object.assign(item, { icon: value('icon'), title: value('title'), description: value('description'), bullets: value('bullets').split(/\r?\n/).map(text => text.trim()).filter(Boolean) });
+        if (type === 'project') Object.assign(item, { category: value('category'), label: value('label'), title: value('title'), image: value('image'), featured: value('featured') });
+        if (type === 'tour') Object.assign(item, { icon: value('icon'), title: value('title'), description: value('description') });
+        return item;
+      }).filter(item => item.title);
+    }
+
+    async function saveAll() {
+      const settings = {};
+      $$('[data-setting]').forEach(input => settings[input.name] = input.value.trim());
+      const payload = {
+        settings,
+        services: collectItems($('#servicesList'), 'service'),
+        projects: collectItems($('#projectsList'), 'project'),
+        tour: collectItems($('#tourList'), 'tour')
+      };
+      const button = $('#saveAllBtn');
+      button.disabled = true;
+      showStatus($('#saveStatus'), 'Menyimpan perubahan...', '');
+      try {
+        const result = await serverCall('saveAdminContent', sessionToken, payload);
+        showStatus($('#saveStatus'), result.message || 'Berhasil disimpan.', 'success');
+        currentData = payload;
+      } catch (error) {
+        showStatus($('#saveStatus'), error.message, 'error');
+      } finally {
+        button.disabled = false;
+      }
+    }
+    $('#saveAllBtn').addEventListener('click', saveAll);
+    $('#settingsForm').addEventListener('submit', event => { event.preventDefault(); saveAll(); });
+  </script>
+</body>
+</html>
